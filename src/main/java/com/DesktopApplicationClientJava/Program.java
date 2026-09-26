@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 public class Program extends Application {
     final static double windowWidthPx = 200.0;
     final static double windowHeightPx = 100.0;
+    int times = 0;
 
     public static void main(String[] args) {
         launch(args);
@@ -22,7 +23,12 @@ public class Program extends Application {
         text.setLayoutX(windowWidthPx / 2);
         text.setLayoutY(windowHeightPx / 2);
 
-        Button button = new Button("Button");
+        Button button = new Button("You haven't clicked me!");
+        button.setOnAction(e -> {
+                times++;
+                button.setText("You've clicked " + times + " times");
+        });
+
         Group group = new Group(button);
 
         FlowPane root = new FlowPane(text, group);
