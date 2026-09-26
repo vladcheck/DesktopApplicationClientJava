@@ -9,8 +9,8 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Program extends Application {
-    final static double windowWidthPx = 200.0;
-    final static double windowHeightPx = 100.0;
+    final static double windowWidthPx = 400.0;
+    final static double windowHeightPx = 300.0;
 
     public static void main(String[] args) {
         launch(args);
@@ -18,8 +18,9 @@ public class Program extends Application {
 
     @Override
     public void start(Stage stage) throws IOException {
-        Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("fxml/LoginForm.fxml"));
         Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("styles.css").toExternalForm());
 
         stage.setScene(scene);
         stage.setTitle("JavaFX Application");

@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import javafx.scene.Group?>
-<?import javafx.scene.control.Button?>
-<Group xmlns:fx="http://javafx.com/fxml/1" fx:id="root" fx:controller="com.DesktopApplicationClientJava.MainController" >
-    <Button text="Hello FXML" onAction="#click" fx:id="button" />
-</Group>
