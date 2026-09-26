@@ -1,37 +1,24 @@
 package com.DesktopApplicationClientJava;
 
+import java.io.IOException;
+
 import javafx.application.Application;
-import javafx.scene.Group;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class Program extends Application {
     final static double windowWidthPx = 200.0;
     final static double windowHeightPx = 100.0;
-    int times = 0;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage stage) {
-        Text text = new Text("Hello JAVAFX!");
-        text.setLayoutX(windowWidthPx / 2);
-        text.setLayoutY(windowHeightPx / 2);
-
-        Button button = new Button("You haven't clicked me!");
-        button.setOnAction(e -> {
-                times++;
-                button.setText("You've clicked " + times + " times");
-        });
-
-        Group group = new Group(button);
-
-        FlowPane root = new FlowPane(text, group);
+    public void start(Stage stage) throws IOException {
+        Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
         Scene scene = new Scene(root);
 
         stage.setScene(scene);
