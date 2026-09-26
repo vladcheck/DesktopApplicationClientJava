@@ -3,6 +3,6 @@
 <?import java.lang.*?>
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
-<Group xmlns:fx="http://javafx.com/fxml/1">
-    <Button xmlns:fx="http://javafx.com/fxml/1" text="Hello FXML" />
+<Group xmlns:fx="http://javafx.com/fxml/1" fx:id="root" fx:controller="com.DesktopApplicationClientJava.MainController" >
+    <Button text="Hello FXML" onAction="#click" fx:id="button" />
 </Group>
