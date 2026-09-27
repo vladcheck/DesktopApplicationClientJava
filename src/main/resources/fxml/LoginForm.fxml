@@ -28,6 +28,12 @@
         </HBox>
         <Label fx:id="lastNameErrorLabel" styleClass="error-label" managed="false" visible="false"/>
 
+          <HBox spacing="5" alignment="CENTER">
+            <Label text="Отчество" labelFor="$thirdNameField"/>
+            <TextField promptText="Антонович" fx:id="thirdNameField"/>
+        </HBox>
+        <Label fx:id="thirdNameErrorLabel" styleClass="error-label" managed="false" visible="false"/>
+
         <HBox spacing="5" alignment="CENTER">
             <Label text="Почта" labelFor="$emailField"/>
             <TextField promptText="youremail@example.com" fx:id="emailField"/>
