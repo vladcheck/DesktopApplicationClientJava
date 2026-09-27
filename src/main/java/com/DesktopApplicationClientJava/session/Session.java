@@ -1,6 +1,6 @@
 package com.DesktopApplicationClientJava.session;
 
-import com.DesktopApplicationClientJava.User;
+import com.DesktopApplicationClientJava.entities.User;
 
 import lombok.NoArgsConstructor;
 

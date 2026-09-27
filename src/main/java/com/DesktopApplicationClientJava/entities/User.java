@@ -1,4 +1,4 @@
-package com.DesktopApplicationClientJava;
+package com.DesktopApplicationClientJava.entities;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

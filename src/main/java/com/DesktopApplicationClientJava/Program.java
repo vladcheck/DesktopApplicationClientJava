@@ -3,6 +3,7 @@ package com.DesktopApplicationClientJava;
 import java.io.IOException;
 
 import com.DesktopApplicationClientJava.session.Session;
+import com.DesktopApplicationClientJava.utils.ControllerWiring;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

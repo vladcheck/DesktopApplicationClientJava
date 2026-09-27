@@ -1,4 +1,4 @@
-package com.DesktopApplicationClientJava;
+package com.DesktopApplicationClientJava.utils;
 
 import com.DesktopApplicationClientJava.navigation.Navigator;
 import com.DesktopApplicationClientJava.navigation.NavigatorAware;
