@@ -14,7 +14,7 @@ import javafx.stage.Stage;
 public class Program extends Application {
     private final Session session = new Session();
     private final static double windowWidthPx = 400.0;
-    private final static double windowHeightPx = 300.0;
+    private final static double windowHeightPx = 400.0;
 
     public static void main(String[] args) {
         launch(args);

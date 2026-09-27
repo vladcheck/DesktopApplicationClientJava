@@ -7,6 +7,7 @@ import com.DesktopApplicationClientJava.validation.EmailValidator;
 import com.DesktopApplicationClientJava.validation.FirstNameValidator;
 import com.DesktopApplicationClientJava.validation.LastNameValidator;
 import com.DesktopApplicationClientJava.validation.PasswordValidator;
+import com.DesktopApplicationClientJava.validation.ThirdNameValidator;
 import com.DesktopApplicationClientJava.validation.utils.Validator;
 
 import javafx.event.ActionEvent;
@@ -30,6 +31,12 @@ public class LoginFormController extends Controller {
     private FieldError lastNameError;
 
     @FXML
+    private TextField thirdNameField;
+    @FXML
+    private Label thirdNameErrorLabel;
+    private FieldError thirdNameError;
+
+    @FXML
     private TextField emailField;
     @FXML
     private Label emailErrorLabel;
@@ -48,6 +55,7 @@ public class LoginFormController extends Controller {
     private void initialize() {
         firstNameError = new FieldError(firstNameErrorLabel);
         lastNameError = new FieldError(lastNameErrorLabel);
+        thirdNameError = new FieldError(thirdNameErrorLabel);
         emailError = new FieldError(emailErrorLabel);
         passwordError = new FieldError(passwordErrorLabel);
 
@@ -69,7 +77,7 @@ public class LoginFormController extends Controller {
     }
 
     private boolean isValid() {
-        return isFirstNameValid() & isLastNameValid() & isEmailValid() & isPasswordValid();
+        return isFirstNameValid() & isLastNameValid() & isThirdNameValid() & isEmailValid() & isPasswordValid();
     }
 
     private boolean isFirstNameValid() {
@@ -78,6 +86,10 @@ public class LoginFormController extends Controller {
 
     private boolean isLastNameValid() {
         return isFieldValid(lastNameField, new LastNameValidator(), lastNameError);
+    }
+
+    private boolean isThirdNameValid() {
+        return isFieldValid(thirdNameField, new ThirdNameValidator(), thirdNameError);
     }
 
     private boolean isEmailValid() {
