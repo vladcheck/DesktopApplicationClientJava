@@ -12,9 +12,7 @@
 
     <name>DesktopApplicationClientJava</name>
     <description>DesktopApplicationClientJava</description>
-    <url>
-        https://github.com/vladcheck/DesktopApplicationClientJava
-    </url>
+    <url>https://github.com/vladcheck/DesktopApplicationClientJava</url>
 
     <properties>
         <encoding>UTF-8</encoding>
@@ -26,9 +24,39 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>openjfx-monocle</artifactId>
+            <version>21.0.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-junit5</artifactId>
+            <version>4.0.18</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.testfx</groupId>
+            <artifactId>testfx-core</artifactId>
+            <version>4.0.18</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>11</version>
+            <version>27</version>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -47,9 +75,36 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+                <configuration>
+                    <argLine>
+                        -Dtestfx.headless=true
+                        -Dtestfx.robot=glass
+                        -Dglass.platform=Monocle
+                        -Dmonocle.platform=Headless
+                        -Dprism.order=sw
+                        -Dprism.text=t2k
+                        -Djava.awt.headless=true
+                        --enable-native-access=ALL-UNNAMED
+                    </argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.14.1</version>
                 <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>1.18.48</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-proc:full</arg>
+                    </compilerArgs>
                     <release>25</release>
                 </configuration>
             </plugin>

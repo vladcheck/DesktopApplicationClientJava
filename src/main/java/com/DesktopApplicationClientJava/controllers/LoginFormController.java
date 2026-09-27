@@ -1,5 +1,14 @@
 package com.DesktopApplicationClientJava.controllers;
 
+import com.DesktopApplicationClientJava.FieldError;
+import com.DesktopApplicationClientJava.User;
+import com.DesktopApplicationClientJava.controllers.utils.Controller;
+import com.DesktopApplicationClientJava.validation.EmailValidator;
+import com.DesktopApplicationClientJava.validation.FirstNameValidator;
+import com.DesktopApplicationClientJava.validation.LastNameValidator;
+import com.DesktopApplicationClientJava.validation.PasswordValidator;
+import com.DesktopApplicationClientJava.validation.utils.Validator;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -7,8 +16,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
-public class LoginFormController {
-    private static final int MIN_PASSWORD_LENGTH = 8;
+public class LoginFormController extends Controller {
+    @FXML
+    private TextField firstNameField;
+    @FXML
+    private Label firstNameErrorLabel;
+    private FieldError firstNameError;
+
+    @FXML
+    private TextField lastNameField;
+    @FXML
+    private Label lastNameErrorLabel;
+    private FieldError lastNameError;
 
     @FXML
     private TextField emailField;
@@ -27,6 +46,8 @@ public class LoginFormController {
 
     @FXML
     private void initialize() {
+        firstNameError = new FieldError(firstNameErrorLabel);
+        lastNameError = new FieldError(lastNameErrorLabel);
         emailError = new FieldError(emailErrorLabel);
         passwordError = new FieldError(passwordErrorLabel);
 
@@ -36,52 +57,49 @@ public class LoginFormController {
 
     @FXML
     private void onSubmit(ActionEvent event) {
-        if (!isValid()) {
+        if (!isValid())
             return;
-        }
+
+        User user = authenticate(firstNameField.getText(), lastNameField.getText(), emailField.getText());
+        if (user == null)
+            return;
+
+        session.setCurrentUser(user);
+        navigator.goTo("/fxml/Search.fxml");
     }
 
     private boolean isValid() {
-        return isEmailValid() & isPasswordValid();
+        return isFirstNameValid() & isLastNameValid() & isEmailValid() & isPasswordValid();
+    }
+
+    private boolean isFirstNameValid() {
+        return isFieldValid(firstNameField, new FirstNameValidator(), firstNameError);
+    }
+
+    private boolean isLastNameValid() {
+        return isFieldValid(lastNameField, new LastNameValidator(), lastNameError);
     }
 
     private boolean isEmailValid() {
-        String email = emailField.getText();
-
-        if (email.isBlank()) {
-            emailError.show("Это поле обязательно для заполнения");
-            return false;
-        }
-        if (email.length() < 5) {
-            emailError.show("Почта не может быть короче 5 символов");
-            return false;
-        }
-        if (email.length() > 100) {
-            emailError.show("Почта не должна быть длиннее 100 символов");
-            return false;
-        }
-        if (!email.contains("@")) {
-            emailError.show("Неверный формат почты");
-            return false;
-        }
-
-        emailError.hide();
-        return true;
+        return isFieldValid(emailField, new EmailValidator(), emailError);
     }
 
     private boolean isPasswordValid() {
-        String pw = passwordField.getText();
+        return isFieldValid(passwordField, new PasswordValidator(), passwordError);
+    }
 
-        if (pw.isBlank()) {
-            passwordError.show("Это поле обязательно для заполнения");
-            return false;
+    private boolean isFieldValid(TextField field, Validator validator, FieldError errorLabel) {
+        String input = field.getText();
+        var error = validator.isValid(input);
+        if (error == null) {
+            errorLabel.hide();
+            return true;
         }
-        if (pw.length() < MIN_PASSWORD_LENGTH) {
-            passwordError.show("Пароль не может быть короче " + MIN_PASSWORD_LENGTH + " символов");
-            return false;
-        }
+        errorLabel.show(error);
+        return false;
+    }
 
-        passwordError.hide();
-        return true;
+    private User authenticate(String firstName, String lastName, String email) {
+        return new User(firstName, lastName, email);
     }
 }
