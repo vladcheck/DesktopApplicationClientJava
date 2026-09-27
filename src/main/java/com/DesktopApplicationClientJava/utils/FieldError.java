@@ -1,4 +1,4 @@
-package com.DesktopApplicationClientJava;
+package com.DesktopApplicationClientJava.utils;
 
 import javafx.scene.control.Label;
 

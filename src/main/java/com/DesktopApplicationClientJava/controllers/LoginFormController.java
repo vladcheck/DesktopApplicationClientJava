@@ -1,8 +1,8 @@
 package com.DesktopApplicationClientJava.controllers;
 
-import com.DesktopApplicationClientJava.FieldError;
-import com.DesktopApplicationClientJava.User;
 import com.DesktopApplicationClientJava.controllers.utils.Controller;
+import com.DesktopApplicationClientJava.entities.User;
+import com.DesktopApplicationClientJava.utils.FieldError;
 import com.DesktopApplicationClientJava.validation.EmailValidator;
 import com.DesktopApplicationClientJava.validation.FirstNameValidator;
 import com.DesktopApplicationClientJava.validation.LastNameValidator;
