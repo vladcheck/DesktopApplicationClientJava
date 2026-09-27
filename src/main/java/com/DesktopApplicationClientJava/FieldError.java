@@ -1,15 +1,15 @@
-package com.DesktopApplicationClientJava.controllers;
+package com.DesktopApplicationClientJava;
 
 import javafx.scene.control.Label;
 
-class FieldError {
+public class FieldError {
     private final Label label;
 
-    FieldError(Label label) {
+    public FieldError(Label label) {
         this.label = label;
     }
 
-    void show(String message) {
+    public void show(String message) {
         if (label == null)
             return;
         label.setText(message);
@@ -17,14 +17,14 @@ class FieldError {
         label.setManaged(true);
     }
 
-    void hide() {
+    public void hide() {
         if (label == null)
             return;
         label.setVisible(false);
         label.setManaged(false);
     }
 
-    boolean isShowing() {
+    public boolean isShowing() {
         return label.isVisible();
     }
 }

@@ -16,13 +16,25 @@
 
         <Label text="Госхрон" styleClass="h1"/>
 
-        <HBox spacing="5">
+         <HBox spacing="5" alignment="CENTER">
+            <Label text="Имя" labelFor="$firstNameField"/>
+            <TextField promptText="Антон" fx:id="firstNameField"/>
+        </HBox>
+        <Label fx:id="firstNameErrorLabel" styleClass="error-label" managed="false" visible="false"/>
+
+         <HBox spacing="5" alignment="CENTER">
+            <Label text="Фамилия" labelFor="$lastNameField"/>
+            <TextField promptText="Антонов" fx:id="lastNameField"/>
+        </HBox>
+        <Label fx:id="lastNameErrorLabel" styleClass="error-label" managed="false" visible="false"/>
+
+        <HBox spacing="5" alignment="CENTER">
             <Label text="Почта" labelFor="$emailField"/>
             <TextField promptText="youremail@example.com" fx:id="emailField"/>
         </HBox>
         <Label fx:id="emailErrorLabel" styleClass="error-label" managed="false" visible="false"/>
 
-        <HBox spacing="5">
+        <HBox spacing="5" alignment="CENTER">
             <Label text="Пароль" labelFor="$passwordField"/>
             <PasswordField fx:id="passwordField"/>
         </HBox>
