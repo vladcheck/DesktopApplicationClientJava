@@ -1,5 +1,5 @@
 package com.DesktopApplicationClientJava.navigation;
 
 public interface NavigatorAware {
-    void setNavigator(Navigator navigator);
+  void setNavigator(Navigator navigator);
 }

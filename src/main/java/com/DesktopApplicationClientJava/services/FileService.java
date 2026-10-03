@@ -1,4 +1,3 @@
 package com.DesktopApplicationClientJava.services;
 
-public class FileService {
-}
+public class FileService {}

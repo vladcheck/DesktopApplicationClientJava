@@ -5,10 +5,9 @@ import java.util.List;
 import java.util.UUID;
 
 public record ResourceDto(
-        UUID uuid,
-        String title,
-        String description,
-        LocalDateTime createdAt,
-        LocalDateTime updatedAt,
-        List<FileDto> files
-) {}
+    UUID uuid,
+    String title,
+    String description,
+    LocalDateTime createdAt,
+    LocalDateTime updatedAt,
+    List<FileDto> files) {}
