@@ -1,5 +1,6 @@
 package com.DesktopApplicationClientJava.entities;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,11 +11,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Resource {
   private UUID uuid;
-  private String email;
-  private Role role;
-  private String firstName;
-  private String lastName;
-  private Boolean enabled;
+  private String title;
+  private String description;
+  private LocalDateTime createdAt;
+  private LocalDateTime updatedAt;
 }
