@@ -1,20 +1,20 @@
 package com.DesktopApplicationClientJava.Api;
 
-import dto.Error.ErrorResponse;
+import com.DesktopApplicationClientJava.Api.Dto.error.ErrorResponse;
 
 public class ApiException extends RuntimeException {
-    private final ErrorResponse errorResponse;
+  private final ErrorResponse errorResponse;
 
-    public ApiException(ErrorResponse errorResponse) {
-        super(errorResponse.message());
-        this.errorResponse = errorResponse;
-    }
+  public ApiException(ErrorResponse errorResponse) {
+    super(errorResponse.message());
+    this.errorResponse = errorResponse;
+  }
 
-    public ErrorResponse getErrorResponse() {
-        return errorResponse;
-    }
+  public ErrorResponse getErrorResponse() {
+    return errorResponse;
+  }
 
-    public int getStatus() {
-        return errorResponse.status();
-    }
+  public int getStatus() {
+    return errorResponse.status();
+  }
 }
