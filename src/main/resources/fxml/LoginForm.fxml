@@ -8,44 +8,45 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.geometry.Insets?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" fx:controller="com.DesktopApplicationClientJava.controllers.LoginFormController">
+<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
+    fx:controller="com.DesktopApplicationClientJava.controllers.LoginFormController">
     <VBox spacing="5">
         <padding>
-            <Insets top="10" right="10" bottom="10" left="10"/>
+            <Insets top="10" right="10" bottom="10" left="10" />
         </padding>
 
-        <Label text="Госхрон" styleClass="h1"/>
-
-         <HBox spacing="5" alignment="CENTER">
-            <Label text="Имя" labelFor="$firstNameField"/>
-            <TextField promptText="Антон" fx:id="firstNameField"/>
-        </HBox>
-        <Label fx:id="firstNameErrorLabel" styleClass="error-label" managed="false" visible="false"/>
-
-         <HBox spacing="5" alignment="CENTER">
-            <Label text="Фамилия" labelFor="$lastNameField"/>
-            <TextField promptText="Антонов" fx:id="lastNameField"/>
-        </HBox>
-        <Label fx:id="lastNameErrorLabel" styleClass="error-label" managed="false" visible="false"/>
-
-          <HBox spacing="5" alignment="CENTER">
-            <Label text="Отчество" labelFor="$thirdNameField"/>
-            <TextField promptText="Антонович" fx:id="thirdNameField"/>
-        </HBox>
-        <Label fx:id="thirdNameErrorLabel" styleClass="error-label" managed="false" visible="false"/>
+        <Label text="Госхрон" styleClass="h1" />
 
         <HBox spacing="5" alignment="CENTER">
-            <Label text="Почта" labelFor="$emailField"/>
-            <TextField promptText="youremail@example.com" fx:id="emailField"/>
+            <Label text="Имя" labelFor="$firstNameField" />
+            <TextField promptText="Антон" fx:id="firstNameField" />
         </HBox>
-        <Label fx:id="emailErrorLabel" styleClass="error-label" managed="false" visible="false"/>
+        <Label fx:id="firstNameErrorLabel" styleClass="error-label" managed="false" visible="false" />
 
         <HBox spacing="5" alignment="CENTER">
-            <Label text="Пароль" labelFor="$passwordField"/>
-            <PasswordField fx:id="passwordField"/>
+            <Label text="Фамилия" labelFor="$lastNameField" />
+            <TextField promptText="Антонов" fx:id="lastNameField" />
         </HBox>
-        <Label fx:id="passwordErrorLabel" styleClass="error-label" managed="false" visible="false"/>
+        <Label fx:id="lastNameErrorLabel" styleClass="error-label" managed="false" visible="false" />
 
-        <Button text="Войти" fx:id="submitButton" onAction="#onSubmit"/>
+        <HBox spacing="5" alignment="CENTER">
+            <Label text="Отчество" labelFor="$thirdNameField" />
+            <TextField promptText="Антонович" fx:id="thirdNameField" />
+        </HBox>
+        <Label fx:id="thirdNameErrorLabel" styleClass="error-label" managed="false" visible="false" />
+
+        <HBox spacing="5" alignment="CENTER">
+            <Label text="Почта" labelFor="$emailField" />
+            <TextField promptText="youremail@example.com" fx:id="emailField" />
+        </HBox>
+        <Label fx:id="emailErrorLabel" styleClass="error-label" managed="false" visible="false" />
+
+        <HBox spacing="5" alignment="CENTER">
+            <Label text="Пароль" labelFor="$passwordField" />
+            <PasswordField fx:id="passwordField" />
+        </HBox>
+        <Label fx:id="passwordErrorLabel" styleClass="error-label" managed="false" visible="false" />
+
+        <Button text="Войти" fx:id="submitButton" onAction="#onSubmit" />
     </VBox>
 </VBox>
