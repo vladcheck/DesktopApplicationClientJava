@@ -37,7 +37,8 @@ public class ApiClient {
     this.objectMapper = new ObjectMapper();
     this.objectMapper.registerModule(new JavaTimeModule());
 
-    this.httpController = new HttpController(baseUrl, httpClient, objectMapper, refreshToken, accessToken);
+    this.httpController =
+        new HttpController(baseUrl, httpClient, objectMapper, refreshToken, accessToken);
     this.authHandler = new AuthHandler(httpController);
     this.userHandler = new UserHandler(httpController);
     this.resourceHandler = new ResourceHandler(httpController);
@@ -47,11 +48,12 @@ public class ApiClient {
 
   // Получение информации пользователя о себе
   public UserDto getMe() throws IOException, InterruptedException {
-    HttpRequest httpRequest = HttpRequest.newBuilder()
-        .uri(URI.create(baseUrl + "/api/v1/user/me"))
-        .header("Authorization", "Bearer " + accessToken)
-        .GET()
-        .build();
+    HttpRequest httpRequest =
+        HttpRequest.newBuilder()
+            .uri(URI.create(baseUrl + "/api/v1/user/me"))
+            .header("Authorization", "Bearer " + accessToken)
+            .GET()
+            .build();
 
     HttpResponse<String> response = httpController.send(httpRequest);
     httpController.checkError(response);
