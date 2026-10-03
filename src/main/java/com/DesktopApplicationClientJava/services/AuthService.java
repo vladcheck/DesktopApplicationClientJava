@@ -1,11 +1,5 @@
-package dto.Error;
+package com.DesktopApplicationClientJava.services;
 
-public record ErrorResponse(
-        String message,
-        int status,
-        long timestamp
-) {
-    public ErrorResponse(String message, int status) {
-        this(message, status, System.currentTimeMillis());
-    }
+public class AuthService {
+
 }
