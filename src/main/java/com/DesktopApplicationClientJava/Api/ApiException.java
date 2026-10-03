@@ -1,6 +1,6 @@
 package com.DesktopApplicationClientJava.Api;
 
-import dto.Error.ErrorResponse;
+import com.DesktopApplicationClientJava.Api.Dto.error.ErrorResponse;
 
 public class ApiException extends RuntimeException {
     private final ErrorResponse errorResponse;

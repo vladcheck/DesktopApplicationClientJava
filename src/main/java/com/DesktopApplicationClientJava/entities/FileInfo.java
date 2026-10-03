@@ -11,11 +11,9 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class FileInfo {
     private UUID uuid;
-    private String email;
-    private Role role;
-    private String firstName;
-    private String lastName;
-    private Boolean enabled;
+    private String name;
+    private String contentType;
+    private Long size;
 }
