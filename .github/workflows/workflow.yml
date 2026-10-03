@@ -1,0 +1,36 @@
+name: PR pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+
+jobs:
+  build:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: Set up JDK
+      uses: ./.github/actions/setup-jdk
+    - name: Build with Maven
+      run: mvn -B package --file pom.xml
+    - name: Update dependency graph
+      uses: advanced-security/maven-dependency-submission-action@v5
+      continue-on-error: true
+      with:
+        directory: .
+        maven-args: "-DmergeClassifiers=true"
+
+  format:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up JDK
+        uses: ./.github/actions/setup-jdk
+      - name: Check formatting
+        run: mvn -B spotless:check --file pom.xml
