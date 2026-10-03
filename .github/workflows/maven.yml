@@ -28,3 +28,16 @@ jobs:
       with:
         directory: .
         maven-args: "-DmergeClassifiers=true"
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+      - name: Check formatting
+        run: mvn -B spotless:check --file pom.xml
