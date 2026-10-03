@@ -10,14 +10,18 @@ public class FieldError {
   }
 
   public void show(String message) {
-    if (label == null) return;
+    if (label == null) {
+      return;
+    }
     label.setText(message);
     label.setVisible(true);
     label.setManaged(true);
   }
 
   public void hide() {
-    if (label == null) return;
+    if (label == null) {
+      return;
+    }
     label.setVisible(false);
     label.setManaged(false);
   }
