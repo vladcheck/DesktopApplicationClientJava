@@ -1,5 +1,3 @@
 package com.DesktopApplicationClientJava.services;
 
-public class AuthService {
-
-}
+public class AuthService {}
