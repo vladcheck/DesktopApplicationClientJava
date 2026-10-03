@@ -1,6 +1,5 @@
 package com.DesktopApplicationClientJava.Api;
 
-import com.DesktopApplicationClientJava.Api.ApiException;
 import com.DesktopApplicationClientJava.Api.Dto.request.Admin.RegisterRequest;
 import com.DesktopApplicationClientJava.Api.Dto.request.Admin.UpdateUserRequest;
 import com.DesktopApplicationClientJava.Api.Dto.request.Admin.UserFilterRequest;
