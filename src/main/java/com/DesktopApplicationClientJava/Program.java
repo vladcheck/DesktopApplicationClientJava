@@ -16,9 +16,6 @@ public class Program extends Application {
     private final static double windowWidthPx = 400.0;
     private final static double windowHeightPx = 400.0;
 
-    public static void main(String[] args) {
-        launch(args);
-    }
 
     @Override
     public void start(Stage stage) throws IOException {
