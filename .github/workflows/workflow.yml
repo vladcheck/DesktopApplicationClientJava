@@ -48,3 +48,15 @@ jobs:
         uses: ./.github/actions/setup-jdk
       - name: Check lint
         run: mvn -B checkstyle:check --file pom.xml
+
+  junit:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK
+        uses: ./.github/actions/setup-jdk
+      - name: Run tests
+        run: mvn -B test --file pom.xml
