@@ -28,6 +28,8 @@ jobs:
   format:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - uses: actions/checkout@v5
       - name: Set up JDK
