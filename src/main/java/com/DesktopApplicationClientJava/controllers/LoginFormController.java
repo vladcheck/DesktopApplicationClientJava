@@ -1,6 +1,7 @@
 package com.DesktopApplicationClientJava.controllers;
 
 import com.DesktopApplicationClientJava.controllers.utils.Controller;
+import com.DesktopApplicationClientJava.entities.Role;
 import com.DesktopApplicationClientJava.entities.User;
 import com.DesktopApplicationClientJava.utils.FieldError;
 import com.DesktopApplicationClientJava.validation.EmailValidator;
@@ -9,6 +10,7 @@ import com.DesktopApplicationClientJava.validation.LastNameValidator;
 import com.DesktopApplicationClientJava.validation.PasswordValidator;
 import com.DesktopApplicationClientJava.validation.ThirdNameValidator;
 import com.DesktopApplicationClientJava.validation.utils.Validator;
+import java.util.UUID;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -103,6 +105,6 @@ public class LoginFormController extends Controller {
   }
 
   private User authenticate(String firstName, String lastName, String email) {
-    return new User(firstName, lastName, email);
+    return new User(UUID.randomUUID(), email, Role.USER, firstName, lastName, true);
   }
 }
