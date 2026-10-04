@@ -13,7 +13,7 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v7
     - name: Set up JDK
       uses: ./.github/actions/setup-jdk
     - name: Build with Maven
@@ -31,7 +31,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: ./.github/actions/setup-jdk
       - name: Check formatting
@@ -43,7 +43,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Set up JDK
         uses: ./.github/actions/setup-jdk
       - name: Check lint
