@@ -37,7 +37,7 @@ jobs:
       - name: Check formatting
         run: mvn -B spotless:check --file pom.xml
 
-  check-lint:
+  lint:
     needs: build
     runs-on: ubuntu-latest
     permissions:
