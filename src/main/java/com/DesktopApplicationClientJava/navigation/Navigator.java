@@ -5,6 +5,7 @@ import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.session.SessionAware;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
 import java.io.IOException;
+import java.util.function.Consumer;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.stage.Stage;
@@ -22,6 +23,10 @@ public class Navigator {
   }
 
   public void goTo(String fxmlFile) {
+    goTo(fxmlFile, controller -> {});
+  }
+
+  public void goTo(String fxmlFile, Consumer<Object> withController) {
     var url = Navigator.class.getResource(fxmlFile);
     if (url == null) {
       throw new IllegalArgumentException("FXML not found on classpath: " + fxmlFile);
@@ -49,6 +54,7 @@ public class Navigator {
       if (controller instanceof NavigatorAware na) {
         na.setNavigator(this);
       }
+      withController.accept(controller);
 
       stage.getScene().setRoot(root);
     } catch (IOException e) {

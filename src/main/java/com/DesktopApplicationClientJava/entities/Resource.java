@@ -1,6 +1,7 @@
 package com.DesktopApplicationClientJava.entities;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -17,4 +18,5 @@ public class Resource {
   private String description;
   private LocalDateTime createdAt;
   private LocalDateTime updatedAt;
+  private List<FileInfo> files;
 }

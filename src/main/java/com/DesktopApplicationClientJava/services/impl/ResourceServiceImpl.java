@@ -6,6 +6,7 @@ import com.DesktopApplicationClientJava.Api.Dto.request.Resource.CreateResourceR
 import com.DesktopApplicationClientJava.Api.Dto.request.Resource.ResourceFilterRequest;
 import com.DesktopApplicationClientJava.Api.Dto.request.Resource.UpdateResourceRequest;
 import com.DesktopApplicationClientJava.Api.Dto.response.ResourceDto;
+import com.DesktopApplicationClientJava.entities.FileInfo;
 import com.DesktopApplicationClientJava.entities.Resource;
 import com.DesktopApplicationClientJava.services.ResourceService;
 import com.DesktopApplicationClientJava.services.ServiceException;
@@ -83,7 +84,13 @@ public class ResourceServiceImpl implements ResourceService {
   }
 
   private Resource toEntity(ResourceDto dto) {
+    List<FileInfo> files =
+        dto.files() == null
+            ? List.of()
+            : dto.files().stream()
+                .map(f -> new FileInfo(f.uuid(), f.name(), f.contentType(), f.size()))
+                .toList();
     return new Resource(
-        dto.uuid(), dto.title(), dto.description(), dto.createdAt(), dto.updatedAt());
+        dto.uuid(), dto.title(), dto.description(), dto.createdAt(), dto.updatedAt(), files);
   }
 }

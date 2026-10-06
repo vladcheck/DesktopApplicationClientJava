@@ -55,7 +55,9 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public boolean hasRole(Role required) {
     User current = session.getCurrentUser();
-    return current != null && current.getRole() == required;
+    return current != null
+        && current.getRole() != null
+        && level(current.getRole()) >= level(required);
   }
 
   @Override
@@ -71,5 +73,13 @@ public class AuthServiceImpl implements AuthService {
   private User toEntity(UserDto dto) {
     return new User(
         dto.uuid(), dto.email(), dto.role(), dto.firstName(), dto.lastName(), dto.enabled());
+  }
+
+  private static int level(Role role) {
+    return switch (role) {
+      case USER -> 0;
+      case MODER -> 1;
+      case ADMIN -> 2;
+    };
   }
 }
