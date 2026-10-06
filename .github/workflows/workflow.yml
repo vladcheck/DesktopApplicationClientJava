@@ -9,9 +9,9 @@ on:
 
 jobs:
   build:
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
-    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
     - name: Set up JDK
@@ -27,7 +27,7 @@ jobs:
 
   format:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -39,7 +39,7 @@ jobs:
 
   lint:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     steps:
@@ -48,3 +48,15 @@ jobs:
         uses: ./.github/actions/setup-jdk
       - name: Check lint
         run: mvn -B checkstyle:check --file pom.xml
+
+  junit:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+      - name: Set up JDK
+        uses: ./.github/actions/setup-jdk
+      - name: Run tests
+        run: mvn -B test --file pom.xml
