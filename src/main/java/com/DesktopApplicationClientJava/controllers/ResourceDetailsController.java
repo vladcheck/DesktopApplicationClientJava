@@ -23,6 +23,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
+import lombok.Setter;
 
 public class ResourceDetailsController extends Controller {
 
@@ -42,7 +43,7 @@ public class ResourceDetailsController extends Controller {
   @FXML private TableColumn<FileInfo, Void> downloadColumn;
   @FXML private Button backButton;
 
-  private UUID resourceId;
+  @Setter private UUID resourceId;
 
   @FXML
   private void initialize() {
@@ -52,10 +53,6 @@ public class ResourceDetailsController extends Controller {
     contentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("contentType"));
     downloadColumn.setCellFactory(col -> new DownloadCell(this::onDownload));
     autoSelectFirstInMockMode();
-  }
-
-  public void setResourceId(UUID resourceId) {
-    this.resourceId = resourceId;
   }
 
   public void load() {

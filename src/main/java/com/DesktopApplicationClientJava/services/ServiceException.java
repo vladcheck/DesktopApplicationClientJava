@@ -1,5 +1,8 @@
 package com.DesktopApplicationClientJava.services;
 
+import lombok.Getter;
+
+@Getter
 public class ServiceException extends RuntimeException {
   private final int status;
 
@@ -10,9 +13,5 @@ public class ServiceException extends RuntimeException {
 
   public ServiceException(String message) {
     this(message, 0);
-  }
-
-  public int getStatus() {
-    return status;
   }
 }

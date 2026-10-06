@@ -9,9 +9,11 @@ import com.DesktopApplicationClientJava.services.mock.MockResourceService;
 import com.DesktopApplicationClientJava.services.mock.MockStore;
 import com.DesktopApplicationClientJava.services.mock.MockUsersService;
 import com.DesktopApplicationClientJava.session.Session;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
+@AllArgsConstructor
 public class ServiceRegistry {
   private final AuthService authService;
   private final UsersService usersService;
@@ -26,19 +28,6 @@ public class ServiceRegistry {
         new ResourceServiceImpl(apiClient),
         new FileServiceImpl(apiClient),
         new ExportServiceImpl(apiClient));
-  }
-
-  public ServiceRegistry(
-      AuthService authService,
-      UsersService usersService,
-      ResourceService resourceService,
-      FileService fileService,
-      ExportService exportService) {
-    this.authService = authService;
-    this.usersService = usersService;
-    this.resourceService = resourceService;
-    this.fileService = fileService;
-    this.exportService = exportService;
   }
 
   /** In-memory services for UI testing without a backend (see MOCK_DATA in Program). */
