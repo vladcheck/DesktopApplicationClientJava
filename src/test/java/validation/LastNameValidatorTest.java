@@ -7,11 +7,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.DesktopApplicationClientJava.validation.LastNameValidator;
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
-import javafx.beans.property.SimpleStringProperty;
-import net.synedra.validatorfx.Validator;
+import com.dlsc.formsfx.model.structure.Field;
+import com.dlsc.formsfx.model.structure.StringField;
+import com.dlsc.formsfx.model.validators.Validator;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class LastNameValidatorTest extends ValidatorFxTest {
+public class LastNameValidatorTest {
+
+  private static StringField fieldWith(String value) {
+    List<Validator<String>> validators = LastNameValidator.validators();
+    @SuppressWarnings("unchecked")
+    Validator<String>[] array = validators.toArray(new Validator[0]);
+    return Field.ofStringType(value).required(ErrorMessages.Required).validate(array);
+  }
 
   @Test
   void emptyLastNameIsRejected() {
@@ -24,23 +33,15 @@ public class LastNameValidatorTest extends ValidatorFxTest {
   }
 
   @Test
-  void checkRejectsEmptyLastName() {
-    Validator validator = new Validator();
-    SimpleStringProperty lastName = new SimpleStringProperty("");
-    LastNameValidator.createCheck(validator, lastName);
+  void fieldRejectsEmptyLastName() {
+    StringField field = fieldWith("");
 
-    assertFalse(validator.validate());
-    assertTrue(validator.containsErrors());
-    assertEquals(
-        ErrorMessages.Required, validator.getValidationResult().getMessages().get(0).getText());
+    assertFalse(field.isValid());
+    assertTrue(field.getErrorMessages().contains(ErrorMessages.Required));
   }
 
   @Test
-  void checkAcceptsValidLastName() {
-    Validator validator = new Validator();
-    SimpleStringProperty lastName = new SimpleStringProperty("Антонов");
-    LastNameValidator.createCheck(validator, lastName);
-
-    assertTrue(validator.validate());
+  void fieldAcceptsValidLastName() {
+    assertTrue(fieldWith("Антонов").isValid());
   }
 }

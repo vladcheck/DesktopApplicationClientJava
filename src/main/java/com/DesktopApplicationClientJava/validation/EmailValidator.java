@@ -2,15 +2,15 @@ package com.DesktopApplicationClientJava.validation;
 
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
 import com.DesktopApplicationClientJava.validation.utils.ValidatorHelpers;
-import javafx.beans.value.ObservableValue;
-import net.synedra.validatorfx.Check;
-import net.synedra.validatorfx.Validator;
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.StringLengthValidator;
+import com.dlsc.formsfx.model.validators.Validator;
+import java.util.List;
 
 public final class EmailValidator {
   public static final String FIELD_NAME = "Почта";
   public static final int MIN_EMAIL_LENGTH = 5;
   public static final int MAX_EMAIL_LENGTH = 100;
-  private static final String KEY = "value";
 
   private EmailValidator() {}
 
@@ -24,14 +24,19 @@ public final class EmailValidator {
     return null;
   }
 
-  public static void check(Check.Context context) {
-    String error = validate(context.get(KEY));
-    if (error != null) {
-      context.error(error);
-    }
+  public static List<Validator<String>> validators() {
+    return List.of(
+        CustomValidator.forPredicate(
+            input -> !ValidatorHelpers.isEmpty(input), ErrorMessages.Required),
+        StringLengthValidator.atLeast(
+            MIN_EMAIL_LENGTH, ErrorMessages.MinLength(FIELD_NAME, MIN_EMAIL_LENGTH)),
+        StringLengthValidator.upTo(
+            MAX_EMAIL_LENGTH, ErrorMessages.MaxLength(FIELD_NAME, MAX_EMAIL_LENGTH)),
+        CustomValidator.forPredicate(
+            EmailValidator::hasValidFormat, ErrorMessages.IncorrectFormat));
   }
 
-  public static Check createCheck(Validator validator, ObservableValue<String> property) {
-    return validator.createCheck().dependsOn(KEY, property).withMethod(EmailValidator::check);
+  private static boolean hasValidFormat(String input) {
+    return ValidatorHelpers.isEmpty(input) || ValidatorHelpers.includes(input, "@");
   }
 }
