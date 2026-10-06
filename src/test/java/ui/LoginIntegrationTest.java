@@ -12,12 +12,17 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
  * Integration test for the login flow: real {@link AuthService} with a real {@link ApiClient}, no
  * mocks. Requires a running backend at {@code localhost:8080}; otherwise tests are aborted.
+ *
+ * <p>Excluded from the default build and CI (see surefire {@code excludedGroups} in pom.xml). Run
+ * explicitly: {@code mvn test -Dgroups=integration -DexcludedGroups=}
  */
+@Tag("integration")
 class LoginIntegrationTest {
 
   private AuthService authService;
