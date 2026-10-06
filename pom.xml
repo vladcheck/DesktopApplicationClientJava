@@ -74,6 +74,12 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.2.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>27</version>
@@ -146,6 +152,11 @@
                         Run them explicitly:
                         mvn test -Dgroups=integration -DexcludedGroups= -->
                     <excludedGroups>${excludedGroups}</excludedGroups>
+                    <!-- Path to the local .env file for integration tests (java-dotenv).
+                        Missing file is fine: tests skip via assumeTrue. -->
+                    <systemPropertyVariables>
+                        <dotenv.path>${project.basedir}/.env</dotenv.path>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
