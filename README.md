@@ -24,6 +24,24 @@ mvn javafx:run
 в `Program.java`). Для проверки вёрстки отдельной страницы можно временно подменить
 `INITIAL_PAGE_PATH` на нужный FXML.
 
+## Git hooks
+
+Перед каждым коммитом автоматически проверяются: линт (`checkstyle:check`),
+формат (`spotless:check`) и unit-тесты (`mvn test`, без интеграционных).
+Настройка один раз на клон:
+
+```powershell
+# Windows (PowerShell 5.1 / 7+):
+.\setup.ps1
+
+# macOS / Linux:
+pip install pre-commit
+pre-commit install
+```
+
+Ручная проверка всего сразу: `pre-commit run --all-files`.
+Если упал формат — поправить: `mvn spotless:apply`.
+
 ## RBAC
 
 В системе предусмотрено 3 роли: пользователь, модератор и администратор:
