@@ -1,42 +1,18 @@
 package com.DesktopApplicationClientJava.session;
 
 import com.DesktopApplicationClientJava.entities.User;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
 @NoArgsConstructor
 public class Session {
 
   private User currentUser;
   private String accessToken;
   private String refreshToken;
-
-  // ===== user =====
-
-  public User getCurrentUser() {
-    return currentUser;
-  }
-
-  public void setCurrentUser(User user) {
-    this.currentUser = user;
-  }
-
-  // ===== tokens =====
-
-  public String getAccessToken() {
-    return accessToken;
-  }
-
-  public void setAccessToken(String accessToken) {
-    this.accessToken = accessToken;
-  }
-
-  public String getRefreshToken() {
-    return refreshToken;
-  }
-
-  public void setRefreshToken(String refreshToken) {
-    this.refreshToken = refreshToken;
-  }
 
   // ===== helpers =====
 
