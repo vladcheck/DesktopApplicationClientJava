@@ -18,6 +18,7 @@
         <encoding>UTF-8</encoding>
         <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+        <excludedGroups>integration</excludedGroups>
     </properties>
 
     <dependencyManagement>
@@ -134,6 +135,11 @@
                         -Djava.awt.headless=true
                         --enable-native-access=ALL-UNNAMED
                     </argLine>
+                    <!-- Integration tests (tag "integration") need a live backend,
+                        so they never run in the default build or CI.
+                        Run them explicitly:
+                        mvn test -Dgroups=integration -DexcludedGroups= -->
+                    <excludedGroups>${excludedGroups}</excludedGroups>
                 </configuration>
             </plugin>
             <plugin>
