@@ -4,6 +4,8 @@ import com.DesktopApplicationClientJava.controllers.utils.Controller;
 import com.DesktopApplicationClientJava.entities.FileInfo;
 import com.DesktopApplicationClientJava.entities.Resource;
 import com.DesktopApplicationClientJava.services.ServiceException;
+import com.DesktopApplicationClientJava.services.filter.ResourceFilter;
+import com.DesktopApplicationClientJava.services.mock.MockService;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -49,6 +51,7 @@ public class ResourceDetailsController extends Controller {
     sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
     contentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("contentType"));
     downloadColumn.setCellFactory(col -> new DownloadCell(this::onDownload));
+    autoSelectFirstInMockMode();
   }
 
   public void setResourceId(UUID resourceId) {
@@ -84,6 +87,26 @@ public class ResourceDetailsController extends Controller {
 
   protected File chooseDirectory(Window owner) {
     return new DirectoryChooser().showDialog(owner);
+  }
+
+  /**
+   * Dev-only fallback: when the page is opened without an id (e.g. straight via INITIAL_PAGE_PATH)
+   * against a mock service, show the first seeded resource so the UI is clickable without the
+   * resource list. Never triggers against the real backend.
+   */
+  private void autoSelectFirstInMockMode() {
+    if (resourceId != null || !(services.getResourceService() instanceof MockService mock)) {
+      return;
+    }
+    mock.doIfInitialPage();
+    services.getResourceService().search(ResourceFilter.empty(), 0, 1).stream()
+        .map(Resource::getUuid)
+        .findFirst()
+        .ifPresent(
+            id -> {
+              setResourceId(id);
+              load();
+            });
   }
 
   private void showResource(Resource resource) {

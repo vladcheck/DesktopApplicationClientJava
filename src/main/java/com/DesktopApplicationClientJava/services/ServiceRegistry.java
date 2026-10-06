@@ -2,8 +2,16 @@ package com.DesktopApplicationClientJava.services;
 
 import com.DesktopApplicationClientJava.Api.ApiClient;
 import com.DesktopApplicationClientJava.services.impl.*;
+import com.DesktopApplicationClientJava.services.mock.MockAuthService;
+import com.DesktopApplicationClientJava.services.mock.MockExportService;
+import com.DesktopApplicationClientJava.services.mock.MockFileService;
+import com.DesktopApplicationClientJava.services.mock.MockResourceService;
+import com.DesktopApplicationClientJava.services.mock.MockStore;
+import com.DesktopApplicationClientJava.services.mock.MockUsersService;
 import com.DesktopApplicationClientJava.session.Session;
+import lombok.Getter;
 
+@Getter
 public class ServiceRegistry {
   private final AuthService authService;
   private final UsersService usersService;
@@ -12,30 +20,35 @@ public class ServiceRegistry {
   private final ExportService exportService;
 
   public ServiceRegistry(ApiClient apiClient, Session session) {
-    this.authService = new AuthServiceImpl(apiClient, session);
-    this.usersService = new UsersServiceImpl(apiClient);
-    this.resourceService = new ResourceServiceImpl(apiClient);
-    this.fileService = new FileServiceImpl(apiClient);
-    this.exportService = new ExportServiceImpl(apiClient);
+    this(
+        new AuthServiceImpl(apiClient, session),
+        new UsersServiceImpl(apiClient),
+        new ResourceServiceImpl(apiClient),
+        new FileServiceImpl(apiClient),
+        new ExportServiceImpl(apiClient));
   }
 
-  public AuthService getAuthService() {
-    return authService;
+  public ServiceRegistry(
+      AuthService authService,
+      UsersService usersService,
+      ResourceService resourceService,
+      FileService fileService,
+      ExportService exportService) {
+    this.authService = authService;
+    this.usersService = usersService;
+    this.resourceService = resourceService;
+    this.fileService = fileService;
+    this.exportService = exportService;
   }
 
-  public ExportService getExportService() {
-    return exportService;
-  }
-
-  public FileService getFileService() {
-    return fileService;
-  }
-
-  public ResourceService getResourceService() {
-    return resourceService;
-  }
-
-  public UsersService getUsersService() {
-    return usersService;
+  /** In-memory services for UI testing without a backend (see MOCK_DATA in Program). */
+  public static ServiceRegistry mock(Session session) {
+    MockStore store = new MockStore();
+    return new ServiceRegistry(
+        new MockAuthService(store, session),
+        new MockUsersService(store),
+        new MockResourceService(store),
+        new MockFileService(store),
+        new MockExportService());
   }
 }

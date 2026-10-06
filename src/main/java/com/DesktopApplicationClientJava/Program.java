@@ -16,12 +16,14 @@ import org.kordamp.bootstrapfx.BootstrapFX;
 public class Program extends Application {
   private static final String INITIAL_PAGE_PATH =
       System.getenv().getOrDefault("INITIAL_PAGE_PATH", "/fxml/LoginForm.fxml");
+  private static final boolean MOCK_DATA =
+      Boolean.parseBoolean(System.getenv().getOrDefault("MOCK_DATA", "false"));
   private static final double WINDOW_WIDTH = 800.0;
   private static final double WINDOW_HEIGHT = 600.0;
 
   private final Session session = new Session();
   private final ApiClient apiClient = new ApiClient(session);
-  private final ServiceRegistry services = new ServiceRegistry(apiClient, session);
+  private final ServiceRegistry services = createServices();
 
   public static void main(String[] args) {
     launch(args);
@@ -49,11 +51,18 @@ public class Program extends Application {
     loadStyleSheet(scene, "/styles.css");
 
     stage.setScene(scene);
-    stage.setTitle("JavaFX Application");
+    stage.setTitle("JavaFX Application" + (MOCK_DATA ? " [MOCK]" : ""));
     stage.setWidth(WINDOW_WIDTH);
     stage.setHeight(WINDOW_HEIGHT);
     stage.centerOnScreen();
     stage.show();
+  }
+
+  private ServiceRegistry createServices() {
+    if (MOCK_DATA) {
+      return ServiceRegistry.mock(session);
+    }
+    return new ServiceRegistry(apiClient, session);
   }
 
   private void loadStyleSheet(Scene scene, String path) {
