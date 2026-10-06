@@ -7,12 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.DesktopApplicationClientJava.validation.PasswordValidator;
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
-import javafx.beans.property.SimpleStringProperty;
-import net.synedra.validatorfx.Validator;
+import com.dlsc.formsfx.model.structure.Field;
+import com.dlsc.formsfx.model.structure.PasswordField;
+import com.dlsc.formsfx.model.validators.Validator;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class PasswordValidatorTest extends ValidatorFxTest {
+public class PasswordValidatorTest {
   private static final String FIELD_NAME = PasswordValidator.FIELD_NAME;
+
+  private static PasswordField fieldWith(String value) {
+    List<Validator<String>> validators = PasswordValidator.validators();
+    @SuppressWarnings("unchecked")
+    Validator<String>[] array = validators.toArray(new Validator[0]);
+    return Field.ofPasswordType(value).required(ErrorMessages.Required).validate(array);
+  }
 
   @Test
   void emptyPasswordIsRejected() {
@@ -32,24 +41,26 @@ public class PasswordValidatorTest extends ValidatorFxTest {
   }
 
   @Test
-  void checkRejectsShortPassword() {
-    Validator validator = new Validator();
-    SimpleStringProperty password = new SimpleStringProperty("short");
-    PasswordValidator.createCheck(validator, password);
+  void fieldRejectsEmptyPassword() {
+    PasswordField field = fieldWith("");
 
-    assertFalse(validator.validate());
-    assertTrue(validator.containsErrors());
-    assertEquals(
-        ErrorMessages.MinLength(FIELD_NAME, PasswordValidator.MIN_LENGTH),
-        validator.getValidationResult().getMessages().get(0).getText());
+    assertFalse(field.isValid());
+    assertTrue(field.getErrorMessages().contains(ErrorMessages.Required));
   }
 
   @Test
-  void checkAcceptsValidPassword() {
-    Validator validator = new Validator();
-    SimpleStringProperty password = new SimpleStringProperty("12345678");
-    PasswordValidator.createCheck(validator, password);
+  void fieldRejectsShortPassword() {
+    PasswordField field = fieldWith("short");
 
-    assertTrue(validator.validate());
+    assertFalse(field.isValid());
+    assertTrue(
+        field
+            .getErrorMessages()
+            .contains(ErrorMessages.MinLength(FIELD_NAME, PasswordValidator.MIN_LENGTH)));
+  }
+
+  @Test
+  void fieldAcceptsValidPassword() {
+    assertTrue(fieldWith("12345678").isValid());
   }
 }

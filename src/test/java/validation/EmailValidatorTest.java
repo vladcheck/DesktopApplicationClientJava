@@ -7,12 +7,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.DesktopApplicationClientJava.validation.EmailValidator;
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
-import javafx.beans.property.SimpleStringProperty;
-import net.synedra.validatorfx.Validator;
+import com.dlsc.formsfx.model.structure.Field;
+import com.dlsc.formsfx.model.structure.StringField;
+import com.dlsc.formsfx.model.validators.Validator;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class EmailValidatorTest extends ValidatorFxTest {
+public class EmailValidatorTest {
   private static final String FIELD_NAME = EmailValidator.FIELD_NAME;
+
+  private static StringField fieldWith(String value) {
+    List<Validator<String>> validators = EmailValidator.validators();
+    @SuppressWarnings("unchecked")
+    Validator<String>[] array = validators.toArray(new Validator[0]);
+    return Field.ofStringType(value).required(ErrorMessages.Required).validate(array);
+  }
 
   @Test
   void emptyEmailIsRejected() {
@@ -50,25 +59,23 @@ public class EmailValidatorTest extends ValidatorFxTest {
   }
 
   @Test
-  void checkRejectsInvalidEmail() {
-    Validator validator = new Validator();
-    SimpleStringProperty email = new SimpleStringProperty("nope.com");
-    EmailValidator.createCheck(validator, email);
+  void fieldRejectsEmptyEmail() {
+    StringField field = fieldWith("");
 
-    assertFalse(validator.validate());
-    assertTrue(validator.containsErrors());
-    assertEquals(1, validator.getValidationResult().getMessages().size());
-    assertEquals(
-        ErrorMessages.IncorrectFormat,
-        validator.getValidationResult().getMessages().get(0).getText());
+    assertFalse(field.isValid());
+    assertTrue(field.getErrorMessages().contains(ErrorMessages.Required));
   }
 
   @Test
-  void checkAcceptsValidEmail() {
-    Validator validator = new Validator();
-    SimpleStringProperty email = new SimpleStringProperty("test@example.com");
-    EmailValidator.createCheck(validator, email);
+  void fieldRejectsInvalidEmail() {
+    StringField field = fieldWith("nope.com");
 
-    assertTrue(validator.validate());
+    assertFalse(field.isValid());
+    assertTrue(field.getErrorMessages().contains(ErrorMessages.IncorrectFormat));
+  }
+
+  @Test
+  void fieldAcceptsValidEmail() {
+    assertTrue(fieldWith("test@example.com").isValid());
   }
 }

@@ -2,15 +2,15 @@ package com.DesktopApplicationClientJava.validation;
 
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
 import com.DesktopApplicationClientJava.validation.utils.ValidatorHelpers;
-import javafx.beans.value.ObservableValue;
-import net.synedra.validatorfx.Check;
-import net.synedra.validatorfx.Validator;
+import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.validators.StringLengthValidator;
+import com.dlsc.formsfx.model.validators.Validator;
+import java.util.List;
 
 public final class PasswordValidator {
   public static final String FIELD_NAME = "Пароль";
   public static final int MIN_LENGTH = 8;
   public static final int MAX_LENGTH = 64;
-  private static final String KEY = "value";
 
   private PasswordValidator() {}
 
@@ -23,14 +23,11 @@ public final class PasswordValidator {
     return null;
   }
 
-  public static void check(Check.Context context) {
-    String error = validate(context.get(KEY));
-    if (error != null) {
-      context.error(error);
-    }
-  }
-
-  public static Check createCheck(Validator validator, ObservableValue<String> property) {
-    return validator.createCheck().dependsOn(KEY, property).withMethod(PasswordValidator::check);
+  public static List<Validator<String>> validators() {
+    return List.of(
+        CustomValidator.forPredicate(
+            input -> !ValidatorHelpers.isEmpty(input), ErrorMessages.Required),
+        StringLengthValidator.atLeast(MIN_LENGTH, ErrorMessages.MinLength(FIELD_NAME, MIN_LENGTH)),
+        StringLengthValidator.upTo(MAX_LENGTH, ErrorMessages.MaxLength(FIELD_NAME, MAX_LENGTH)));
   }
 }

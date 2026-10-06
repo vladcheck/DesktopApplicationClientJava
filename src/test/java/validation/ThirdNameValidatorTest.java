@@ -7,11 +7,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.DesktopApplicationClientJava.validation.ThirdNameValidator;
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
-import javafx.beans.property.SimpleStringProperty;
-import net.synedra.validatorfx.Validator;
+import com.dlsc.formsfx.model.structure.Field;
+import com.dlsc.formsfx.model.structure.StringField;
+import com.dlsc.formsfx.model.validators.Validator;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class ThirdNameValidatorTest extends ValidatorFxTest {
+public class ThirdNameValidatorTest {
+
+  private static StringField fieldWith(String value) {
+    List<Validator<String>> validators = ThirdNameValidator.validators();
+    @SuppressWarnings("unchecked")
+    Validator<String>[] array = validators.toArray(new Validator[0]);
+    return Field.ofStringType(value).required(ErrorMessages.Required).validate(array);
+  }
 
   @Test
   void emptyThirdNameIsRejected() {
@@ -24,23 +33,15 @@ public class ThirdNameValidatorTest extends ValidatorFxTest {
   }
 
   @Test
-  void checkRejectsEmptyThirdName() {
-    Validator validator = new Validator();
-    SimpleStringProperty thirdName = new SimpleStringProperty("");
-    ThirdNameValidator.createCheck(validator, thirdName);
+  void fieldRejectsEmptyThirdName() {
+    StringField field = fieldWith("");
 
-    assertFalse(validator.validate());
-    assertTrue(validator.containsErrors());
-    assertEquals(
-        ErrorMessages.Required, validator.getValidationResult().getMessages().get(0).getText());
+    assertFalse(field.isValid());
+    assertTrue(field.getErrorMessages().contains(ErrorMessages.Required));
   }
 
   @Test
-  void checkAcceptsValidThirdName() {
-    Validator validator = new Validator();
-    SimpleStringProperty thirdName = new SimpleStringProperty("Антон");
-    ThirdNameValidator.createCheck(validator, thirdName);
-
-    assertTrue(validator.validate());
+  void fieldAcceptsValidThirdName() {
+    assertTrue(fieldWith("Антон").isValid());
   }
 }
