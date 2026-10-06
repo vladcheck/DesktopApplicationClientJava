@@ -18,7 +18,8 @@ if (-not (Test-Command 'git')) {
   exit 1
 }
 
-if (-not (Test-Command 'python')) {
+$Python = if (Test-Command 'python') { 'python' } elseif (Test-Command 'python3') { 'python3' } else { $null }
+if (-not $Python) {
   Write-Error 'Python not found in PATH. Install Python 3 (python.org) with "Add to PATH" and retry.'
   exit 1
 }
@@ -30,14 +31,14 @@ if ($LASTEXITCODE -ne 0) {
   exit 1
 }
 
-python -m pre_commit --version > $null 2>&1
+& $Python -m pre_commit --version > $null 2>&1
 if ($LASTEXITCODE -ne 0) {
   Write-Host 'pre-commit not found, installing via pip...'
-  python -m pip install --user pre-commit
+  & $Python -m pip install --user pre-commit
 }
 
 # Use `python -m` so it works even if pip --user Scripts dir is not on PATH.
-python -m pre_commit install
+& $Python -m pre_commit install
 Write-Host ''
 Write-Host 'Done. Hooks will run on every commit.'
 Write-Host 'To check everything right now: pre-commit run --all-files'
