@@ -4,72 +4,58 @@ import com.DesktopApplicationClientJava.controllers.utils.Controller;
 import com.DesktopApplicationClientJava.entities.User;
 import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.validation.EmailValidator;
-import com.DesktopApplicationClientJava.validation.PasswordValidator;
-import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
-import com.dlsc.formsfx.model.structure.Field;
-import com.dlsc.formsfx.model.structure.Form;
-import com.dlsc.formsfx.model.structure.PasswordField;
-import com.dlsc.formsfx.model.structure.Section;
-import com.dlsc.formsfx.model.structure.StringField;
-import com.dlsc.formsfx.model.validators.Validator;
-import com.dlsc.formsfx.view.renderer.FormRenderer;
-import java.util.List;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
 
 public class LoginFormController extends Controller {
-  @FXML private VBox formContainer;
+
+  @FXML private TextField emailField;
+  @FXML private PasswordField passwordField;
+  @FXML private Label errorLabel;
   @FXML private Button submitButton;
-
-  private StringField email;
-  private PasswordField password;
-  private Form loginForm;
-
-  @FXML
-  private void initialize() {
-    email =
-        Field.ofStringType("")
-            .label(EmailValidator.FIELD_NAME)
-            .placeholder("youremail@example.com")
-            .required(ErrorMessages.Required)
-            .validate(toArray(EmailValidator.validators()));
-    password =
-        Field.ofPasswordType("")
-            .label(PasswordValidator.FIELD_NAME)
-            .required(ErrorMessages.Required)
-            .validate(toArray(PasswordValidator.validators()));
-
-    loginForm = Form.of(Section.of(email, password));
-    formContainer.getChildren().add(new FormRenderer(loginForm));
-  }
 
   @FXML
   private void onSubmit(ActionEvent event) {
-    boolean valid = email.validate() & password.validate();
-    if (!valid) {
+    String email = emailField.getText() == null ? "" : emailField.getText().trim();
+    String password = passwordField.getText() == null ? "" : passwordField.getText();
+
+    if (email.isBlank() || password.isBlank()) {
+      showError("Заполните все поля");
+      return;
+    }
+
+    String emailError = EmailValidator.validate(email);
+    if (emailError != null) {
+      showError(emailError);
       return;
     }
 
     try {
-      User user = services.getAuthService().login(email.getValue(), password.getValue());
+      // ← ВЫЗОВ СЕРВИСА (middleware): session уже обновлён сервисом при успехе
+      User user = services.getAuthService().login(email, password);
       if (user == null) {
         return;
       }
+      hideError();
       navigator.goTo("/fxml/ResourceList.fxml");
     } catch (ServiceException e) {
-      Alert alert = new Alert(Alert.AlertType.ERROR);
-      alert.setTitle("Ошибка входа");
-      alert.setHeaderText(null);
-      alert.setContentText(e.getMessage());
-      alert.showAndWait();
+      showError(e.getMessage());
     }
   }
 
-  @SuppressWarnings("unchecked")
-  private static Validator<String>[] toArray(List<Validator<String>> validators) {
-    return validators.toArray(new Validator[0]);
+  private void showError(String message) {
+    errorLabel.setText(message);
+    errorLabel.setVisible(true);
+    errorLabel.setManaged(true);
+  }
+
+  private void hideError() {
+    errorLabel.setText("");
+    errorLabel.setVisible(false);
+    errorLabel.setManaged(false);
   }
 }
