@@ -4,6 +4,9 @@
 # Log file
 *.log
 
+# Local environment (see .env.example, never commit real secrets)
+.env
+
 # BlueJ files
 *.ctxt
 
