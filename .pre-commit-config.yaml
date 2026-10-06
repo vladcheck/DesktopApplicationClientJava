@@ -1,0 +1,37 @@
+# Pre-commit hooks for this Java/Maven project (the Java-conventional
+# equivalent of husky hooks in JS projects).
+#
+# All hooks are CHECK-ONLY (no auto-fix):
+# - lint via `mvn checkstyle:check`
+# - format via `mvn spotless:check` (use `mvn spotless:apply` manually to fix)
+# - unit tests via `mvn test` (integration tests tagged `integration` are
+#   already excluded from the default build via surefire `excludedGroups`
+#   in pom.xml, so no live backend is needed)
+#
+# Install/activate (per clone):
+#   pip install pre-commit   # or: brew install pre-commit
+#   pre-commit install
+#
+# Run manually:
+#   pre-commit run --all-files
+repos:
+  - repo: local
+    hooks:
+      - id: checkstyle-check
+        name: "lint: mvn checkstyle:check"
+        entry: mvn -B checkstyle:check
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: spotless-check
+        name: "format: mvn spotless:check"
+        entry: mvn -B spotless:check
+        language: system
+        pass_filenames: false
+        always_run: true
+      - id: unit-tests
+        name: "test: mvn test (unit only, integration excluded)"
+        entry: mvn -B test
+        language: system
+        pass_filenames: false
+        always_run: true
