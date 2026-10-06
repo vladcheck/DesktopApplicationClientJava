@@ -1,8 +1,8 @@
 package com.DesktopApplicationClientJava.validation;
 
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
-import com.DesktopApplicationClientJava.validation.utils.ValidatorHelpers;
-import com.dlsc.formsfx.model.validators.CustomValidator;
+import com.dlsc.formsfx.model.structure.Field;
+import com.dlsc.formsfx.model.structure.StringField;
 import com.dlsc.formsfx.model.validators.StringLengthValidator;
 import com.dlsc.formsfx.model.validators.Validator;
 import java.util.List;
@@ -13,17 +13,28 @@ public final class LastNameValidator {
 
   private LastNameValidator() {}
 
-  public static String validate(String input) {
-    if (ValidatorHelpers.isEmpty(input)) return ErrorMessages.Required;
-    if (ValidatorHelpers.isShorterThan(input, MIN_LENGTH))
-      return ErrorMessages.MinLength(FIELD_NAME, MIN_LENGTH);
-    return null;
-  }
-
   public static List<Validator<String>> validators() {
     return List.of(
-        CustomValidator.forPredicate(
-            input -> !ValidatorHelpers.isEmpty(input), ErrorMessages.Required),
         StringLengthValidator.atLeast(MIN_LENGTH, ErrorMessages.MinLength(FIELD_NAME, MIN_LENGTH)));
+  }
+
+  /**
+   * Thin contract over the stock FormsFX validators above: runs a {@link StringField} and returns
+   * the first error message, or {@code null} when valid.
+   */
+  public static String validate(String input) {
+    String value = input == null ? "" : input;
+    if (value.isBlank()) {
+      // Stock FormsFX required-check is empty-based; preserve blank-means-required semantics.
+      return ErrorMessages.Required;
+    }
+    StringField field =
+        Field.ofStringType(value).required(ErrorMessages.Required).validate(toArray(validators()));
+    return field.isValid() ? null : field.getErrorMessages().get(0);
+  }
+
+  @SuppressWarnings("unchecked")
+  private static Validator<String>[] toArray(List<Validator<String>> validators) {
+    return validators.toArray(new Validator[0]);
   }
 }
