@@ -50,6 +50,8 @@ public class ApiClient {
             .build();
     this.objectMapper = new ObjectMapper();
     this.objectMapper.registerModule(new JavaTimeModule());
+    // FIXME: temporary — backend returns firstname/lastname instead of firstName/lastName.
+    // Remove once backend uses camelCase; then unknown properties should fail fast again.
     this.objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
   }
 
