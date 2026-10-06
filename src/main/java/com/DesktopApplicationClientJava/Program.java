@@ -14,7 +14,8 @@ import javafx.stage.Stage;
 import org.kordamp.bootstrapfx.BootstrapFX;
 
 public class Program extends Application {
-  private static final String INITIAL_PAGE_PATH = "/fxml/LoginForm.fxml";
+  private static final String INITIAL_PAGE_PATH =
+      System.getenv().getOrDefault("INITIAL_PAGE_PATH", "/fxml/LoginForm.fxml");
   private static final double WINDOW_WIDTH = 800.0;
   private static final double WINDOW_HEIGHT = 600.0;
 
