@@ -14,6 +14,7 @@ import com.DesktopApplicationClientJava.Api.Dto.response.Jwt.JwtTokenResponse;
 import com.DesktopApplicationClientJava.Api.Dto.response.ResourceDto;
 import com.DesktopApplicationClientJava.Api.Dto.response.UserDto;
 import com.DesktopApplicationClientJava.session.Session;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.io.ByteArrayOutputStream;
@@ -49,6 +50,7 @@ public class ApiClient {
             .build();
     this.objectMapper = new ObjectMapper();
     this.objectMapper.registerModule(new JavaTimeModule());
+    this.objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
   }
 
   // ======================== AUTH ========================
