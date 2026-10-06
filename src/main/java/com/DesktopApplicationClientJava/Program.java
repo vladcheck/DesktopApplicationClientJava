@@ -13,7 +13,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Program extends Application {
-  private static final String INITIAL_PAGE_PATH = "/fxml/Search.fxml";
+  private static final String INITIAL_PAGE_PATH = "/fxml/ResourceList.fxml";
   private static final double WINDOW_WIDTH = 800.0;
   private static final double WINDOW_HEIGHT = 600.0;
 

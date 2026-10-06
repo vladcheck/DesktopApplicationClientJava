@@ -4,6 +4,6 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root"
-    fx:controller="com.DesktopApplicationClientJava.controllers.SearchController">
+    fx:controller="com.DesktopApplicationClientJava.controllers.ResourceListController">
     <Label text="Welcome!" fx:id="welcomeLabel" styleClass="h1" />
 </VBox>

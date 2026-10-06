@@ -58,7 +58,7 @@ public class LoginFormController extends Controller {
       if (user == null) {
         return;
       }
-      navigator.goTo("/fxml/Search.fxml");
+      navigator.goTo("/fxml/ResourceList.fxml");
     } catch (ServiceException e) {
       Alert alert = new Alert(Alert.AlertType.ERROR);
       alert.setTitle("Ошибка входа");
