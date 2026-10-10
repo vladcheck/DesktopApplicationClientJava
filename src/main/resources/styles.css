@@ -1,42 +1,376 @@
-.i {
-    -fx-font-style: italic;
+/* ============================================================
+   ВАЖНО: JavaFX CSS lookup-переменные работают ТОЛЬКО для цветов.
+   Размеры, радиусы, тени, шрифты — прописывать прямо в правилах.
+   ============================================================ */
+
+.root {
+    -fx-font-family: "Segoe UI", "Inter", "Roboto", sans-serif;
+
+    -accent: #4f46e5;
+    -accent-hover: #4338ca;
+    -accent-pressed: #3730a3;
+    -accent-soft: #eef2ff;
+
+    -app-bg: linear-gradient(to bottom right, #eef2ff 0%, #e0e7ff 100%);
+    -surface: #ffffff;
+    -surface-muted: #f9fafb;
+    -border: #e5e7eb;
+    -border-strong: #d1d5db;
+
+    -text-primary: #111827;
+    -text-secondary: #6b7280;
+    -text-muted: #9ca3af;
+
+    -danger-bg: #fee2e2;
+    -danger-fg: #b91c1c;
 }
 
-.b {
-    -fx-font-weight: bold;
-}
+/* ============================================================
+   Типографика
+   ============================================================ */
 
-.h1 {
-    -fx-font-size: 32px;
-    -fx-font-weight: bold;
-}
+.i  { -fx-font-style: italic; }
+.b  { -fx-font-weight: bold; }
 
-.h2 {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-}
-
-.h3 {
-    -fx-font-size: 19px;
-    -fx-font-weight: bold;
-}
-
-.h4 {
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
-}
-
-.h5 {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-}
-
-.h6 {
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
-}
+.h1 { -fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: -text-primary; }
+.h2 { -fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: -text-primary; }
+.h3 { -fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: -text-primary; }
+.h4 { -fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: -text-primary; }
+.h5 { -fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: -text-primary; }
+.h6 { -fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: -text-primary; }
 
 .error-label {
-    -fx-text-fill: red;
+    -fx-text-fill: -danger-fg;
     -fx-font-size: 11px;
+}
+
+/* ============================================================
+   Общий фон
+   ============================================================ */
+
+.auth-bg,
+.app-bg {
+    -fx-background-color: -app-bg;
+}
+
+/* ============================================================
+   Карточки
+   ============================================================ */
+
+.card {
+    -fx-background-color: -surface;
+    -fx-background-radius: 16px;
+    -fx-padding: 32px;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.12), 24, 0.12, 0, 8);
+}
+
+.card-lg {
+    -fx-background-color: -surface;
+    -fx-background-radius: 16px;
+    -fx-padding: 24px;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.12), 24, 0.12, 0, 8);
+}
+
+.card-title {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.card-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ============================================================
+   Поля ввода
+   ============================================================ */
+
+.field-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-secondary;
+}
+
+.text-input {
+    -fx-background-color: -surface-muted;
+    -fx-background-radius: 10px;
+    -fx-border-color: -border;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 10px 12px;
+    -fx-font-size: 14px;
+    -fx-text-fill: -text-primary;
+    -fx-prompt-text-fill: -text-muted;
+}
+
+.text-input:focused {
+    -fx-background-color: -surface;
+    -fx-border-color: -accent;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.25), 8, 0.2, 0, 0);
+}
+
+/* ============================================================
+   Кнопки
+   ============================================================ */
+
+.btn-primary {
+    -fx-background-color: -accent;
+    -fx-background-radius: 10px;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 11px 16px;
+    -fx-cursor: hand;
+}
+.btn-primary:hover   { -fx-background-color: -accent-hover; }
+.btn-primary:pressed { -fx-background-color: -accent-pressed; }
+.btn-primary:disabled {
+    -fx-opacity: 0.5;
+    -fx-cursor: default;
+}
+
+.btn-ghost {
+    -fx-background-color: transparent;
+    -fx-border-color: -border;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13px;
+    -fx-padding: 8px 14px;
+    -fx-cursor: hand;
+}
+.btn-ghost:hover   { -fx-background-color: #f3f4f6; }
+.btn-ghost:pressed { -fx-background-color: #e5e7eb; }
+.btn-ghost:disabled {
+    -fx-opacity: 0.45;
+    -fx-cursor: default;
+}
+
+/* ============================================================
+   Сообщения об ошибке
+   ============================================================ */
+
+.alert-danger {
+    -fx-background-color: -danger-bg;
+    -fx-background-radius: 10px;
+    -fx-text-fill: -danger-fg;
+    -fx-font-size: 12px;
+    -fx-padding: 10px 12px;
+    -fx-wrap-text: true;
+}
+
+/* ============================================================
+   Чип с пользователем
+   ============================================================ */
+
+.user-chip {
+    -fx-background-color: rgba(255, 255, 255, 0.75);
+    -fx-background-radius: 999px;
+    -fx-border-color: -border;
+    -fx-border-radius: 999px;
+    -fx-padding: 6px 14px;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: -text-primary;
+}
+
+.user-info {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ============================================================
+   Оболочка страницы
+   ============================================================ */
+
+.page-shell {
+    -fx-max-width: 1080px;
+}
+
+.app-header {
+    -fx-padding: 8px 4px;
+}
+
+/* ============================================================
+   ComboBox
+   ============================================================ */
+
+.combo {
+    -fx-background-color: -surface-muted;
+    -fx-background-radius: 10px;
+    -fx-border-color: -border;
+    -fx-border-radius: 10px;
+    -fx-padding: 2px 6px;
+}
+.combo:focused {
+    -fx-border-color: -accent;
+    -fx-effect: dropshadow(gaussian, rgba(79, 70, 229, 0.25), 8, 0.2, 0, 0);
+}
+.combo .list-cell {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13px;
+    -fx-padding: 6px 8px;
+    -fx-background-color: transparent;
+}
+.combo .arrow-button {
+    -fx-background-color: transparent;
+}
+.combo .list-view {
+    -fx-background-color: -surface;
+    -fx-background-radius: 10px;
+    -fx-border-color: -border;
+    -fx-border-radius: 10px;
+    -fx-effect: dropshadow(gaussian, rgba(17, 24, 39, 0.10), 20, 0.10, 0, 6);
+}
+.combo .list-view .list-cell:hover {
+    -fx-background-color: -accent-soft;
+}
+
+/* ============================================================
+   Современная таблица
+   ============================================================ */
+
+.modern-table,
+.resource-table {
+    -fx-background-color: transparent;
+    -fx-border-color: -border;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 1px;
+}
+
+.modern-table .column-header-background,
+.resource-table .column-header-background {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1px 0;
+}
+
+.modern-table .column-header,
+.modern-table .filler,
+.resource-table .column-header,
+.resource-table .filler {
+    -fx-background-color: transparent;
+    -fx-font-weight: bold;
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-secondary;
+    -fx-size: 38px;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 0 0 0 14px;
+}
+
+/* Метка внутри заголовка наследует выравнивание */
+.modern-table .column-header .label,
+.resource-table .column-header .label {
+    -fx-alignment: CENTER_LEFT;
+    -fx-text-fill: -text-secondary;
+}
+
+.modern-table .table-row-cell,
+.resource-table .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent -border transparent;
+    -fx-border-width: 0 0 1px 0;
+    -fx-cell-size: 48px;
+}
+
+.modern-table .table-row-cell:hover,
+.resource-table .table-row-cell:hover {
+    -fx-background-color: #f3f4f6;
+}
+
+.modern-table .table-row-cell:selected,
+.resource-table .table-row-cell:selected {
+    -fx-background-color: -accent-soft;
+}
+
+.modern-table .table-row-cell:selected .table-cell,
+.resource-table .table-row-cell:selected .table-cell {
+    -fx-text-fill: -text-primary;
+}
+
+.modern-table .table-cell,
+.resource-table .table-cell {
+    -fx-text-fill: -text-primary;
+    -fx-font-size: 13px;
+    -fx-padding: 8px 14px;
+    -fx-border-color: transparent;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.modern-table .placeholder .label,
+.resource-table .placeholder .label {
+    -fx-text-fill: -text-secondary;
+    -fx-font-size: 13px;
+}
+
+/* ============================================================
+   Пагинация
+   ============================================================ */
+
+.pagination {
+    -fx-padding: 4px 0 0 0;
+}
+
+.pagination-info {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ============================================================
+   Мета-блок
+   ============================================================ */
+
+.meta-block {
+    -fx-background-color: -surface-muted;
+    -fx-background-radius: 10px;
+    -fx-padding: 14px 16px;
+}
+
+.meta-value {
+    -fx-font-size: 13px;
+    -fx-text-fill: -text-primary;
+}
+
+.meta-uuid {
+    -fx-font-family: "Courier New", "Consolas", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-secondary;
+}
+
+/* ============================================================
+   Прочее
+   ============================================================ */
+
+.lbl {
+    -fx-font-size: 12px;
+    -fx-text-fill: -text-secondary;
+    -fx-font-weight: bold;
+}
+
+/* Скроллбар */
+.scroll-bar:vertical,
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+.scroll-bar .track {
+    -fx-background-color: transparent;
+}
+.scroll-bar .thumb {
+    -fx-background-color: -border-strong;
+    -fx-background-radius: 6px;
+}
+.scroll-bar .thumb:hover {
+    -fx-background-color: -text-muted;
+}
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+.scroll-bar .increment-arrow,
+.scroll-bar .decrement-arrow {
+    -fx-shape: " ";
+    -fx-padding: 0;
 }

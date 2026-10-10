@@ -6,58 +6,74 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" alignment="CENTER"
-    fx:controller="com.DesktopApplicationClientJava.controllers.ResourceDetailsController">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20" />
-    </padding>
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="root"
+      styleClass="auth-bg"
+      alignment="TOP_CENTER"
+      fx:controller="com.DesktopApplicationClientJava.controllers.ResourceDetailsController">
 
-    <VBox styleClass="panel, panel-primary" maxWidth="640">
-        <VBox styleClass="panel-heading">
-            <Label fx:id="titleLabel" styleClass="panel-title" text="..." />
+    <VBox styleClass="card-lg"
+          spacing="16"
+          maxWidth="720">
+
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Button fx:id="backButton"
+                    text="← Назад"
+                    onAction="#onBack"
+                    styleClass="btn-ghost"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" styleClass="pagination-info"/>
+        </HBox>
+
+        <VBox spacing="6">
+            <Label fx:id="titleLabel" styleClass="card-title" text="..."/>
+            <Label fx:id="descriptionLabel"
+                   styleClass="card-subtitle"
+                   wrapText="true"/>
         </VBox>
 
-        <VBox styleClass="panel-body" spacing="8">
-            <padding>
-                <Insets top="12" right="12" bottom="12" left="12" />
-            </padding>
-
-            <Label fx:id="descriptionLabel" wrapText="true" />
-
+        <VBox spacing="6" styleClass="meta-block">
             <HBox spacing="8">
-                <Label text="Создан:" styleClass="lbl" />
-                <Label fx:id="createdLabel" />
+                <Label text="Создан:" styleClass="field-label" minWidth="70"/>
+                <Label fx:id="createdLabel" styleClass="meta-value"/>
             </HBox>
-
             <HBox spacing="8">
-                <Label text="Изменён:" styleClass="lbl" />
-                <Label fx:id="updatedLabel" />
+                <Label text="Изменён:" styleClass="field-label" minWidth="70"/>
+                <Label fx:id="updatedLabel" styleClass="meta-value"/>
             </HBox>
-
             <HBox spacing="8">
-                <Label text="UUID:" styleClass="lbl" />
-                <Label fx:id="uuidLabel" style="-fx-font-family: monospace; -fx-font-size: 11;" />
+                <Label text="UUID:" styleClass="field-label" minWidth="70"/>
+                <Label fx:id="uuidLabel" styleClass="meta-uuid"/>
             </HBox>
+        </VBox>
 
-            <Label fx:id="errorLabel" styleClass="alert, alert-danger" visible="false"
-                managed="false" wrapText="true" maxWidth="Infinity" />
+        <Label fx:id="errorLabel"
+               styleClass="alert-danger"
+               visible="false"
+               managed="false"
+               wrapText="true"
+               maxWidth="Infinity"/>
 
-            <TableView fx:id="filesTable" prefHeight="200" maxWidth="Infinity">
+        <VBox spacing="6">
+            <Label text="Файлы" styleClass="field-label"/>
+            <TableView fx:id="filesTable"
+                       styleClass="modern-table"
+                       prefHeight="220"
+                       maxWidth="Infinity">
                 <columns>
-                    <TableColumn fx:id="nameColumn" text="Имя" prefWidth="240" />
-                    <TableColumn fx:id="sizeColumn" text="Размер" prefWidth="100" />
-                    <TableColumn fx:id="contentTypeColumn" text="Тип" prefWidth="160" />
-                    <TableColumn fx:id="downloadColumn" text="" prefWidth="110" sortable="false" />
+                    <TableColumn fx:id="nameColumn"        text="Имя"    prefWidth="280"/>
+                    <TableColumn fx:id="sizeColumn"        text="Размер" prefWidth="100"/>
+                    <TableColumn fx:id="contentTypeColumn" text="Тип"    prefWidth="180"/>
+                    <TableColumn fx:id="downloadColumn"    text=""       prefWidth="120" sortable="false"/>
                 </columns>
             </TableView>
-
-            <HBox spacing="8">
-                <Button fx:id="backButton" text="Назад" onAction="#onBack"
-                    styleClass="btn, btn-default" />
-                <Label fx:id="statusLabel" styleClass="lbl" />
-            </HBox>
         </VBox>
     </VBox>
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
 </VBox>

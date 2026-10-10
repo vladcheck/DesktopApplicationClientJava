@@ -61,6 +61,21 @@ public class ResourceServiceImpl implements ResourceService {
   }
 
   @Override
+  public List<Resource> search(ResourceFilter filter, long offset, long count,
+                               String sortBy, String sortDir) {
+    ResourceFilterRequest req = new ResourceFilterRequest(
+            filter.getTitle(), filter.getDescription(), null, null);
+    try {
+      return apiClient.findResourcesByFilters(req, offset, count, sortBy, sortDir)
+              .stream().map(this::toEntity).toList();
+    } catch (ApiException e) {
+      throw new ServiceException(e.getMessage(), e.getStatus());
+    } catch (IOException | InterruptedException e) {
+      throw new ServiceException("Ошибка соединения с сервером");
+    }
+  }
+
+  @Override
   public Resource update(UUID resourceId, String title, String description) {
     UpdateResourceRequest req = new UpdateResourceRequest(title, description);
     try {
