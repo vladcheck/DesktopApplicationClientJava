@@ -14,4 +14,7 @@ public abstract class Controller implements SessionAware, NavigatorAware, Servic
   protected Session session;
   protected Navigator navigator;
   protected ServiceRegistry services;
+
+  public void onLoad() {
+  }
 }

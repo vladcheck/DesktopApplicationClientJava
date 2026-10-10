@@ -13,8 +13,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -38,7 +40,7 @@ public class ResourceDetailsController extends Controller {
   @FXML private Label statusLabel;
   @FXML private TableView<FileInfo> filesTable;
   @FXML private TableColumn<FileInfo, String> nameColumn;
-  @FXML private TableColumn<FileInfo, Long> sizeColumn;
+  @FXML private TableColumn<FileInfo, String> sizeColumn;
   @FXML private TableColumn<FileInfo, String> contentTypeColumn;
   @FXML private TableColumn<FileInfo, Void> downloadColumn;
   @FXML private Button backButton;
@@ -48,10 +50,27 @@ public class ResourceDetailsController extends Controller {
   @FXML
   private void initialize() {
     hideError();
+
     nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-    sizeColumn.setCellValueFactory(new PropertyValueFactory<>("size"));
     contentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("contentType"));
+    sizeColumn.setCellValueFactory(c ->
+            new SimpleStringProperty(formatSize(c.getValue().getSize())));
+    sizeColumn.setCellFactory(col -> {
+      TableCell<FileInfo, String> cell = new TableCell<>() {
+        @Override
+        protected void updateItem(String item, boolean empty) {
+          super.updateItem(item, empty);
+          setText(empty ? null : item);
+          setAlignment(Pos.CENTER_RIGHT);
+        }
+      };
+      return cell;
+    });
+
     downloadColumn.setCellFactory(col -> new DownloadCell(this::onDownload));
+    filesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+    filesTable.setPlaceholder(new Label("У этого документа нет файлов"));
+
     autoSelectFirstInMockMode();
   }
 
@@ -75,7 +94,8 @@ public class ResourceDetailsController extends Controller {
       return;
     }
     try {
-      Path saved = services.getFileService().downloadFile(resourceId, file.getUuid(), dir.toPath());
+      Path saved =
+              services.getFileService().downloadFile(resourceId, file.getUuid(), dir.toPath());
       statusLabel.setText("Сохранено: " + saved.getFileName());
     } catch (ServiceException e) {
       showError(e.getMessage());
@@ -87,9 +107,9 @@ public class ResourceDetailsController extends Controller {
   }
 
   /**
-   * Dev-only fallback: when the page is opened without an id (e.g. straight via INITIAL_PAGE_PATH)
-   * against a mock service, show the first seeded resource so the UI is clickable without the
-   * resource list. Never triggers against the real backend.
+   * Dev-only fallback: when the page is opened without an id (e.g. straight via
+   * INITIAL_PAGE_PATH) against a mock service, show the first seeded resource so the UI is
+   * clickable without the resource list. Never triggers against the real backend.
    */
   private void autoSelectFirstInMockMode() {
     if (resourceId != null || !(services.getResourceService() instanceof MockService mock)) {
@@ -97,13 +117,13 @@ public class ResourceDetailsController extends Controller {
     }
     mock.doIfInitialPage();
     services.getResourceService().search(ResourceFilter.empty(), 0, 1).stream()
-        .map(Resource::getUuid)
-        .findFirst()
-        .ifPresent(
-            id -> {
-              setResourceId(id);
-              load();
-            });
+            .map(Resource::getUuid)
+            .findFirst()
+            .ifPresent(
+                    id -> {
+                      setResourceId(id);
+                      load();
+                    });
   }
 
   private void showResource(Resource resource) {
@@ -118,6 +138,14 @@ public class ResourceDetailsController extends Controller {
 
   private static String formatDateTime(LocalDateTime value) {
     return value == null ? "" : DATE_TIME_FORMAT.format(value);
+  }
+
+  private static String formatSize(Long bytes) {
+    if (bytes == null) return "";
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return String.format("%.1f KB", bytes / 1024.0);
+    if (bytes < 1024L * 1024 * 1024) return String.format("%.1f MB", bytes / (1024.0 * 1024));
+    return String.format("%.1f GB", bytes / (1024.0 * 1024 * 1024));
   }
 
   private void showError(String message) {
@@ -136,7 +164,7 @@ public class ResourceDetailsController extends Controller {
     private final Button button = new Button("Скачать");
 
     DownloadCell(Consumer<FileInfo> onDownload) {
-      button.getStyleClass().setAll("btn", "btn-default");
+      button.getStyleClass().setAll("btn-ghost");
       button.setOnAction(event -> onDownload.accept(getTableView().getItems().get(getIndex())));
     }
 

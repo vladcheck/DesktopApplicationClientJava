@@ -6,8 +6,10 @@ import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.filter.ResourceFilter;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /** In-memory {@link ResourceService} over {@link MockStore}. */
 public class MockResourceService implements ResourceService, MockService {
@@ -43,6 +45,35 @@ public class MockResourceService implements ResourceService, MockService {
       throw new ServiceException("Ресурс не найден", 404);
     }
     return resource;
+  }
+
+  @Override
+  public List<Resource> search(ResourceFilter filter, long offset, long count,
+                               String sortBy, String sortDir) {
+    // 1. Сначала фильтрация (как в текущей 3-аргументной версии)
+    List<Resource> filtered = store.getResources().values().stream()
+            .filter(r -> matches(r, filter))
+            .collect(Collectors.toList());
+
+    // 2. Сортировка по sortBy/sortDir
+    Comparator<Resource> comparator = switch (sortBy == null ? "createdAt" : sortBy) {
+      case "title" -> Comparator.comparing(
+              r -> r.getTitle() == null ? "" : r.getTitle(),
+              String.CASE_INSENSITIVE_ORDER);
+      default -> Comparator.comparing(
+              Resource::getCreatedAt,
+              Comparator.nullsLast(Comparator.naturalOrder()));
+    };
+    if ("desc".equalsIgnoreCase(sortDir)) {
+      comparator = comparator.reversed();
+    }
+    filtered.sort(comparator);
+
+    // 3. Пагинация
+    int from = (int) Math.max(0, offset);
+    int to = (int) Math.min(filtered.size(), from + count);
+    if (from >= filtered.size()) return List.of();
+    return List.copyOf(filtered.subList(from, to));
   }
 
   @Override

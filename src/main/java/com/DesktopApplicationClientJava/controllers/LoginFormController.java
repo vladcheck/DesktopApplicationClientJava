@@ -35,7 +35,6 @@ public class LoginFormController extends Controller {
     }
 
     try {
-      // ← ВЫЗОВ СЕРВИСА (middleware): session уже обновлён сервисом при успехе
       User user = services.getAuthService().login(email, password);
       if (user == null) {
         return;
