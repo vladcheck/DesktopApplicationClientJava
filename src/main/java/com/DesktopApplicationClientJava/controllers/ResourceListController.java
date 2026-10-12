@@ -192,8 +192,7 @@ public class ResourceListController extends Controller {
 
     @FXML
     private void onCreate(ActionEvent e) {
-        // Страница создания — отдельная задача; пока просто заглушка
-        statusLabel.setText("Раздел создания ещё не реализован");
+        navigator.goTo("/fxml/ResourceForm.fxml");
     }
 
     @FXML

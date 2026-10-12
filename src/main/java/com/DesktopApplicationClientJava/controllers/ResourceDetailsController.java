@@ -44,7 +44,7 @@ public class ResourceDetailsController extends Controller {
   @FXML private TableColumn<FileInfo, String> contentTypeColumn;
   @FXML private TableColumn<FileInfo, Void> downloadColumn;
   @FXML private Button backButton;
-
+  @FXML private Button editButton;
   @Setter private UUID resourceId;
 
   @FXML
@@ -70,7 +70,10 @@ public class ResourceDetailsController extends Controller {
     downloadColumn.setCellFactory(col -> new DownloadCell(this::onDownload));
     filesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     filesTable.setPlaceholder(new Label("У этого документа нет файлов"));
-
+    boolean canEdit = services.getAuthService().isAdmin()
+            || services.getAuthService().isModerator();
+    editButton.setVisible(canEdit);
+    editButton.setManaged(canEdit);
     autoSelectFirstInMockMode();
   }
 
@@ -173,5 +176,12 @@ public class ResourceDetailsController extends Controller {
       super.updateItem(item, empty);
       setGraphic(empty ? null : button);
     }
+  }
+  @FXML
+  private void onEdit(ActionEvent event) {
+    if (resourceId == null) return;
+    navigator.goTo(
+            "/fxml/ResourceForm.fxml",
+            c -> ((ResourceFormController) c).setResourceId(resourceId));
   }
 }
