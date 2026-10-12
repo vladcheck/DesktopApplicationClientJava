@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-  Sets up git pre-commit hooks for this repo (pre-commit framework).
+  Sets up git hooks for this repo (lefthook).
 
 .DESCRIPTION
-  Installs the `pre-commit` package if missing and runs `pre-commit install`
+  Installs `lefthook` if missing and runs `lefthook install`
   so the lint/format/unit-test checks run automatically on every `git commit`.
   Works on Windows PowerShell 5.1 and PowerShell 7+.
 #>
@@ -18,12 +18,6 @@ if (-not (Test-Command 'git')) {
   exit 1
 }
 
-$Python = if (Test-Command 'python') { 'python' } elseif (Test-Command 'python3') { 'python3' } else { $null }
-if (-not $Python) {
-  Write-Error 'Python not found in PATH. Install Python 3 (python.org) with "Add to PATH" and retry.'
-  exit 1
-}
-
 # Must run inside the repo so hooks land in .git/hooks.
 $null = git rev-parse --show-toplevel 2>$null
 if ($LASTEXITCODE -ne 0) {
@@ -31,14 +25,20 @@ if ($LASTEXITCODE -ne 0) {
   exit 1
 }
 
-& $Python -m pre_commit --version > $null 2>&1
-if ($LASTEXITCODE -ne 0) {
-  Write-Host 'pre-commit not found, installing via pip...'
-  & $Python -m pip install --user pre-commit
+if (-not (Test-Command 'lefthook')) {
+  if (Test-Command 'winget') {
+    Write-Host 'lefthook not found, installing via winget...'
+    winget install --exact --id evilmartians.lefthook
+  } elseif (Test-Command 'scoop') {
+    Write-Host 'lefthook not found, installing via scoop...'
+    scoop install lefthook
+  } else {
+    Write-Error 'lefthook not found in PATH. Install it (winget install evilmartians.lefthook, or scoop install lefthook) and retry.'
+    exit 1
+  }
 }
 
-# Use `python -m` so it works even if pip --user Scripts dir is not on PATH.
-& $Python -m pre_commit install
+lefthook install
 Write-Host ''
 Write-Host 'Done. Hooks will run on every commit.'
-Write-Host 'To check everything right now: pre-commit run --all-files'
+Write-Host 'To check everything right now: lefthook run pre-commit'

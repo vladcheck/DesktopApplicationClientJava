@@ -1,0 +1,24 @@
+# Lefthook config for this Java/Maven project (replaces pre-commit).
+#
+# All jobs are CHECK-ONLY (no auto-fix):
+# - lint via `mvn checkstyle:check`
+# - format via `mvn spotless:check` (use `mvn spotless:apply` manually to fix)
+# - unit tests via `mvn test` (integration tests tagged `integration` are
+#   already excluded from the default build via surefire `excludedGroups`
+#   in pom.xml, so no live backend is needed)
+#
+# Install/activate (per clone):
+#   brew install lefthook   # or: winget install evilmartians.lefthook / scoop install lefthook
+#   lefthook install
+#
+# Run manually:
+#   lefthook run pre-commit
+pre-commit:
+  parallel: false
+  jobs:
+    - name: "lint: mvn checkstyle:check"
+      run: mvn -B checkstyle:check
+    - name: "format: mvn spotless:check"
+      run: mvn -B spotless:check
+    - name: "test: mvn test (unit only, integration excluded)"
+      run: mvn -B test
