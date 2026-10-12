@@ -60,11 +60,11 @@ MOCK_DATA=true mvn javafx:run
 .\setup.ps1
 
 # macOS / Linux:
-pip install pre-commit
-pre-commit install
+brew install lefthook
+lefthook install
 ```
 
-Ручная проверка всего сразу: `pre-commit run --all-files`.
+Ручная проверка всего сразу: `lefthook run pre-commit`.
 Если упал формат — поправить: `mvn spotless:apply`.
 
 ## RBAC
