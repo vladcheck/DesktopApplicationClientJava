@@ -11,7 +11,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.kordamp.bootstrapfx.BootstrapFX;
 
 public class Program extends Application {
   private static final String INITIAL_PAGE_PATH =
@@ -43,7 +42,6 @@ public class Program extends Application {
 
     Parent root = loader.load();
     Scene scene = new Scene(root);
-    scene.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
     loadStyleSheet(scene, "/styles.css");
 
     stage.setScene(scene);
