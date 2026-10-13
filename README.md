@@ -49,6 +49,41 @@ MOCK_DATA=true mvn javafx:run
 
 Откроется окно 800×600 со стартовой страницы (по умолчанию вход, `LoginForm.fxml`).
 
+### Запуск фронта в Docker
+
+Образ собирается многостадийно (`Dockerfile`): stage `build`
+(`maven:3-eclipse-temurin-25`, `mvn -B package -DskipTests` с кешированием
+зависимостей) и stage `runtime` (`eclipse-temurin:25-jre` + нативные
+библиотеки JavaFX: GTK, GL, X11, шрифты). Точка входа запускает
+`com.DesktopApplicationClientJava.Main` с classpath из собранного jar
+и `target/libs`.
+
+```bash
+# Сборка образа:
+docker build -t desktop-client .
+
+# Запуск GUI на Linux (нужен X-сервер):
+xhost +local:docker
+docker run --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro desktop-client
+
+# Запуск GUI на macOS (XQuartz с разрешёнными подключениями):
+xhost +localhost
+docker run --rm -e DISPLAY=host.docker.internal:0 desktop-client
+
+# Через compose (профиль gui, тест-инфра по умолчанию не затрагивается):
+docker compose --profile gui run --rm client
+```
+
+Переменные окружения (`-e`): `INITIAL_PAGE_PATH` (стартовая страница),
+`MOCK_DATA=true` (работа без бэкенда), `JAVA_OPTS` (по умолчанию
+софтверный рендеринг `-Dprism.order=sw` и `--enable-native-access=ALL-UNNAMED`
+для нативных библиотек JavaFX).
+
+Ограничения: JavaFX — оконный GUI, в headless-контейнере без проброса
+`DISPLAY`/X11-сокета окно не отобразится (процесс при этом стартует).
+Клиент ходит в бэкенд по HTTP (порт `APP_PORT` на хосте), напрямую
+к postgres/redis из `compose.yaml` не подключается.
+
 ## Git hooks
 
 Перед каждым коммитом автоматически проверяются: линт (`checkstyle:check`),
