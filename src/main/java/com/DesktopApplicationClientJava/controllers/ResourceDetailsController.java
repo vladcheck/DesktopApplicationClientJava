@@ -72,8 +72,9 @@ public class ResourceDetailsController extends Controller {
     downloadColumn.setCellFactory(col -> new DownloadCell(this::onDownload));
     filesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     filesTable.setPlaceholder(new Label("У этого документа нет файлов"));
-    boolean canEdit =
-        services.getAuthService().isAdmin() || services.getAuthService().isModerator();
+    // NB: services/getAuthService may be a partial mock in tests — stay null-safe.
+    var authService = services == null ? null : services.getAuthService();
+    boolean canEdit = authService != null && (authService.isAdmin() || authService.isModerator());
     editButton.setVisible(canEdit);
     editButton.setManaged(canEdit);
     autoSelectFirstInMockMode();
@@ -116,7 +117,10 @@ public class ResourceDetailsController extends Controller {
    * resource list. Never triggers against the real backend.
    */
   private void autoSelectFirstInMockMode() {
-    if (resourceId != null || !(services.getResourceService() instanceof MockService mock)) {
+    if (resourceId != null
+        || services == null
+        || services.getResourceService() == null
+        || !(services.getResourceService() instanceof MockService mock)) {
       return;
     }
     mock.doIfInitialPage();

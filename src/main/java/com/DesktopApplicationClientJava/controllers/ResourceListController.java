@@ -71,7 +71,9 @@ public class ResourceListController extends Controller {
   // ===== UI setup =====
 
   private void setupUser() {
-    var me = services.getAuthService().getCurrentUser();
+    // NB: services/getAuthService may be a partial mock in tests — stay null-safe.
+    var authService = services == null ? null : services.getAuthService();
+    var me = authService == null ? null : authService.getCurrentUser();
     userInfoLabel.setText(
         me == null ? "" : me.getFirstName() + " " + me.getLastName() + " · " + me.getRole());
   }
@@ -108,8 +110,8 @@ public class ResourceListController extends Controller {
   }
 
   private void setupRbac() {
-    boolean canCreate =
-        services.getAuthService().isAdmin() || services.getAuthService().isModerator();
+    var authService = services == null ? null : services.getAuthService();
+    boolean canCreate = authService != null && (authService.isAdmin() || authService.isModerator());
     createButton.setVisible(canCreate);
     createButton.setManaged(canCreate);
   }
