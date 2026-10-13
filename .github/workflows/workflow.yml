@@ -35,8 +35,7 @@ jobs:
       - name: Set up JDK
         uses: ./.github/actions/setup-jdk
       - name: Check formatting
-        # -nsu: пропустить проверку snapshot-репозиториев (в проекте нет
-        # SNAPSHOT-зависимостей) — меньше сетевых обращений, быстрее старт.
+        # -nsu безопасен: SNAPSHOT-зависимостей нет.
         run: mvn -B -nsu spotless:check --file pom.xml
 
   lint:
@@ -51,18 +50,12 @@ jobs:
       - name: Restore checkstyle cache
         uses: actions/cache@v5
         with:
-          # Инкрементальный кеш checkstyle (cacheFile из pom.xml): при
-          # неизменённых исходниках аудит пропускается. Ключ — по конфигам,
-          # fallback — любой предыдущий кеш (устаревшие записи checkstyle
-          # перепроверяет по хешам файлов сам).
+          # Путь совпадает с cacheFile в pom.xml.
           path: target/checkstyle-cachefile
           key: checkstyle-${{ hashFiles('checkstyle.xml', 'pom.xml') }}
           restore-keys: checkstyle-
       - name: Check lint
-        # -nsu: не опрашивать snapshot-репозитории (apache.snapshots тянется
-        # из родительского apache-pom цепочки плагина): в проекте нет
-        # SNAPSHOT-зависимостей, а каждый артефакт иначе даёт лишний сетевой
-        # round-trip — это и есть основная задержка из Issue #31.
+        # -nsu безопасен: SNAPSHOT-зависимостей нет.
         run: mvn -B -nsu checkstyle:check --file pom.xml
 
   junit:

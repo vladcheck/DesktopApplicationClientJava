@@ -212,8 +212,6 @@
                     <configLocation>checkstyle.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
                     <failOnViolation>true</failOnViolation>
-                    <!-- Инкрементальный кеш: повторные прогоны без изменений
-                        исходников пропускают аудит (Issue #31) -->
                     <cacheFile>${project.build.directory}/checkstyle-cachefile</cacheFile>
                 </configuration>
                 <executions>
