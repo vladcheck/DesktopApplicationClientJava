@@ -212,6 +212,7 @@
                     <configLocation>checkstyle.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
                     <failOnViolation>true</failOnViolation>
+                    <cacheFile>${project.build.directory}/checkstyle-cachefile</cacheFile>
                 </configuration>
                 <executions>
                     <execution>
