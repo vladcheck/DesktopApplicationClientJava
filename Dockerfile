@@ -1,29 +1,17 @@
-# Многостадийная сборка десктоп-клиента (JavaFX, Java 25, Maven).
-#
-# Сборка образа:
-#   docker build -t desktop-client .
-#
-# Запуск GUI (нужен X-сервер, иначе окно не отобразится):
-#   Linux:
-#     xhost +local:docker
-#     docker run --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro desktop-client
-#   macOS (XQuartz: разрешить подключения, затем):
-#     xhost +localhost
-#     docker run --rm -e DISPLAY=host.docker.internal:0 desktop-client
-# Без X-сервера процесс стартует, но окно JavaFX не покажет (headless-контейнер).
+# JavaFX десктоп-клиент. Для GUI нужен X-сервер, иначе окно не отобразится:
+#   Linux: xhost +local:docker && docker run --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix:ro desktop-client
+#   macOS: XQuartz + xhost +localhost, затем docker run --rm -e DISPLAY=host.docker.internal:0 desktop-client
+# Подробности — в README («Запуск фронта в Docker»).
 
 # ---------- stage 1: сборка jar ----------
 FROM maven:3-eclipse-temurin-25 AS build
 WORKDIR /app
 
-# Сначала только дескрипторы — слой с зависимостями кешируется,
-# пока не меняется pom.xml.
 COPY pom.xml ./
 COPY .mvn/ .mvn/
 RUN mvn -B dependency:go-offline -DskipTests
 
-# Затем исходники и сборка без тестов
-# (verify-плагины spotless/checkstyle не входят в фазу package).
+# spotless/checkstyle привязаны к verify, поэтому package достаточно.
 COPY src/ src/
 COPY checkstyle.xml ./
 RUN mvn -B package -DskipTests \
@@ -61,10 +49,10 @@ WORKDIR /app
 COPY --from=build /app/target/*.jar ./app.jar
 COPY --from=build /app/target/libs/ ./libs/
 
-# Дефолты для запуска без бэкенда можно переопределить через -e:
-#   docker run --rm -e MOCK_DATA=true ... desktop-client
+# Дефолты переопределяются через -e (напр. MOCK_DATA=true для работы без бэкенда).
 ENV INITIAL_PAGE_PATH=/fxml/LoginForm.fxml \
     MOCK_DATA=false \
     JAVA_OPTS="-Dprism.order=sw -Djava.awt.headless=false --enable-native-access=ALL-UNNAMED"
-
+# prism.order=sw: в контейнере нет GPU; native-access: доступ JavaFX к нативным либам, обязательный на JDK 25.
+# classpath: собранный jar + runtime-зависимости из target/libs (см. copy-dependencies выше).
 ENTRYPOINT ["sh", "-c", "exec java ${JAVA_OPTS} -cp '/app/app.jar:/app/libs/*' com.DesktopApplicationClientJava.Main"]

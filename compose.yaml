@@ -8,10 +8,8 @@
 #   docker compose up -d
 # With object storage (for file/export ITs):
 #   docker compose --profile files up -d
-# Desktop client (GUI needs an X server, see Dockerfile header / README):
+# Desktop client (GUI: нужен X-сервер, подробности в README; к бэкенду ходит по HTTP, поэтому без depends_on):
 #   docker compose --profile gui run --rm client
-# The client talks to the backend API over HTTP (host port from APP_PORT),
-# not to postgres/redis directly, so it has no depends_on.
 
 services:
   client:

@@ -51,12 +51,13 @@ MOCK_DATA=true mvn javafx:run
 
 ### Запуск фронта в Docker
 
-Образ собирается многостадийно (`Dockerfile`): stage `build`
-(`maven:3-eclipse-temurin-25`, `mvn -B package -DskipTests` с кешированием
-зависимостей) и stage `runtime` (`eclipse-temurin:25-jre` + нативные
-библиотеки JavaFX: GTK, GL, X11, шрифты). Точка входа запускает
-`com.DesktopApplicationClientJava.Main` с classpath из собранного jar
-и `target/libs`.
+Образ (`Dockerfile`): сборка в `maven:3-eclipse-temurin-25`
+(`mvn -B package -DskipTests`; spotless/checkstyle живут в `verify`,
+поэтому `package` достаточно), запуск в `eclipse-temurin:25-jre`
+с нативными библиотеками JavaFX для Jammy (GTK/GL/X11/звук/шрифты).
+Точка входа запускает `com.DesktopApplicationClientJava.Main`,
+classpath — собранный jar + `target/libs` (runtime-зависимости,
+разложенные через `dependency:copy-dependencies`).
 
 ```bash
 # Сборка образа:
@@ -76,8 +77,9 @@ docker compose --profile gui run --rm client
 
 Переменные окружения (`-e`): `INITIAL_PAGE_PATH` (стартовая страница),
 `MOCK_DATA=true` (работа без бэкенда), `JAVA_OPTS` (по умолчанию
-софтверный рендеринг `-Dprism.order=sw` и `--enable-native-access=ALL-UNNAMED`
-для нативных библиотек JavaFX).
+`-Dprism.order=sw` — в контейнере нет GPU — и
+`--enable-native-access=ALL-UNNAMED` — доступ JavaFX к нативным либам,
+обязательный на JDK 25).
 
 Ограничения: JavaFX — оконный GUI, в headless-контейнере без проброса
 `DISPLAY`/X11-сокета окно не отобразится (процесс при этом стартует).
