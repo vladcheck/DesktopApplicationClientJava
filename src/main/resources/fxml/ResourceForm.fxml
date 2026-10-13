@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="root"
+      styleClass="auth-bg"
+      alignment="TOP_CENTER"
+      fx:controller="com.DesktopApplicationClientJava.controllers.ResourceFormController">
+
+    <VBox styleClass="card-lg"
+          spacing="18"
+          maxWidth="600">
+
+        <!-- Заголовок -->
+        <VBox spacing="4">
+            <Label fx:id="formTitleLabel" styleClass="card-title" text="Документ"/>
+            <Label text="Заполните поля и сохраните" styleClass="card-subtitle"/>
+        </VBox>
+
+        <!-- Название -->
+        <VBox spacing="6">
+            <Label text="Название" styleClass="field-label" labelFor="$titleField"/>
+            <TextField fx:id="titleField"
+                       styleClass="text-input"
+                       promptText="Например: Годовой отчёт"/>
+        </VBox>
+
+        <!-- Описание -->
+        <VBox spacing="6">
+            <Label text="Описание" styleClass="field-label" labelFor="$descriptionArea"/>
+            <TextArea fx:id="descriptionArea"
+                      styleClass="text-area"
+                      promptText="Краткое описание документа"
+                      wrapText="true"
+                      prefRowCount="5"/>
+        </VBox>
+
+        <!-- Ошибка -->
+        <Label fx:id="errorLabel"
+               styleClass="alert-danger"
+               visible="false"
+               managed="false"
+               wrapText="true"
+               maxWidth="Infinity"/>
+
+        <!-- Кнопки -->
+        <HBox spacing="12" alignment="CENTER_RIGHT">
+            <Button fx:id="cancelButton"
+                    text="Отмена"
+                    onAction="#onCancel"
+                    styleClass="btn-ghost"/>
+            <Button fx:id="saveButton"
+                    text="Сохранить"
+                    onAction="#onSave"
+                    styleClass="btn-primary"
+                    defaultButton="true"/>
+        </HBox>
+    </VBox>
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+</VBox>

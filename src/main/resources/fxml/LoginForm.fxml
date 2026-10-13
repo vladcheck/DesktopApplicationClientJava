@@ -7,33 +7,52 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox xmlns:fx="http://javafx.com/fxml/1" fx:id="root" alignment="CENTER"
-    fx:controller="com.DesktopApplicationClientJava.controllers.LoginFormController">
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20" />
-    </padding>
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="root"
+      styleClass="auth-bg"
+      alignment="CENTER"
+      fx:controller="com.DesktopApplicationClientJava.controllers.LoginFormController">
 
-    <VBox styleClass="panel, panel-primary" maxWidth="420">
-        <VBox styleClass="panel-heading">
-            <Label text="Госхрон" styleClass="panel-title" />
+    <VBox styleClass="card"
+          spacing="18"
+          alignment="TOP_LEFT"
+          maxWidth="420">
+
+        <VBox spacing="4">
+            <Label text="Госхрон" styleClass="card-title"/>
+            <Label text="Войдите в свой аккаунт" styleClass="card-subtitle"/>
         </VBox>
 
-        <VBox styleClass="panel-body" spacing="8">
-            <padding>
-                <Insets top="12" right="12" bottom="12" left="12" />
-            </padding>
-
-            <Label text="Почта" />
-            <TextField fx:id="emailField" promptText="youremail@example.com" />
-
-            <Label text="Пароль" />
-            <PasswordField fx:id="passwordField" />
-
-            <Label fx:id="errorLabel" styleClass="alert, alert-danger" visible="false"
-                managed="false" wrapText="true" maxWidth="Infinity" />
-
-            <Button fx:id="submitButton" text="Войти" onAction="#onSubmit"
-                styleClass="btn, btn-primary, btn-block" maxWidth="Infinity" />
+        <VBox spacing="6">
+            <Label text="Почта" styleClass="field-label" labelFor="$emailField"/>
+            <TextField fx:id="emailField"
+                       promptText="youremail@example.com"
+                       styleClass="text-input"/>
         </VBox>
+
+        <VBox spacing="6">
+            <Label text="Пароль" styleClass="field-label" labelFor="$passwordField"/>
+            <PasswordField fx:id="passwordField"
+                           promptText="••••••••"
+                           styleClass="text-input"/>
+        </VBox>
+
+        <Label fx:id="errorLabel"
+               styleClass="alert-danger"
+               visible="false"
+               managed="false"
+               wrapText="true"
+               maxWidth="Infinity"/>
+
+        <Button fx:id="submitButton"
+                text="Войти"
+                onAction="#onSubmit"
+                styleClass="btn-primary"
+                maxWidth="Infinity"
+                defaultButton="true"/>
     </VBox>
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
 </VBox>

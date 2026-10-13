@@ -11,23 +11,18 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import org.kordamp.bootstrapfx.BootstrapFX;
 
 public class Program extends Application {
   private static final String INITIAL_PAGE_PATH =
       System.getenv().getOrDefault("INITIAL_PAGE_PATH", "/fxml/LoginForm.fxml");
-  private static final boolean MOCK_DATA =
-      Boolean.parseBoolean(System.getenv().getOrDefault("MOCK_DATA", "false"));
+  private static final boolean MOCK_DATA = true;
+  // Boolean.parseBoolean(System.getenv().getOrDefault("MOCK_DATA", "false"));
   private static final double WINDOW_WIDTH = 800.0;
   private static final double WINDOW_HEIGHT = 600.0;
 
   private final Session session = new Session();
   private final ApiClient apiClient = new ApiClient(session);
   private final ServiceRegistry services = createServices();
-
-  public static void main(String[] args) {
-    launch(args);
-  }
 
   @Override
   public void start(Stage stage) throws IOException {
@@ -47,7 +42,6 @@ public class Program extends Application {
 
     Parent root = loader.load();
     Scene scene = new Scene(root);
-    scene.getStylesheets().add(BootstrapFX.bootstrapFXStylesheet());
     loadStyleSheet(scene, "/styles.css");
 
     stage.setScene(scene);
