@@ -27,7 +27,7 @@ class ResourceMapperTest {
             LocalDateTime.parse("2026-01-03T04:05:06"),
             List.of(new FileDto(fileUuid, "отчёт.pdf", "application/pdf", 12345L)));
 
-    Resource resource = ResourceMapper.toEntity(dto);
+    Resource resource = ResourceMapper.INSTANCE.toEntity(dto);
 
     assertEquals(uuid, resource.getUuid());
     assertEquals("Отчёт", resource.getTitle());
@@ -47,7 +47,7 @@ class ResourceMapperTest {
         new ResourceDto(
             UUID.randomUUID(), "Отчёт", "Описание", LocalDateTime.now(), LocalDateTime.now(), null);
 
-    Resource resource = ResourceMapper.toEntity(dto);
+    Resource resource = ResourceMapper.INSTANCE.toEntity(dto);
 
     assertTrue(resource.getFiles().isEmpty());
   }

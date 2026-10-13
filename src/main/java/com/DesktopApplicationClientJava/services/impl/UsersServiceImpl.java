@@ -37,7 +37,7 @@ public class UsersServiceImpl implements UsersService {
 
     try {
       return apiClient.getUsersByFilters(req, offset, count, "createdAt", "desc").stream()
-          .map(UserMapper::toEntity)
+          .map(UserMapper.INSTANCE::toEntity)
           .toList();
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
@@ -49,7 +49,7 @@ public class UsersServiceImpl implements UsersService {
   @Override
   public User getById(UUID uuid) {
     try {
-      return UserMapper.toEntity(apiClient.getUserById(uuid));
+      return UserMapper.INSTANCE.toEntity(apiClient.getUserById(uuid));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {
@@ -67,7 +67,7 @@ public class UsersServiceImpl implements UsersService {
             data.getFirstName(),
             data.getLastName());
     try {
-      return UserMapper.toEntity(apiClient.createUser(req));
+      return UserMapper.INSTANCE.toEntity(apiClient.createUser(req));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {
@@ -86,7 +86,7 @@ public class UsersServiceImpl implements UsersService {
             data.getLastName());
 
     try {
-      return UserMapper.toEntity(apiClient.updateUser(uuid, req));
+      return UserMapper.INSTANCE.toEntity(apiClient.updateUser(uuid, req));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {

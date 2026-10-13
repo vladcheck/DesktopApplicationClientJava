@@ -26,7 +26,7 @@ class UserMapperTest {
             LocalDateTime.parse("2026-01-02T03:04:05"),
             LocalDateTime.parse("2026-01-03T04:05:06"));
 
-    User user = UserMapper.toEntity(dto);
+    User user = UserMapper.INSTANCE.toEntity(dto);
 
     assertEquals(uuid, user.getUuid());
     assertEquals("user@example.com", user.getEmail());

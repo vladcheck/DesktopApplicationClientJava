@@ -15,7 +15,7 @@ class FileMapperTest {
     UUID uuid = UUID.randomUUID();
     FileDto dto = new FileDto(uuid, "отчёт.pdf", "application/pdf", 12345L);
 
-    FileInfo file = FileMapper.toEntity(dto);
+    FileInfo file = FileMapper.INSTANCE.toEntity(dto);
 
     assertEquals(uuid, file.getUuid());
     assertEquals("отчёт.pdf", file.getName());

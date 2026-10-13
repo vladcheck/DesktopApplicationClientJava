@@ -20,7 +20,7 @@ public class FileServiceImpl implements FileService {
 
   public FileInfo uploadFile(UUID resourceId, Path file) {
     try {
-      return FileMapper.toEntity(apiClient.uploadFile(resourceId, file));
+      return FileMapper.INSTANCE.toEntity(apiClient.uploadFile(resourceId, file));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {

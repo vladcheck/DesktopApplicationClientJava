@@ -1,18 +1,18 @@
 package com.DesktopApplicationClientJava.mapper;
 
 import com.DesktopApplicationClientJava.Api.Dto.response.ResourceDto;
-import com.DesktopApplicationClientJava.entities.FileInfo;
 import com.DesktopApplicationClientJava.entities.Resource;
-import java.util.List;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValueMappingStrategy;
+import org.mapstruct.factory.Mappers;
 
-public final class ResourceMapper {
+@Mapper(
+    uses = FileMapper.class,
+    // Бэкенд присылает null вместо пустого списка файлов.
+    nullValueIterableMappingStrategy = NullValueMappingStrategy.RETURN_DEFAULT)
+public interface ResourceMapper {
 
-  private ResourceMapper() {}
+  ResourceMapper INSTANCE = Mappers.getMapper(ResourceMapper.class);
 
-  public static Resource toEntity(ResourceDto dto) {
-    List<FileInfo> files =
-        dto.files() == null ? List.of() : dto.files().stream().map(FileMapper::toEntity).toList();
-    return new Resource(
-        dto.uuid(), dto.title(), dto.description(), dto.createdAt(), dto.updatedAt(), files);
-  }
+  Resource toEntity(ResourceDto dto);
 }

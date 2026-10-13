@@ -25,7 +25,7 @@ public class AuthServiceImpl implements AuthService {
   public User login(String email, String password) {
     try {
       apiClient.login(new LoginRequest(email, password));
-      User user = UserMapper.toEntity(apiClient.getMe());
+      User user = UserMapper.INSTANCE.toEntity(apiClient.getMe());
       session.setCurrentUser(user);
       return user;
     } catch (ApiException e) {

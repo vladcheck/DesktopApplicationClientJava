@@ -2,12 +2,13 @@ package com.DesktopApplicationClientJava.mapper;
 
 import com.DesktopApplicationClientJava.Api.Dto.response.FileDto;
 import com.DesktopApplicationClientJava.entities.FileInfo;
+import org.mapstruct.Mapper;
+import org.mapstruct.factory.Mappers;
 
-public final class FileMapper {
+@Mapper
+public interface FileMapper {
 
-  private FileMapper() {}
+  FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
 
-  public static FileInfo toEntity(FileDto dto) {
-    return new FileInfo(dto.uuid(), dto.name(), dto.contentType(), dto.size());
-  }
+  FileInfo toEntity(FileDto dto);
 }

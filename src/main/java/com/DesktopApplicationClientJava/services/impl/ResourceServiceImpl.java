@@ -28,7 +28,7 @@ public class ResourceServiceImpl implements ResourceService {
         new ResourceFilterRequest(filter.getTitle(), filter.getDescription(), null, null);
     try {
       return apiClient.findResourcesByFilters(req, offset, count, "createdAt", "desc").stream()
-          .map(ResourceMapper::toEntity)
+          .map(ResourceMapper.INSTANCE::toEntity)
           .toList();
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
@@ -40,7 +40,7 @@ public class ResourceServiceImpl implements ResourceService {
   @Override
   public Resource create(String title, String description) {
     try {
-      return ResourceMapper.toEntity(
+      return ResourceMapper.INSTANCE.toEntity(
           apiClient.createResource(new CreateResourceRequest(title, description)));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
@@ -52,7 +52,7 @@ public class ResourceServiceImpl implements ResourceService {
   @Override
   public Resource getById(UUID resourceId) {
     try {
-      return ResourceMapper.toEntity(apiClient.findResourceById(resourceId));
+      return ResourceMapper.INSTANCE.toEntity(apiClient.findResourceById(resourceId));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {
@@ -67,7 +67,7 @@ public class ResourceServiceImpl implements ResourceService {
         new ResourceFilterRequest(filter.getTitle(), filter.getDescription(), null, null);
     try {
       return apiClient.findResourcesByFilters(req, offset, count, sortBy, sortDir).stream()
-          .map(ResourceMapper::toEntity)
+          .map(ResourceMapper.INSTANCE::toEntity)
           .toList();
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
@@ -80,7 +80,7 @@ public class ResourceServiceImpl implements ResourceService {
   public Resource update(UUID resourceId, String title, String description) {
     UpdateResourceRequest req = new UpdateResourceRequest(title, description);
     try {
-      return ResourceMapper.toEntity(apiClient.updateResource(resourceId, req));
+      return ResourceMapper.INSTANCE.toEntity(apiClient.updateResource(resourceId, req));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {

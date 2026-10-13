@@ -2,13 +2,17 @@ package com.DesktopApplicationClientJava.mapper;
 
 import com.DesktopApplicationClientJava.Api.Dto.response.UserDto;
 import com.DesktopApplicationClientJava.entities.User;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-public final class UserMapper {
+@Mapper
+public interface UserMapper {
 
-  private UserMapper() {}
+  UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-  public static User toEntity(UserDto dto) {
-    return new User(
-        dto.uuid(), dto.email(), dto.role(), dto.firstname(), dto.lastname(), dto.enabled());
-  }
+  // Имена в контракте бэкенда в нижнем регистре, в сущности — camelCase.
+  @Mapping(target = "firstName", source = "firstname")
+  @Mapping(target = "lastName", source = "lastname")
+  User toEntity(UserDto dto);
 }
