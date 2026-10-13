@@ -14,8 +14,7 @@
         value="java.io.Serial, javafx.fxml.FXML"/>
     </module>
   </module>
-  <!-- Модели на Lombok (@Getter генерирует доступ извне, Checkstyle его не видит):
-       поля там используются через сгенерированные геттеры и Jackson-десериализацию. -->
+  <!-- Lombok @Getter и Jackson читают эти поля в обход исходников, Checkstyle их не видит: без фильтра UnusedPrivateField ложно падает на entities/filter/data и ServiceRegistry. -->
   <module name="SuppressionSingleFilter">
     <property name="checks" value="UnusedPrivateField"/>
     <property
