@@ -7,5 +7,19 @@
     <module name="UnusedImports"/>
     <module name="RedundantImport"/>
     <module name="EqualsHashCode"/>
+    <module name="UnusedLocalVariable"/>
+    <module name="UnusedPrivateField">
+      <property
+        name="ignoreAnnotationCanonicalNames"
+        value="java.io.Serial, javafx.fxml.FXML"/>
+    </module>
+  </module>
+  <!-- Модели на Lombok (@Getter генерирует доступ извне, Checkstyle его не видит):
+       поля там используются через сгенерированные геттеры и Jackson-десериализацию. -->
+  <module name="SuppressionSingleFilter">
+    <property name="checks" value="UnusedPrivateField"/>
+    <property
+      name="files"
+      value="(entities|filter|data)[\\/].*\.java|ServiceRegistry\.java"/>
   </module>
 </module>
