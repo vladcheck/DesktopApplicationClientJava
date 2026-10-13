@@ -2,8 +2,8 @@ package com.DesktopApplicationClientJava.services.impl;
 
 import com.DesktopApplicationClientJava.Api.ApiClient;
 import com.DesktopApplicationClientJava.Api.ApiException;
-import com.DesktopApplicationClientJava.Api.Dto.response.FileDto;
 import com.DesktopApplicationClientJava.entities.FileInfo;
+import com.DesktopApplicationClientJava.mapper.FileMapper;
 import com.DesktopApplicationClientJava.services.FileService;
 import com.DesktopApplicationClientJava.services.ServiceException;
 import java.io.IOException;
@@ -20,8 +20,7 @@ public class FileServiceImpl implements FileService {
 
   public FileInfo uploadFile(UUID resourceId, Path file) {
     try {
-      FileDto dto = apiClient.uploadFile(resourceId, file);
-      return new FileInfo(dto.uuid(), dto.name(), dto.contentType(), dto.size());
+      return FileMapper.toEntity(apiClient.uploadFile(resourceId, file));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {

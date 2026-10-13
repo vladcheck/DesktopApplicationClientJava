@@ -8,8 +8,8 @@ public record UserDto(
     UUID uuid,
     String email,
     Role role,
-    String firstName,
-    String lastName,
+    String firstname,
+    String lastname,
     Boolean enabled,
     LocalDateTime createdAt,
     LocalDateTime updatedAt) {}
