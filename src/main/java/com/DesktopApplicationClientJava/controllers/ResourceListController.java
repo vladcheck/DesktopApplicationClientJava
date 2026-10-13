@@ -42,7 +42,7 @@ public class ResourceListController extends Controller {
   @FXML private Button createButton;
   @FXML private Button prevButton;
   @FXML private Button nextButton;
-  @FXML private Button logoutButton; // ← добавь, если ещё нет
+  @FXML private Button logoutButton;
 
   private final ObservableList<Resource> rows = FXCollections.observableArrayList();
   private long offset = 0;
@@ -60,6 +60,11 @@ public class ResourceListController extends Controller {
     searchField.setOnAction(e -> reloadFromStart());
     sortCombo.setOnAction(e -> reloadFromStart());
     resourceTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
+
+    // Initial load on open. Guarded for FXML tooling previews where no services are wired.
+    if (services != null && services.getResourceService() != null) {
+      reloadFromStart();
+    }
   }
 
   // ===== UI setup =====

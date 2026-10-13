@@ -134,7 +134,22 @@ class ResourceListControllerTest {
   }
 
   @Test
+  void initialOpenLoadsFirstPageWithoutInteraction(FxRobot robot) {
+    // Regression test for the missing auto-load: opening the page must fetch the first page
+    // with no user interaction. Red until initialize() triggers the initial load.
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource("Документ 1")));
+
+    robot.interact(this::loadPage);
+
+    waitForLoadComplete(robot);
+    assertEquals(1, rows(robot).size(), "page opened empty: no initial load happened");
+    assertEquals("Показано 1–1", textOf(robot, "#pageInfoLabel"));
+  }
+
+  @Test
   void sortDefaultsToNewestFirst(FxRobot robot) {
+
     ComboBox<String> sort = robot.lookup("#sortCombo").queryAs(ComboBox.class);
     assertEquals(
         List.of("Сначала новые", "Сначала старые", "По названию (А-Я)", "По названию (Я-А)"),
