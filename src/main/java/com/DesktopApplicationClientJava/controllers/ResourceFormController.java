@@ -66,13 +66,15 @@ public class ResourceFormController extends Controller {
     }
     if (title.length() > TITLE_MAX) {
       showError("Название не может быть длиннее " + TITLE_MAX + " символов");
+      titleField.requestFocus();
+      return;
     }
 
     try {
       if (resourceId == null) {
-        services.getResourceService().create(title, description);
+        services.getResourceService().create(title, descriptionOrNull);
       } else {
-        services.getResourceService().update(resourceId, title, description);
+        services.getResourceService().update(resourceId, title, descriptionOrNull);
       }
       navigator.goTo("/fxml/ResourceList.fxml");
     } catch (ServiceException e) {
