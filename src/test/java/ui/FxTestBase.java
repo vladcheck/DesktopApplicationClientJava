@@ -14,17 +14,30 @@ import org.testfx.api.FxToolkit;
  * BeforeEach} наследника.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-abstract class FxTestBase {
+public abstract class FxTestBase {
 
   protected final FxRobot robot = new FxRobot();
 
   @BeforeAll
   void initToolkit() throws TimeoutException {
-    FxToolkit.registerPrimaryStage();
+    startSharedToolkit();
   }
 
   @AfterAll
   void cleanupToolkit() throws TimeoutException {
+    stopSharedToolkit(robot);
+  }
+
+  /**
+   * Подъём toolkit для тестов, которые не могут наследовать этот класс (уже есть предок). Повторные
+   * вызовы дешёвые: toolkit стартует один раз на JVM.
+   */
+  public static void startSharedToolkit() throws TimeoutException {
+    FxToolkit.registerPrimaryStage();
+  }
+
+  /** Пара к {@link #startSharedToolkit()}. */
+  public static void stopSharedToolkit(FxRobot robot) throws TimeoutException {
     FxToolkit.cleanupStages();
     FxToolkit.cleanupInput(robot);
   }
