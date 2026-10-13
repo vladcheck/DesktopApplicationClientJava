@@ -28,14 +28,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
+import org.testfx.api.FxToolkit;
 
-@ExtendWith(ApplicationExtension.class)
-class ResourceFormControllerTest {
+class ResourceFormControllerTest extends FxTestBase {
 
   private static final UUID RESOURCE_ID = UUID.randomUUID();
   private static final String TITLE = "Годовой отчёт";
@@ -47,7 +45,18 @@ class ResourceFormControllerTest {
   private ResourceFormController controller;
   private Stage stage;
 
-  @Start
+  @BeforeEach
+  void resetScene() throws Exception {
+    FxToolkit.setupStage(
+        stage -> {
+          try {
+            start(stage);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
   void start(Stage stage) throws Exception {
     resourceService = mock(ResourceService.class);
     services = mock(ServiceRegistry.class);
@@ -82,13 +91,13 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void createModeShowsNewDocumentTitle(FxRobot robot) {
+  void createModeShowsNewDocumentTitle() {
     assertEquals("Новый документ", textOf(robot, "#formTitleLabel"));
     assertFalse(robot.lookup("#errorLabel").queryAs(Label.class).isVisible());
   }
 
   @Test
-  void blankTitleShowsErrorAndDoesNotSave(FxRobot robot) {
+  void blankTitleShowsErrorAndDoesNotSave() {
     robot.clickOn("#saveButton");
 
     assertError(robot, "Название обязательно для заполнения");
@@ -98,8 +107,8 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void shortTitleShowsErrorAndDoesNotSave(FxRobot robot) {
-    robot.clickOn("#titleField").write("ab");
+  void shortTitleShowsErrorAndDoesNotSave() {
+    fillText(robot, "#titleField", "ab");
     robot.clickOn("#saveButton");
 
     assertError(robot, "Название не может быть короче 3 символов");
@@ -108,8 +117,8 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void longTitleShowsErrorAndDoesNotSave(FxRobot robot) {
-    robot.clickOn("#titleField").write("a".repeat(256));
+  void longTitleShowsErrorAndDoesNotSave() {
+    fillText(robot, "#titleField", "a".repeat(256));
     robot.clickOn("#saveButton");
 
     assertError(robot, "Название не может быть длиннее 255 символов");
@@ -119,9 +128,9 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void validInputCreatesAndNavigatesToList(FxRobot robot) {
-    robot.clickOn("#titleField").write(TITLE);
-    robot.clickOn("#descriptionArea").write(DESCRIPTION);
+  void validInputCreatesAndNavigatesToList() {
+    fillText(robot, "#titleField", TITLE);
+    fillText(robot, "#descriptionArea", DESCRIPTION);
     robot.clickOn("#saveButton");
 
     verify(resourceService).create(TITLE, DESCRIPTION);
@@ -130,8 +139,8 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void blankDescriptionIsSavedAsNull(FxRobot robot) {
-    robot.clickOn("#titleField").write(TITLE);
+  void blankDescriptionIsSavedAsNull() {
+    fillText(robot, "#titleField", TITLE);
     robot.clickOn("#saveButton");
 
     verify(resourceService).create(TITLE, null);
@@ -139,11 +148,11 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void serviceErrorShowsInErrorLabelAndDoesNotNavigate(FxRobot robot) {
+  void serviceErrorShowsInErrorLabelAndDoesNotNavigate() {
     when(resourceService.create(anyString(), any()))
         .thenThrow(new ServiceException("Не удалось сохранить"));
 
-    robot.clickOn("#titleField").write(TITLE);
+    fillText(robot, "#titleField", TITLE);
     robot.clickOn("#saveButton");
 
     assertError(robot, "Не удалось сохранить");
@@ -151,8 +160,8 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void cancelNavigatesToListWithoutSaving(FxRobot robot) {
-    robot.clickOn("#titleField").write(TITLE);
+  void cancelNavigatesToListWithoutSaving() {
+    fillText(robot, "#titleField", TITLE);
     robot.clickOn("#cancelButton");
 
     verify(navigator).goTo("/fxml/ResourceList.fxml");
@@ -161,7 +170,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void editModePrefillsExistingValues(FxRobot robot) {
+  void editModePrefillsExistingValues() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(existingResource());
     openEditForm(robot, RESOURCE_ID);
 
@@ -171,7 +180,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void editModeSaveUpdatesAndNavigatesToList(FxRobot robot) {
+  void editModeSaveUpdatesAndNavigatesToList() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(existingResource());
     openEditForm(robot, RESOURCE_ID);
 
@@ -185,7 +194,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
-  void editModeLoadErrorShowsInErrorLabel(FxRobot robot) {
+  void editModeLoadErrorShowsInErrorLabel() {
     when(resourceService.getById(RESOURCE_ID)).thenThrow(new ServiceException("Ресурс не найден"));
     openEditForm(robot, RESOURCE_ID);
 

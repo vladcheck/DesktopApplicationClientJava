@@ -16,25 +16,33 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
+import org.testfx.api.FxToolkit;
 
 /**
  * Mock-backed UI flow: real pages wired to real in-memory mock services (no Mockito on services, no
  * backend). Proves that MOCK_DATA mode renders actual data.
  */
-@ExtendWith(ApplicationExtension.class)
-class MockFlowTest {
+class MockFlowTest extends FxTestBase {
 
   private static final UUID SEEDED_RESOURCE_ID =
       UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
   private ResourceDetailsController controller;
 
-  @Start
+  @BeforeEach
+  void resetScene() throws Exception {
+    FxToolkit.setupStage(
+        stage -> {
+          try {
+            start(stage);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
   void start(Stage stage) throws Exception {
     Navigator navigator = mockNavigator();
     ServiceRegistry services = ServiceRegistry.mock(new Session());
@@ -68,7 +76,7 @@ class MockFlowTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  void detailsPageRendersSeededMockResource(FxRobot robot) {
+  void detailsPageRendersSeededMockResource() {
     robot.interact(
         () -> {
           controller.setResourceId(SEEDED_RESOURCE_ID);
@@ -83,7 +91,7 @@ class MockFlowTest {
 
   @Test
   @SuppressWarnings("unchecked")
-  void detailsPageAutoSelectsFirstSeedWithoutId(FxRobot robot) {
+  void detailsPageAutoSelectsFirstSeedWithoutId() {
     robot.interact(() -> controller.load());
 
     assertEquals("Годовой отчёт (мок)", robot.lookup("#titleLabel").queryAs(Label.class).getText());

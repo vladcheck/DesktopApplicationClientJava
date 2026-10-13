@@ -32,15 +32,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
+import org.testfx.api.FxToolkit;
 
-@ExtendWith(ApplicationExtension.class)
-class ResourceDetailsControllerTest {
+class ResourceDetailsControllerTest extends FxTestBase {
 
   private static final UUID RESOURCE_ID = UUID.randomUUID();
   private static final UUID FILE_ID_1 = UUID.randomUUID();
@@ -64,7 +62,18 @@ class ResourceDetailsControllerTest {
     }
   }
 
-  @Start
+  @BeforeEach
+  void resetScene() throws Exception {
+    FxToolkit.setupStage(
+        stage -> {
+          try {
+            start(stage);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
   void start(Stage stage) throws Exception {
     resourceService = mock(ResourceService.class);
     fileService = mock(FileService.class);
@@ -83,7 +92,7 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
-  void successfulLoadShowsMetadataAndFiles(FxRobot robot) {
+  void successfulLoadShowsMetadataAndFiles() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     loadPage(robot);
 
@@ -101,7 +110,7 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
-  void resourceNotFoundShowsErrorAndLeavesTableEmpty(FxRobot robot) {
+  void resourceNotFoundShowsErrorAndLeavesTableEmpty() {
     when(resourceService.getById(RESOURCE_ID)).thenThrow(new ServiceException("Ресурс не найден"));
     loadPage(robot);
 
@@ -113,7 +122,7 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
-  void downloadSavesFileAndShowsStatus(FxRobot robot, @TempDir Path tempDir) {
+  void downloadSavesFileAndShowsStatus(@TempDir Path tempDir) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     loadPage(robot);
 
@@ -128,7 +137,7 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
-  void downloadErrorShowsInErrorLabel(FxRobot robot, @TempDir Path tempDir) {
+  void downloadErrorShowsInErrorLabel(@TempDir Path tempDir) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     loadPage(robot);
 
@@ -144,7 +153,7 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
-  void cancelledDirectoryChooserDoesNotCallDownload(FxRobot robot) {
+  void cancelledDirectoryChooserDoesNotCallDownload() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     loadPage(robot);
 
@@ -155,7 +164,7 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
-  void backNavigatesToResourceList(FxRobot robot) {
+  void backNavigatesToResourceList() {
     robot.clickOn("#backButton");
 
     verify(navigator).goTo("/fxml/ResourceList.fxml");

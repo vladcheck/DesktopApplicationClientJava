@@ -31,12 +31,13 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
+import org.testfx.api.FxToolkit;
+import ui.FxTestBase;
 
 /**
  * Integration tests for the resource create/edit flow: real services with a real ApiClient against
@@ -51,15 +52,36 @@ import org.testfx.framework.junit5.Start;
  * excludedGroups} in pom.xml). Run explicitly: {@code mvn test -Dgroups=integration
  * -DexcludedGroups= -Dtest=ResourceFormIntegrationTest}.
  */
-@ExtendWith(ApplicationExtension.class)
 class ResourceFormIntegrationTest extends IntegrationTestCase {
 
+  private final FxRobot robot = new FxRobot();
   private Navigator navigator;
   private Stage stage;
   private Session session;
   private ServiceRegistry services;
 
-  @Start
+  @BeforeAll
+  static void initToolkit() throws Exception {
+    FxTestBase.startSharedToolkit();
+  }
+
+  @AfterAll
+  static void cleanupToolkit() throws Exception {
+    FxTestBase.stopSharedToolkit(new FxRobot());
+  }
+
+  @BeforeEach
+  void resetScene() throws Exception {
+    FxToolkit.setupStage(
+        stage -> {
+          try {
+            start(stage);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
   void start(Stage stage) {
     this.stage = stage;
     this.navigator = mock(Navigator.class);
@@ -146,7 +168,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
-  void saveWithInvalidTokensShowsErrorAndDoesNotNavigate(FxRobot robot) {
+  void saveWithInvalidTokensShowsErrorAndDoesNotNavigate() {
     // Garbage tokens (not a fresh session) force a real HTTP 401 round-trip instead of the
     // client's offline "no refresh token" shortcut, proving server-side auth enforcement.
     Session poisoned = new Session();

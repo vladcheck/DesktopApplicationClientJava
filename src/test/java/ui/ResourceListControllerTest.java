@@ -39,15 +39,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
+import org.testfx.api.FxToolkit;
 import org.testfx.util.WaitForAsyncUtils;
 
-@ExtendWith(ApplicationExtension.class)
-class ResourceListControllerTest {
+class ResourceListControllerTest extends FxTestBase {
 
   private static final User ADMIN =
       new User(UUID.randomUUID(), "admin@example.com", Role.ADMIN, "Имя", "Фамилия", true);
@@ -59,7 +57,18 @@ class ResourceListControllerTest {
   private ResourceListController controller;
   private Stage stage;
 
-  @Start
+  @BeforeEach
+  void resetScene() throws Exception {
+    FxToolkit.setupStage(
+        stage -> {
+          try {
+            start(stage);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
   void start(Stage stage) throws Exception {
     authService = mock(AuthService.class);
     resourceService = mock(ResourceService.class);
@@ -96,19 +105,19 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void showsCurrentUserInHeader(FxRobot robot) {
+  void showsCurrentUserInHeader() {
     assertEquals("Имя Фамилия · ADMIN", textOf(robot, "#userInfoLabel"));
   }
 
   @Test
-  void adminSeesCreateButton(FxRobot robot) {
+  void adminSeesCreateButton() {
     Button create = robot.lookup("#createButton").queryAs(Button.class);
     assertTrue(create.isVisible());
     assertTrue(create.isManaged());
   }
 
   @Test
-  void moderatorSeesCreateButton(FxRobot robot) {
+  void moderatorSeesCreateButton() {
     robot.interact(
         () -> {
           when(authService.isAdmin()).thenReturn(false);
@@ -120,7 +129,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void plainUserDoesNotSeeCreateButton(FxRobot robot) {
+  void plainUserDoesNotSeeCreateButton() {
     robot.interact(
         () -> {
           when(authService.isAdmin()).thenReturn(false);
@@ -134,7 +143,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void initialOpenLoadsFirstPageWithoutInteraction(FxRobot robot) {
+  void initialOpenLoadsFirstPageWithoutInteraction() {
     // Regression test for the missing auto-load: opening the page must fetch the first page
     // with no user interaction. Red until initialize() triggers the initial load.
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
@@ -148,7 +157,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void sortDefaultsToNewestFirst(FxRobot robot) {
+  void sortDefaultsToNewestFirst() {
 
     ComboBox<String> sort = robot.lookup("#sortCombo").queryAs(ComboBox.class);
     assertEquals(
@@ -158,7 +167,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void searchLoadsMatchingRows(FxRobot robot) {
+  void searchLoadsMatchingRows() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of(resource("Документ 1")));
 
@@ -179,7 +188,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void changingSortReloadsWithTitleAsc(FxRobot robot) {
+  void changingSortReloadsWithTitleAsc() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of());
 
@@ -194,7 +203,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void nextPageLoadsWithOffsetAndDisablesButtonsOnShortPage(FxRobot robot) {
+  void nextPageLoadsWithOffsetAndDisablesButtonsOnShortPage() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of(resource("Документ 1")));
 
@@ -218,7 +227,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void serviceErrorShowsErrorAndClearsTable(FxRobot robot) {
+  void serviceErrorShowsErrorAndClearsTable() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenThrow(new ServiceException("Сервер недоступен"));
 
@@ -233,7 +242,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void logoutCallsServiceAndNavigatesToLogin(FxRobot robot) {
+  void logoutCallsServiceAndNavigatesToLogin() {
     robot.clickOn("#logoutButton");
 
     verify(authService).logout();
@@ -241,7 +250,7 @@ class ResourceListControllerTest {
   }
 
   @Test
-  void doubleClickRowOpensDetails(FxRobot robot) {
+  void doubleClickRowOpensDetails() {
     Resource resource = resource("Документ 1");
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of(resource));

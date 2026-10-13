@@ -30,13 +30,14 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
+import org.testfx.api.FxToolkit;
 import org.testfx.util.WaitForAsyncUtils;
+import ui.FxTestBase;
 
 /**
  * UI-level integration tests for the resource list page: real services with a real ApiClient
@@ -47,15 +48,36 @@ import org.testfx.util.WaitForAsyncUtils;
  * the default build and CI (see surefire {@code excludedGroups} in pom.xml). Run explicitly: {@code
  * mvn test -Dgroups=integration -DexcludedGroups= -Dtest=ResourceListIntegrationTest}.
  */
-@ExtendWith(ApplicationExtension.class)
 class ResourceListIntegrationTest extends IntegrationTestCase {
 
+  private final FxRobot robot = new FxRobot();
   private Navigator navigator;
   private Stage stage;
   private Session session;
   private ServiceRegistry services;
 
-  @Start
+  @BeforeAll
+  static void initToolkit() throws Exception {
+    FxTestBase.startSharedToolkit();
+  }
+
+  @AfterAll
+  static void cleanupToolkit() throws Exception {
+    FxTestBase.stopSharedToolkit(new FxRobot());
+  }
+
+  @BeforeEach
+  void resetScene() throws Exception {
+    FxToolkit.setupStage(
+        stage -> {
+          try {
+            start(stage);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
   void start(Stage stage) {
     this.stage = stage;
     this.navigator = mock(Navigator.class);
@@ -75,7 +97,7 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
-  void emptySearchShowsPlaceholderAndZeroCounter(FxRobot robot) {
+  void emptySearchShowsPlaceholderAndZeroCounter() {
     loginAsAdmin();
     loadListPage(robot);
 
@@ -88,7 +110,7 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
-  void seededResourceAppearsInSearch(FxRobot robot) {
+  void seededResourceAppearsInSearch() {
     loginAsAdmin();
     String title = "IT ResourceList " + UUID.randomUUID();
     Resource created = resourceService.create(title, "created by ResourceListIntegrationTest");
@@ -108,7 +130,7 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
-  void sortByTitleAscOrdersSeededResources(FxRobot robot) {
+  void sortByTitleAscOrdersSeededResources() {
     loginAsAdmin();
     String prefix = "IT ResourceSort " + UUID.randomUUID() + " ";
     Resource second = resourceService.create(prefix + "ZZZ", "seeded second");
@@ -133,7 +155,7 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
-  void unauthenticatedSearchShowsErrorAndLeavesTableEmpty(FxRobot robot) {
+  void unauthenticatedSearchShowsErrorAndLeavesTableEmpty() {
     // Fresh session, no login: the request cannot be authenticated.
     session.clear();
     loadListPage(robot);
