@@ -67,7 +67,7 @@ public class ResourceServiceImpl implements ResourceService {
         new ResourceFilterRequest(filter.getTitle(), filter.getDescription(), null, null);
     try {
       return apiClient.findResourcesByFilters(req, offset, count, sortBy, sortDir).stream()
-          .map(this::toEntity)
+          .map(ResourceMapper::toEntity)
           .toList();
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
