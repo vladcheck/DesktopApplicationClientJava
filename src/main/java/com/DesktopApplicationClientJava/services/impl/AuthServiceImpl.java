@@ -3,9 +3,9 @@ package com.DesktopApplicationClientJava.services.impl;
 import com.DesktopApplicationClientJava.Api.ApiClient;
 import com.DesktopApplicationClientJava.Api.ApiException;
 import com.DesktopApplicationClientJava.Api.Dto.request.Auth.LoginRequest;
-import com.DesktopApplicationClientJava.Api.Dto.response.UserDto;
 import com.DesktopApplicationClientJava.entities.Role;
 import com.DesktopApplicationClientJava.entities.User;
+import com.DesktopApplicationClientJava.mapper.UserMapper;
 import com.DesktopApplicationClientJava.services.AuthService;
 import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.session.Session;
@@ -25,8 +25,7 @@ public class AuthServiceImpl implements AuthService {
   public User login(String email, String password) {
     try {
       apiClient.login(new LoginRequest(email, password));
-      UserDto me = apiClient.getMe();
-      User user = toEntity(me);
+      User user = UserMapper.INSTANCE.toEntity(apiClient.getMe());
       session.setCurrentUser(user);
       return user;
     } catch (ApiException e) {
@@ -68,11 +67,6 @@ public class AuthServiceImpl implements AuthService {
   @Override
   public boolean isModerator() {
     return hasRole(Role.MODER);
-  }
-
-  private User toEntity(UserDto dto) {
-    return new User(
-        dto.uuid(), dto.email(), dto.role(), dto.firstName(), dto.lastName(), dto.enabled());
   }
 
   private static int level(Role role) {

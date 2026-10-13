@@ -1,0 +1,11 @@
+target/
+.git/
+.gitignore
+.idea/
+.vscode/
+*.log
+*.class
+.env
+.DS_Store
+lefthook.yml
+setup.ps1

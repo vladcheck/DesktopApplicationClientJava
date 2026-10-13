@@ -8,8 +8,21 @@
 #   docker compose up -d
 # With object storage (for file/export ITs):
 #   docker compose --profile files up -d
+# Desktop client (GUI: нужен X-сервер, подробности в README; к бэкенду ходит по HTTP, поэтому без depends_on):
+#   docker compose --profile gui run --rm client
 
 services:
+  client:
+    build: .
+    image: desktop-client
+    profiles: [gui]
+    environment:
+      - INITIAL_PAGE_PATH=${INITIAL_PAGE_PATH:-/fxml/LoginForm.fxml}
+      - MOCK_DATA=${MOCK_DATA:-false}
+      - DISPLAY=${DISPLAY:-}
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro
+
   postgres:
     image: postgres:16-alpine
     environment:

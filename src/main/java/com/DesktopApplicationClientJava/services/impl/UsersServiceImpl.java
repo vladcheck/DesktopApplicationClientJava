@@ -5,8 +5,8 @@ import com.DesktopApplicationClientJava.Api.ApiException;
 import com.DesktopApplicationClientJava.Api.Dto.request.Admin.RegisterRequest;
 import com.DesktopApplicationClientJava.Api.Dto.request.Admin.UpdateUserRequest;
 import com.DesktopApplicationClientJava.Api.Dto.request.Admin.UserFilterRequest;
-import com.DesktopApplicationClientJava.Api.Dto.response.UserDto;
 import com.DesktopApplicationClientJava.entities.User;
+import com.DesktopApplicationClientJava.mapper.UserMapper;
 import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.UsersService;
 import com.DesktopApplicationClientJava.services.data.RegisterData;
@@ -37,7 +37,7 @@ public class UsersServiceImpl implements UsersService {
 
     try {
       return apiClient.getUsersByFilters(req, offset, count, "createdAt", "desc").stream()
-          .map(this::toEntity)
+          .map(UserMapper.INSTANCE::toEntity)
           .toList();
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
@@ -49,7 +49,7 @@ public class UsersServiceImpl implements UsersService {
   @Override
   public User getById(UUID uuid) {
     try {
-      return toEntity(apiClient.getUserById(uuid));
+      return UserMapper.INSTANCE.toEntity(apiClient.getUserById(uuid));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {
@@ -67,7 +67,7 @@ public class UsersServiceImpl implements UsersService {
             data.getFirstName(),
             data.getLastName());
     try {
-      return toEntity(apiClient.createUser(req));
+      return UserMapper.INSTANCE.toEntity(apiClient.createUser(req));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {
@@ -86,7 +86,7 @@ public class UsersServiceImpl implements UsersService {
             data.getLastName());
 
     try {
-      return toEntity(apiClient.updateUser(uuid, req));
+      return UserMapper.INSTANCE.toEntity(apiClient.updateUser(uuid, req));
     } catch (ApiException e) {
       throw new ServiceException(e.getMessage(), e.getStatus());
     } catch (IOException | InterruptedException e) {
@@ -103,10 +103,5 @@ public class UsersServiceImpl implements UsersService {
     } catch (IOException | InterruptedException e) {
       throw new ServiceException("Ошибка соединения с сервером");
     }
-  }
-
-  private User toEntity(UserDto dto) {
-    return new User(
-        dto.uuid(), dto.email(), dto.role(), dto.firstName(), dto.lastName(), dto.enabled());
   }
 }
