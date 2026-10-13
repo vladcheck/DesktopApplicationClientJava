@@ -7,5 +7,18 @@
     <module name="UnusedImports"/>
     <module name="RedundantImport"/>
     <module name="EqualsHashCode"/>
+    <module name="UnusedLocalVariable"/>
+    <module name="UnusedPrivateField">
+      <property
+        name="ignoreAnnotationCanonicalNames"
+        value="java.io.Serial, javafx.fxml.FXML"/>
+    </module>
+  </module>
+  <!-- Lombok @Getter и Jackson читают эти поля в обход исходников, Checkstyle их не видит: без фильтра UnusedPrivateField ложно падает на entities/filter/data и ServiceRegistry. -->
+  <module name="SuppressionSingleFilter">
+    <property name="checks" value="UnusedPrivateField"/>
+    <property
+      name="files"
+      value="(entities|filter|data)[\\/].*\.java|ServiceRegistry\.java"/>
   </module>
 </module>
