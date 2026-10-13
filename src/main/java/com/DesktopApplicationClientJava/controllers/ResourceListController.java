@@ -62,12 +62,6 @@ public class ResourceListController extends Controller {
     resourceTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
   }
 
-  @Override
-  public void onLoad() {
-    // Стартовая загрузка — после wiring и построения сцены
-    reloadFromStart();
-  }
-
   // ===== UI setup =====
 
   private void setupUser() {
