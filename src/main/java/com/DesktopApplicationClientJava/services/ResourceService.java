@@ -7,8 +7,10 @@ import java.util.UUID;
 
 public interface ResourceService {
   List<Resource> search(ResourceFilter filter, long offset, long count);
-  List<Resource> search(ResourceFilter filter, long offset, long count,
-                        String sortBy, String sortDir);
+
+  List<Resource> search(
+      ResourceFilter filter, long offset, long count, String sortBy, String sortDir);
+
   Resource create(String title, String description);
 
   Resource getById(UUID resourceId);

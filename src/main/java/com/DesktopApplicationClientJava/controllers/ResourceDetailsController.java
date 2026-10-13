@@ -53,25 +53,27 @@ public class ResourceDetailsController extends Controller {
 
     nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
     contentTypeColumn.setCellValueFactory(new PropertyValueFactory<>("contentType"));
-    sizeColumn.setCellValueFactory(c ->
-            new SimpleStringProperty(formatSize(c.getValue().getSize())));
-    sizeColumn.setCellFactory(col -> {
-      TableCell<FileInfo, String> cell = new TableCell<>() {
-        @Override
-        protected void updateItem(String item, boolean empty) {
-          super.updateItem(item, empty);
-          setText(empty ? null : item);
-          setAlignment(Pos.CENTER_RIGHT);
-        }
-      };
-      return cell;
-    });
+    sizeColumn.setCellValueFactory(
+        c -> new SimpleStringProperty(formatSize(c.getValue().getSize())));
+    sizeColumn.setCellFactory(
+        col -> {
+          TableCell<FileInfo, String> cell =
+              new TableCell<>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                  super.updateItem(item, empty);
+                  setText(empty ? null : item);
+                  setAlignment(Pos.CENTER_RIGHT);
+                }
+              };
+          return cell;
+        });
 
     downloadColumn.setCellFactory(col -> new DownloadCell(this::onDownload));
     filesTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
     filesTable.setPlaceholder(new Label("У этого документа нет файлов"));
-    boolean canEdit = services.getAuthService().isAdmin()
-            || services.getAuthService().isModerator();
+    boolean canEdit =
+        services.getAuthService().isAdmin() || services.getAuthService().isModerator();
     editButton.setVisible(canEdit);
     editButton.setManaged(canEdit);
     autoSelectFirstInMockMode();
@@ -97,8 +99,7 @@ public class ResourceDetailsController extends Controller {
       return;
     }
     try {
-      Path saved =
-              services.getFileService().downloadFile(resourceId, file.getUuid(), dir.toPath());
+      Path saved = services.getFileService().downloadFile(resourceId, file.getUuid(), dir.toPath());
       statusLabel.setText("Сохранено: " + saved.getFileName());
     } catch (ServiceException e) {
       showError(e.getMessage());
@@ -110,9 +111,9 @@ public class ResourceDetailsController extends Controller {
   }
 
   /**
-   * Dev-only fallback: when the page is opened without an id (e.g. straight via
-   * INITIAL_PAGE_PATH) against a mock service, show the first seeded resource so the UI is
-   * clickable without the resource list. Never triggers against the real backend.
+   * Dev-only fallback: when the page is opened without an id (e.g. straight via INITIAL_PAGE_PATH)
+   * against a mock service, show the first seeded resource so the UI is clickable without the
+   * resource list. Never triggers against the real backend.
    */
   private void autoSelectFirstInMockMode() {
     if (resourceId != null || !(services.getResourceService() instanceof MockService mock)) {
@@ -120,13 +121,13 @@ public class ResourceDetailsController extends Controller {
     }
     mock.doIfInitialPage();
     services.getResourceService().search(ResourceFilter.empty(), 0, 1).stream()
-            .map(Resource::getUuid)
-            .findFirst()
-            .ifPresent(
-                    id -> {
-                      setResourceId(id);
-                      load();
-                    });
+        .map(Resource::getUuid)
+        .findFirst()
+        .ifPresent(
+            id -> {
+              setResourceId(id);
+              load();
+            });
   }
 
   private void showResource(Resource resource) {
@@ -177,11 +178,11 @@ public class ResourceDetailsController extends Controller {
       setGraphic(empty ? null : button);
     }
   }
+
   @FXML
   private void onEdit(ActionEvent event) {
     if (resourceId == null) return;
     navigator.goTo(
-            "/fxml/ResourceForm.fxml",
-            c -> ((ResourceFormController) c).setResourceId(resourceId));
+        "/fxml/ResourceForm.fxml", c -> ((ResourceFormController) c).setResourceId(resourceId));
   }
 }

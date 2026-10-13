@@ -48,22 +48,24 @@ public class MockResourceService implements ResourceService, MockService {
   }
 
   @Override
-  public List<Resource> search(ResourceFilter filter, long offset, long count,
-                               String sortBy, String sortDir) {
+  public List<Resource> search(
+      ResourceFilter filter, long offset, long count, String sortBy, String sortDir) {
     // 1. Сначала фильтрация (как в текущей 3-аргументной версии)
-    List<Resource> filtered = store.getResources().values().stream()
+    List<Resource> filtered =
+        store.getResources().values().stream()
             .filter(r -> matches(r, filter))
             .collect(Collectors.toList());
 
     // 2. Сортировка по sortBy/sortDir
-    Comparator<Resource> comparator = switch (sortBy == null ? "createdAt" : sortBy) {
-      case "title" -> Comparator.comparing(
-              r -> r.getTitle() == null ? "" : r.getTitle(),
-              String.CASE_INSENSITIVE_ORDER);
-      default -> Comparator.comparing(
-              Resource::getCreatedAt,
-              Comparator.nullsLast(Comparator.naturalOrder()));
-    };
+    Comparator<Resource> comparator =
+        switch (sortBy == null ? "createdAt" : sortBy) {
+          case "title" ->
+              Comparator.comparing(
+                  r -> r.getTitle() == null ? "" : r.getTitle(), String.CASE_INSENSITIVE_ORDER);
+          default ->
+              Comparator.comparing(
+                  Resource::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder()));
+        };
     if ("desc".equalsIgnoreCase(sortDir)) {
       comparator = comparator.reversed();
     }
