@@ -72,15 +72,13 @@ class ResourceFormControllerTest {
     stage.show();
   }
 
-  private void reloadForm(FxRobot robot, UUID resourceId) {
-    robot.interact(
-        () -> {
-          try {
-            loadForm(resourceId);
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        });
+  /**
+   * Production ordering (see Navigator.goTo): the form is loaded with no id, and the id is set
+   * afterwards via withController. Setting it here post-load must drive the controller into edit
+   * mode; pre-setting it before load would mask a controller that ignores late ids.
+   */
+  private void openEditForm(FxRobot robot, UUID resourceId) {
+    robot.interact(() -> controller.setResourceId(resourceId));
   }
 
   @Test
@@ -165,7 +163,7 @@ class ResourceFormControllerTest {
   @Test
   void editModePrefillsExistingValues(FxRobot robot) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(existingResource());
-    reloadForm(robot, RESOURCE_ID);
+    openEditForm(robot, RESOURCE_ID);
 
     assertEquals("Редактирование документа", textOf(robot, "#formTitleLabel"));
     assertEquals("Старое название", fieldText(robot, "#titleField"));
@@ -175,7 +173,7 @@ class ResourceFormControllerTest {
   @Test
   void editModeSaveUpdatesAndNavigatesToList(FxRobot robot) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(existingResource());
-    reloadForm(robot, RESOURCE_ID);
+    openEditForm(robot, RESOURCE_ID);
 
     robot.interact(
         () -> robot.lookup("#titleField").queryAs(TextField.class).setText("Новое название"));
@@ -189,7 +187,7 @@ class ResourceFormControllerTest {
   @Test
   void editModeLoadErrorShowsInErrorLabel(FxRobot robot) {
     when(resourceService.getById(RESOURCE_ID)).thenThrow(new ServiceException("Ресурс не найден"));
-    reloadForm(robot, RESOURCE_ID);
+    openEditForm(robot, RESOURCE_ID);
 
     assertError(robot, "Ресурс не найден");
   }

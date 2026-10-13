@@ -10,7 +10,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import lombok.Setter;
 
 public class ResourceFormController extends Controller {
 
@@ -24,7 +23,20 @@ public class ResourceFormController extends Controller {
   @FXML private Button cancelButton;
   @FXML private Button saveButton;
 
-  @Setter private UUID resourceId;
+  private UUID resourceId;
+
+  /**
+   * Navigator sets the id <i>after</i> FXML load (see {@code Navigator.goTo}), so the setter itself
+   * must switch the form into edit mode when the view is already initialized. Setting the id before
+   * load is also honored by {@link #initialize()}.
+   */
+  public void setResourceId(UUID resourceId) {
+    this.resourceId = resourceId;
+    if (formTitleLabel != null && resourceId != null && services != null) {
+      formTitleLabel.setText("Редактирование документа");
+      loadExisting();
+    }
+  }
 
   @FXML
   private void initialize() {

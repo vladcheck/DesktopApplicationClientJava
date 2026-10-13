@@ -25,7 +25,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Window;
-import lombok.Setter;
 
 public class ResourceDetailsController extends Controller {
 
@@ -45,7 +44,19 @@ public class ResourceDetailsController extends Controller {
   @FXML private TableColumn<FileInfo, Void> downloadColumn;
   @FXML private Button backButton;
   @FXML private Button editButton;
-  @Setter private UUID resourceId;
+
+  private UUID resourceId;
+
+  /**
+   * Navigator sets the id <i>after</i> FXML load (see {@code Navigator.goTo}), so the setter itself
+   * must load the resource when the view is already initialized.
+   */
+  public void setResourceId(UUID resourceId) {
+    this.resourceId = resourceId;
+    if (titleLabel != null && resourceId != null && services != null) {
+      load();
+    }
+  }
 
   @FXML
   private void initialize() {
@@ -127,11 +138,7 @@ public class ResourceDetailsController extends Controller {
     services.getResourceService().search(ResourceFilter.empty(), 0, 1).stream()
         .map(Resource::getUuid)
         .findFirst()
-        .ifPresent(
-            id -> {
-              setResourceId(id);
-              load();
-            });
+        .ifPresent(this::setResourceId); // the setter loads the resource
   }
 
   private void showResource(Resource resource) {

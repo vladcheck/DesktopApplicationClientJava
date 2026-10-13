@@ -162,11 +162,10 @@ class ResourceDetailsControllerTest {
   }
 
   private void loadPage(FxRobot robot) {
-    robot.interact(
-        () -> {
-          controller.setResourceId(RESOURCE_ID);
-          controller.load();
-        });
+    // Production ordering (see Navigator.goTo): FXML is loaded first with no id, and the id is
+    // set afterwards via withController. The controller must react to the late id itself;
+    // calling load() here would mask a controller that ignores post-load ids.
+    robot.interact(() -> controller.setResourceId(RESOURCE_ID));
   }
 
   private Resource resourceWithFiles() {
