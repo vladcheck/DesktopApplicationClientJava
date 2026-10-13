@@ -23,14 +23,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.testfx.api.FxRobot;
-import org.testfx.framework.junit5.ApplicationExtension;
-import org.testfx.framework.junit5.Start;
+import org.testfx.api.FxToolkit;
 
-@ExtendWith(ApplicationExtension.class)
-class LoginFormControllerTest {
+class LoginFormControllerTest extends FxTestBase {
 
   private static final String VALID_EMAIL = "user@example.com";
   private static final String VALID_PASSWORD = "secret123";
@@ -38,7 +35,18 @@ class LoginFormControllerTest {
   private AuthService authService;
   private Navigator navigator;
 
-  @Start
+  @BeforeEach
+  void resetScene() throws Exception {
+    FxToolkit.setupStage(
+        stage -> {
+          try {
+            start(stage);
+          } catch (Exception e) {
+            throw new RuntimeException(e);
+          }
+        });
+  }
+
   void start(Stage stage) throws Exception {
     authService = mock(AuthService.class);
     ServiceRegistry services = mock(ServiceRegistry.class);
@@ -62,7 +70,7 @@ class LoginFormControllerTest {
   }
 
   @Test
-  void emptyFieldsShowErrorAndDoNotCallApi(FxRobot robot) {
+  void emptyFieldsShowErrorAndDoNotCallApi() {
     robot.clickOn("#submitButton");
 
     Label error = robot.lookup("#errorLabel").queryAs(Label.class);
@@ -73,8 +81,8 @@ class LoginFormControllerTest {
   }
 
   @Test
-  void blankPasswordShowsErrorAndDoesNotCallApi(FxRobot robot) {
-    robot.clickOn("#emailField").write(VALID_EMAIL);
+  void blankPasswordShowsErrorAndDoesNotCallApi() {
+    fillText(robot, "#emailField", VALID_EMAIL);
     robot.clickOn("#submitButton");
 
     Label error = robot.lookup("#errorLabel").queryAs(Label.class);
@@ -85,9 +93,9 @@ class LoginFormControllerTest {
   }
 
   @Test
-  void invalidEmailShowsErrorAndDoesNotCallApi(FxRobot robot) {
-    robot.clickOn("#emailField").write("not-an-email");
-    robot.clickOn("#passwordField").write(VALID_PASSWORD);
+  void invalidEmailShowsErrorAndDoesNotCallApi() {
+    fillText(robot, "#emailField", "not-an-email");
+    fillText(robot, "#passwordField", VALID_PASSWORD);
     robot.clickOn("#submitButton");
 
     Label error = robot.lookup("#errorLabel").queryAs(Label.class);
@@ -98,12 +106,12 @@ class LoginFormControllerTest {
   }
 
   @Test
-  void successfulLoginNavigatesToResourceList(FxRobot robot) {
+  void successfulLoginNavigatesToResourceList() {
     User user = new User(UUID.randomUUID(), VALID_EMAIL, Role.USER, "Имя", "Фамилия", true);
     when(authService.login(VALID_EMAIL, VALID_PASSWORD)).thenReturn(user);
 
-    robot.clickOn("#emailField").write(VALID_EMAIL);
-    robot.clickOn("#passwordField").write(VALID_PASSWORD);
+    fillText(robot, "#emailField", VALID_EMAIL);
+    fillText(robot, "#passwordField", VALID_PASSWORD);
     robot.clickOn("#submitButton");
 
     verify(authService).login(VALID_EMAIL, VALID_PASSWORD);
@@ -113,12 +121,12 @@ class LoginFormControllerTest {
   }
 
   @Test
-  void failedLoginShowsServerErrorAndDoesNotNavigate(FxRobot robot) {
+  void failedLoginShowsServerErrorAndDoesNotNavigate() {
     when(authService.login(VALID_EMAIL, VALID_PASSWORD))
         .thenThrow(new ServiceException("Неверный логин или пароль"));
 
-    robot.clickOn("#emailField").write(VALID_EMAIL);
-    robot.clickOn("#passwordField").write(VALID_PASSWORD);
+    fillText(robot, "#emailField", VALID_EMAIL);
+    fillText(robot, "#passwordField", VALID_PASSWORD);
     robot.clickOn("#submitButton");
 
     Label error = robot.lookup("#errorLabel").queryAs(Label.class);
