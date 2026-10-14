@@ -45,7 +45,7 @@ public class Program extends Application {
     loadStyleSheet(scene, "/styles.css");
 
     stage.setScene(scene);
-    stage.setTitle("JavaFX Application" + (MOCK_DATA ? " [MOCK]" : ""));
+    stage.setTitle("Госхрон" + (MOCK_DATA ? " [MOCK]" : ""));
     stage.setWidth(WINDOW_WIDTH);
     stage.setHeight(WINDOW_HEIGHT);
     stage.centerOnScreen();
