@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+<VBox fx:id="root" alignment="CENTER" prefHeight="259.0" prefWidth="410.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.DesktopApplicationClientJava.controllers.UserCreateFormController">
+   <padding>
+      <Insets bottom="20" left="20" right="20" top="20" />
+   </padding>
+
+   <VBox maxWidth="420" styleClass="panel, panel-primary">
+      <VBox styleClass="panel-heading">
+         <Label styleClass="panel-title" text="Госхрон" />
+      </VBox>
+
+      <VBox spacing="8" styleClass="panel-body">
+         <padding>
+            <Insets bottom="12" left="12" right="12" top="12" />
+         </padding>
+
+         <Label text="Почта" />
+         <TextField fx:id="emailField" promptText="youremail@example.com" />
+
+         <Label text="Пароль" />
+         <PasswordField fx:id="passwordField" />
+
+         <Label text="Роль" />
+         <ChoiceBox fx:id="rolesChoiceBox" prefWidth="150.0">
+            <items>
+               <FXCollections fx:factory="observableArrayList">
+                  <String fx:value="Значение 1"/>
+                  <String fx:value="Значение 2"/>
+                  <String fx:value="Значение 3"/>
+               </FXCollections>
+            </items>
+         </ChoiceBox>
+
+         <Label text="Имя" />
+         <TextField fx:id="firstNameField" promptText="Иван" />
+
+         <Label text="Фамилия" />
+         <TextField fx:id="lastNameField" promptText="Иванов" />
+
+         <Label fx:id="errorLabel" managed="false" maxWidth="Infinity" styleClass="alert, alert-danger" visible="false" wrapText="true" />
+
+
+         <Button fx:id="submitButton" maxWidth="Infinity" onAction="#onSubmit" styleClass="btn, btn-primary, btn-block" text="Войти" />
+      </VBox>
+   </VBox>
+</VBox>
