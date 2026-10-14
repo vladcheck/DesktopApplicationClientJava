@@ -1,4 +1,4 @@
-package ui;
+package com.DesktopApplicationClientJava.ui;
 
 import java.util.concurrent.TimeoutException;
 import javafx.scene.control.TextInputControl;

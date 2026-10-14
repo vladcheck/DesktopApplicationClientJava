@@ -1,4 +1,4 @@
-package ui.integration;
+package com.DesktopApplicationClientJava.ui.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -19,6 +19,7 @@ import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.services.impl.AuthServiceImpl;
 import com.DesktopApplicationClientJava.services.impl.ResourceServiceImpl;
 import com.DesktopApplicationClientJava.session.Session;
+import com.DesktopApplicationClientJava.ui.FxTestBase;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
 import java.util.UUID;
 import javafx.event.ActionEvent;
@@ -37,7 +38,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
-import ui.FxTestBase;
 
 /**
  * Integration tests for the resource create/edit flow: real services with a real ApiClient against
@@ -58,7 +58,6 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   private Navigator navigator;
   private Stage stage;
   private Session session;
-  private ServiceRegistry services;
 
   @BeforeAll
   static void initToolkit() throws Exception {
@@ -97,7 +96,6 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
     ApiClient apiClient = new ApiClient(session);
     authService = new AuthServiceImpl(apiClient, session);
     resourceService = new ResourceServiceImpl(apiClient);
-    services = new ServiceRegistry(apiClient, session);
   }
 
   @Test

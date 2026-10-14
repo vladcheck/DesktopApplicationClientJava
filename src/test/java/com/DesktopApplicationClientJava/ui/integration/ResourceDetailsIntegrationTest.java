@@ -1,4 +1,4 @@
-package ui.integration;
+package com.DesktopApplicationClientJava.ui.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

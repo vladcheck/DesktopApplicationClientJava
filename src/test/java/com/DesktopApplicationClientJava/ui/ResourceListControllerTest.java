@@ -1,4 +1,4 @@
-package ui;
+package com.DesktopApplicationClientJava.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -158,7 +158,7 @@ class ResourceListControllerTest extends FxTestBase {
 
   @Test
   void sortDefaultsToNewestFirst() {
-
+    @SuppressWarnings("unchecked")
     ComboBox<String> sort = robot.lookup("#sortCombo").queryAs(ComboBox.class);
     assertEquals(
         List.of("Сначала новые", "Сначала старые", "По названию (А-Я)", "По названию (Я-А)"),

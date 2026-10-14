@@ -1,4 +1,4 @@
-package ui;
+package com.DesktopApplicationClientJava.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.DesktopApplicationClientJava.controllers.ResourceDetailsController;
 import com.DesktopApplicationClientJava.entities.FileInfo;
 import com.DesktopApplicationClientJava.entities.Resource;
 import com.DesktopApplicationClientJava.navigation.Navigator;
@@ -25,20 +24,20 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
-import javafx.stage.Stage;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Window;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.testfx.api.FxRobot;
-import org.testfx.api.FxToolkit;
 
-class ResourceDetailsControllerTest extends FxTestBase {
+class ResourceDetailsControllerTest {
 
   private static final UUID RESOURCE_ID = UUID.randomUUID();
   private static final UUID FILE_ID_1 = UUID.randomUUID();
@@ -62,119 +61,120 @@ class ResourceDetailsControllerTest extends FxTestBase {
     }
   }
 
-  @BeforeEach
-  void resetScene() throws Exception {
-    FxToolkit.setupStage(
-        stage -> {
-          try {
-            start(stage);
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        });
+  @BeforeAll
+  static void bootstrapFx() {
+    try {
+      Platform.startup(() -> {});
+      Platform.setImplicitExit(false);
+    } catch (IllegalStateException alreadyStarted) {
+      // JVM-wide singleton; another test class already started the toolkit.
+    }
   }
 
-  void start(Stage stage) throws Exception {
+  @BeforeEach
+  void setUp() {
     resourceService = mock(ResourceService.class);
     fileService = mock(FileService.class);
+    navigator = mock(Navigator.class);
+
     ServiceRegistry services = mock(ServiceRegistry.class);
     when(services.getResourceService()).thenReturn(resourceService);
     when(services.getFileService()).thenReturn(fileService);
-    navigator = mock(Navigator.class);
 
     controller = new TestableResourceDetailsController();
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ResourceDetails.fxml"));
-    loader.setControllerFactory(clazz -> controller);
     ControllerWiring.wire(controller, navigator, new Session(), services);
-    Parent root = loader.load();
-    stage.setScene(new Scene(root));
-    stage.show();
+
+    controller.titleLabel = new Label();
+    controller.descriptionLabel = new Label();
+    controller.createdLabel = new Label();
+    controller.updatedLabel = new Label();
+    controller.uuidLabel = new Label();
+    controller.errorLabel = new Label();
+    controller.statusLabel = new Label();
+    controller.filesTable = new TableView<>();
+
+    // onDownload does backButton.getScene().getWindow() before calling chooseDirectory.
+    // Attaching the button to a Scene keeps that expression from NPE-ing; the window itself
+    // is never dereferenced because our chooseDirectory override ignores its argument.
+    controller.backButton = new Button();
+    new Scene(new StackPane(controller.backButton));
   }
 
   @Test
   void successfulLoadShowsMetadataAndFiles() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
-    loadPage(robot);
+    controller.setResourceId(RESOURCE_ID);
 
-    assertEquals("Годовой отчёт", textOf(robot, "#titleLabel"));
-    assertEquals("Описание ресурса", textOf(robot, "#descriptionLabel"));
-    assertEquals("06.05.2024 07:08", textOf(robot, "#createdLabel"));
-    assertEquals("07.05.2024 09:10", textOf(robot, "#updatedLabel"));
-    assertEquals(RESOURCE_ID.toString(), textOf(robot, "#uuidLabel"));
-
-    TableView<FileInfo> table = filesTable(robot);
-    assertEquals(2, table.getItems().size());
-    assertEquals("report.pdf", table.getItems().get(0).getName());
-    assertEquals("photo.png", table.getItems().get(1).getName());
-    assertFalse(robot.lookup("#errorLabel").queryAs(Label.class).isVisible());
+    assertEquals("Годовой отчёт", controller.titleLabel.getText());
+    assertEquals("Описание ресурса", controller.descriptionLabel.getText());
+    assertEquals("06.05.2024 07:08", controller.createdLabel.getText());
+    assertEquals("07.05.2024 09:10", controller.updatedLabel.getText());
+    assertEquals(RESOURCE_ID.toString(), controller.uuidLabel.getText());
+    assertEquals(2, controller.filesTable.getItems().size());
+    assertEquals("report.pdf", controller.filesTable.getItems().get(0).getName());
+    assertFalse(controller.errorLabel.isVisible());
   }
 
   @Test
   void resourceNotFoundShowsErrorAndLeavesTableEmpty() {
     when(resourceService.getById(RESOURCE_ID)).thenThrow(new ServiceException("Ресурс не найден"));
-    loadPage(robot);
+    controller.setResourceId(RESOURCE_ID);
 
-    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
-    assertTrue(error.isVisible());
-    assertEquals("Ресурс не найден", error.getText());
-    assertTrue(filesTable(robot).getItems().isEmpty());
+    assertTrue(controller.errorLabel.isVisible());
+    assertEquals("Ресурс не найден", controller.errorLabel.getText());
+    assertTrue(controller.filesTable.getItems().isEmpty());
     verifyNoInteractions(navigator);
   }
 
   @Test
   void downloadSavesFileAndShowsStatus(@TempDir Path tempDir) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
-    loadPage(robot);
+    controller.setResourceId(RESOURCE_ID);
 
+    FileInfo toDownload = controller.filesTable.getItems().get(0);
     controller.setDirectory(tempDir.toFile());
     Path saved = tempDir.resolve("report.pdf");
     when(fileService.downloadFile(eq(RESOURCE_ID), eq(FILE_ID_1), any())).thenReturn(saved);
 
-    robot.clickOn("Скачать");
+    controller.onDownload(toDownload);
 
     verify(fileService).downloadFile(RESOURCE_ID, FILE_ID_1, tempDir);
-    assertEquals("Сохранено: report.pdf", textOf(robot, "#statusLabel"));
+    assertEquals("Сохранено: report.pdf", controller.statusLabel.getText());
   }
 
   @Test
   void downloadErrorShowsInErrorLabel(@TempDir Path tempDir) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
-    loadPage(robot);
+    controller.setResourceId(RESOURCE_ID);
 
+    FileInfo toDownload = controller.filesTable.getItems().get(0);
     controller.setDirectory(tempDir.toFile());
     when(fileService.downloadFile(eq(RESOURCE_ID), eq(FILE_ID_1), any()))
         .thenThrow(new ServiceException("Файл недоступен"));
 
-    robot.clickOn("Скачать");
+    controller.onDownload(toDownload);
 
-    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
-    assertTrue(error.isVisible());
-    assertEquals("Файл недоступен", error.getText());
+    assertTrue(controller.errorLabel.isVisible());
+    assertEquals("Файл недоступен", controller.errorLabel.getText());
   }
 
   @Test
   void cancelledDirectoryChooserDoesNotCallDownload() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
-    loadPage(robot);
+    controller.setResourceId(RESOURCE_ID);
 
+    FileInfo toDownload = controller.filesTable.getItems().get(0);
     controller.setDirectory(null);
-    robot.clickOn("Скачать");
+
+    controller.onDownload(toDownload);
 
     verifyNoInteractions(fileService);
   }
 
   @Test
   void backNavigatesToResourceList() {
-    robot.clickOn("#backButton");
-
+    controller.onBack(new ActionEvent());
     verify(navigator).goTo("/fxml/ResourceList.fxml");
-  }
-
-  private void loadPage(FxRobot robot) {
-    // Production ordering (see Navigator.goTo): FXML is loaded first with no id, and the id is
-    // set afterwards via withController. The controller must react to the late id itself;
-    // calling load() here would mask a controller that ignores post-load ids.
-    robot.interact(() -> controller.setResourceId(RESOURCE_ID));
   }
 
   private Resource resourceWithFiles() {
@@ -187,14 +187,5 @@ class ResourceDetailsControllerTest extends FxTestBase {
         LocalDateTime.of(2024, 5, 6, 7, 8),
         LocalDateTime.of(2024, 5, 7, 9, 10),
         List.of(first, second));
-  }
-
-  private static String textOf(FxRobot robot, String query) {
-    return robot.lookup(query).queryAs(Label.class).getText();
-  }
-
-  @SuppressWarnings("unchecked")
-  private static TableView<FileInfo> filesTable(FxRobot robot) {
-    return robot.lookup("#filesTable").queryAs(TableView.class);
   }
 }

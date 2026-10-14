@@ -30,20 +30,20 @@ public class ResourceDetailsController extends Controller {
 
   static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-  @FXML private Label titleLabel;
-  @FXML private Label descriptionLabel;
-  @FXML private Label createdLabel;
-  @FXML private Label updatedLabel;
-  @FXML private Label uuidLabel;
-  @FXML private Label errorLabel;
-  @FXML private Label statusLabel;
-  @FXML private TableView<FileInfo> filesTable;
-  @FXML private TableColumn<FileInfo, String> nameColumn;
-  @FXML private TableColumn<FileInfo, String> sizeColumn;
-  @FXML private TableColumn<FileInfo, String> contentTypeColumn;
-  @FXML private TableColumn<FileInfo, Void> downloadColumn;
-  @FXML private Button backButton;
-  @FXML private Button editButton;
+  @FXML Label titleLabel;
+  @FXML Label descriptionLabel;
+  @FXML Label createdLabel;
+  @FXML Label updatedLabel;
+  @FXML Label uuidLabel;
+  @FXML Label errorLabel;
+  @FXML Label statusLabel;
+  @FXML TableView<FileInfo> filesTable;
+  @FXML TableColumn<FileInfo, String> nameColumn;
+  @FXML TableColumn<FileInfo, String> sizeColumn;
+  @FXML TableColumn<FileInfo, String> contentTypeColumn;
+  @FXML TableColumn<FileInfo, Void> downloadColumn;
+  @FXML Button backButton;
+  @FXML Button editButton;
 
   private UUID resourceId;
 
@@ -101,11 +101,12 @@ public class ResourceDetailsController extends Controller {
   }
 
   @FXML
-  private void onBack(ActionEvent event) {
+  void onBack(ActionEvent event) {
     navigator.goTo("/fxml/ResourceList.fxml");
   }
 
-  private void onDownload(FileInfo file) {
+  @FXML
+  void onDownload(FileInfo file) {
     File dir = chooseDirectory(backButton.getScene().getWindow());
     if (dir == null) {
       return;

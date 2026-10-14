@@ -1,9 +1,8 @@
-package validation;
+package com.DesktopApplicationClientJava.validation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-import com.DesktopApplicationClientJava.validation.LastNameValidator;
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
 import org.junit.jupiter.api.Test;
 

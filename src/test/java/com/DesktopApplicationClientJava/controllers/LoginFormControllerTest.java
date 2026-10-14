@@ -1,4 +1,4 @@
-package ui;
+package com.DesktopApplicationClientJava.controllers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -18,89 +18,79 @@ import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
 import java.util.UUID;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.TextField;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.testfx.api.FxToolkit;
 
-class LoginFormControllerTest extends FxTestBase {
+class LoginFormControllerTest {
 
   private static final String VALID_EMAIL = "user@example.com";
   private static final String VALID_PASSWORD = "secret123";
 
   private AuthService authService;
   private Navigator navigator;
+  private LoginFormController controller;
 
-  @BeforeEach
-  void resetScene() throws Exception {
-    FxToolkit.setupStage(
-        stage -> {
-          try {
-            start(stage);
-          } catch (Exception e) {
-            throw new RuntimeException(e);
-          }
-        });
+  @BeforeAll
+  static void bootstrapFx() {
+    try {
+      Platform.startup(() -> {});
+      Platform.setImplicitExit(false);
+    } catch (IllegalStateException alreadyStarted) {
+      // JVM-wide singleton; another test class already started the toolkit.
+    }
   }
 
-  void start(Stage stage) throws Exception {
+  @BeforeEach
+  void setUp() {
     authService = mock(AuthService.class);
-    ServiceRegistry services = mock(ServiceRegistry.class);
-    when(services.getAuthService()).thenReturn(authService);
     navigator = mock(Navigator.class);
 
-    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/LoginForm.fxml"));
-    loader.setControllerFactory(
-        clazz -> {
-          try {
-            Object controller = clazz.getDeclaredConstructor().newInstance();
-            ControllerWiring.wire(controller, navigator, new Session(), services);
-            return controller;
-          } catch (Exception e) {
-            throw new RuntimeException("Cannot create controller: " + clazz, e);
-          }
-        });
-    Parent root = loader.load();
-    stage.setScene(new Scene(root));
-    stage.show();
+    ServiceRegistry services = mock(ServiceRegistry.class);
+    when(services.getAuthService()).thenReturn(authService);
+
+    controller = new LoginFormController();
+    ControllerWiring.wire(controller, navigator, new Session(), services);
+
+    controller.emailField = new TextField();
+    controller.passwordField = new PasswordField();
+    controller.errorLabel = new Label();
   }
 
   @Test
   void emptyFieldsShowErrorAndDoNotCallApi() {
-    robot.clickOn("#submitButton");
+    controller.onSubmit(new ActionEvent());
 
-    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
-    assertTrue(error.isVisible());
-    assertEquals("Заполните все поля", error.getText());
+    assertTrue(controller.errorLabel.isVisible());
+    assertEquals("Заполните все поля", controller.errorLabel.getText());
     verify(authService, never()).login(anyString(), anyString());
     verify(navigator, never()).goTo(anyString());
   }
 
   @Test
   void blankPasswordShowsErrorAndDoesNotCallApi() {
-    fillText(robot, "#emailField", VALID_EMAIL);
-    robot.clickOn("#submitButton");
+    controller.emailField.setText(VALID_EMAIL);
+    controller.onSubmit(new ActionEvent());
 
-    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
-    assertTrue(error.isVisible());
-    assertEquals("Заполните все поля", error.getText());
+    assertTrue(controller.errorLabel.isVisible());
+    assertEquals("Заполните все поля", controller.errorLabel.getText());
     verify(authService, never()).login(anyString(), anyString());
     verify(navigator, never()).goTo(anyString());
   }
 
   @Test
   void invalidEmailShowsErrorAndDoesNotCallApi() {
-    fillText(robot, "#emailField", "not-an-email");
-    fillText(robot, "#passwordField", VALID_PASSWORD);
-    robot.clickOn("#submitButton");
+    controller.emailField.setText("not-an-email");
+    controller.passwordField.setText(VALID_PASSWORD);
+    controller.onSubmit(new ActionEvent());
 
-    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
-    assertTrue(error.isVisible());
-    assertEquals("Неверный формат", error.getText());
+    assertTrue(controller.errorLabel.isVisible());
+    assertEquals("Неверный формат", controller.errorLabel.getText());
     verify(authService, never()).login(anyString(), anyString());
     verify(navigator, never()).goTo(anyString());
   }
@@ -110,14 +100,13 @@ class LoginFormControllerTest extends FxTestBase {
     User user = new User(UUID.randomUUID(), VALID_EMAIL, Role.USER, "Имя", "Фамилия", true);
     when(authService.login(VALID_EMAIL, VALID_PASSWORD)).thenReturn(user);
 
-    fillText(robot, "#emailField", VALID_EMAIL);
-    fillText(robot, "#passwordField", VALID_PASSWORD);
-    robot.clickOn("#submitButton");
+    controller.emailField.setText(VALID_EMAIL);
+    controller.passwordField.setText(VALID_PASSWORD);
+    controller.onSubmit(new ActionEvent());
 
     verify(authService).login(VALID_EMAIL, VALID_PASSWORD);
     verify(navigator).goTo("/fxml/ResourceList.fxml");
-    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
-    assertFalse(error.isVisible());
+    assertFalse(controller.errorLabel.isVisible());
   }
 
   @Test
@@ -125,13 +114,12 @@ class LoginFormControllerTest extends FxTestBase {
     when(authService.login(VALID_EMAIL, VALID_PASSWORD))
         .thenThrow(new ServiceException("Неверный логин или пароль"));
 
-    fillText(robot, "#emailField", VALID_EMAIL);
-    fillText(robot, "#passwordField", VALID_PASSWORD);
-    robot.clickOn("#submitButton");
+    controller.emailField.setText(VALID_EMAIL);
+    controller.passwordField.setText(VALID_PASSWORD);
+    controller.onSubmit(new ActionEvent());
 
-    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
-    assertTrue(error.isVisible());
-    assertEquals("Неверный логин или пароль", error.getText());
+    assertTrue(controller.errorLabel.isVisible());
+    assertEquals("Неверный логин или пароль", controller.errorLabel.getText());
     verify(navigator, never()).goTo(anyString());
   }
 }
