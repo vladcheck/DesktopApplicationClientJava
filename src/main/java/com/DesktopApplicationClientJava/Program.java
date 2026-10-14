@@ -15,8 +15,8 @@ import javafx.stage.Stage;
 public class Program extends Application {
   private static final String INITIAL_PAGE_PATH =
       System.getenv().getOrDefault("INITIAL_PAGE_PATH", "/fxml/LoginForm.fxml");
-  private static final boolean MOCK_DATA = true;
-  // Boolean.parseBoolean(System.getenv().getOrDefault("MOCK_DATA", "false"));
+  private static final boolean MOCK_DATA =
+      Boolean.parseBoolean(System.getenv().getOrDefault("MOCK_DATA", "false"));
   private static final double WINDOW_WIDTH = 800.0;
   private static final double WINDOW_HEIGHT = 600.0;
 
