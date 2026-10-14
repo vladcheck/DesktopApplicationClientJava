@@ -6,10 +6,13 @@ import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 public class Program extends Application {
@@ -19,6 +22,9 @@ public class Program extends Application {
       Boolean.parseBoolean(System.getenv().getOrDefault("MOCK_DATA", "false"));
   private static final double WINDOW_WIDTH = 800.0;
   private static final double WINDOW_HEIGHT = 600.0;
+
+  private static final String ICON_BASE = "/images/icons/png/app-";
+  private static final List<Integer> ICON_SIZES = List.of(16, 32, 48, 64, 128, 256);
 
   private final Session session = new Session();
   private final ApiClient apiClient = new ApiClient(session);
@@ -43,6 +49,7 @@ public class Program extends Application {
     Parent root = loader.load();
     Scene scene = new Scene(root);
     loadStyleSheet(scene, "/styles.css");
+    loadIcons(stage);
 
     stage.setScene(scene);
     stage.setTitle("Госхрон" + (MOCK_DATA ? " [MOCK]" : ""));
@@ -63,6 +70,18 @@ public class Program extends Application {
     var url = getClass().getResource(path);
     if (url != null) {
       scene.getStylesheets().add(url.toExternalForm());
+    }
+  }
+
+  private void loadIcons(Stage stage) {
+    for (int size : ICON_SIZES) {
+      try (InputStream in = getClass().getResourceAsStream(ICON_BASE + size + ".png")) {
+        if (in != null) {
+          stage.getIcons().add(new Image(in));
+        }
+      } catch (IOException e) {
+        System.err.println(e);
+      }
     }
   }
 }
