@@ -1,3 +1,11 @@
 {
-  "recommendations": ["vscjava.vscode-lombok"]
+  "recommendations": [
+    "vscjava.vscode-lombok",
+    "github.vscode-github-actions",
+    "dhruv.maven-dependency-explorer",
+    "vscjava.vscode-maven",
+    "vscjava.vscode-java-dependency",
+    "vscjava.vscode-java-test",
+    "shengchen.vscode-checkstyle"
+  ]
 }
