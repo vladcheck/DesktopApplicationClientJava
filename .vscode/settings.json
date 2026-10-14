@@ -1,0 +1,24 @@
+{
+    "[java]": {
+        "editor.detectIndentation": false,
+    },
+    "java.project.sourcePaths": [
+        "src/main/java/com/DesktopApplicationClientJava",
+    ],
+    "java.format.settings.url": ".vscode/eclipse-java-google-style.xml",
+    "java.format.settings.profile": "GoogleStyle",
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "xml.validation.noGrammar": "ignore",
+    "java.checkstyle.configuration": "${workspaceFolder}/checkstyle.xml",
+    "java.checkstyle.version": "14.3.0",
+    "java.autobuild.enabled": false,
+    "files.watcherExclude": {
+        "**/target/**": true
+    },
+    "files.exclude": {
+        "**/target": true
+    },
+    "java.import.exclusions": [
+        "**/target/**"
+    ]
+}
