@@ -1,6 +1,8 @@
 pre-commit:
   parallel: true
   jobs:
+  - name: "lfs: audit staged files"
+    run: bash tools/check-lfs.sh
   - name: "lint"
     run: mvn -B -q checkstyle:check
   - name: "format"
