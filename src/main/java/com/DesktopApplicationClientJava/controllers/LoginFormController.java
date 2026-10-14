@@ -13,13 +13,13 @@ import javafx.scene.control.TextField;
 
 public class LoginFormController extends Controller {
 
-  @FXML private TextField emailField;
-  @FXML private PasswordField passwordField;
-  @FXML private Label errorLabel;
-  @FXML private Button submitButton;
+  @FXML TextField emailField;
+  @FXML PasswordField passwordField;
+  @FXML Label errorLabel;
+  @FXML Button submitButton;
 
   @FXML
-  private void onSubmit(ActionEvent event) {
+  void onSubmit(ActionEvent event) {
     String email = emailField.getText() == null ? "" : emailField.getText().trim();
     String password = passwordField.getText() == null ? "" : passwordField.getText();
 

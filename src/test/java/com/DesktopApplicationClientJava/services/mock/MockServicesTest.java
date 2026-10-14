@@ -1,4 +1,4 @@
-package services.mock;
+package com.DesktopApplicationClientJava.services.mock;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -13,11 +13,6 @@ import com.DesktopApplicationClientJava.entities.User;
 import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.filter.ResourceFilter;
 import com.DesktopApplicationClientJava.services.filter.UserFilter;
-import com.DesktopApplicationClientJava.services.mock.MockAuthService;
-import com.DesktopApplicationClientJava.services.mock.MockFileService;
-import com.DesktopApplicationClientJava.services.mock.MockResourceService;
-import com.DesktopApplicationClientJava.services.mock.MockStore;
-import com.DesktopApplicationClientJava.services.mock.MockUsersService;
 import com.DesktopApplicationClientJava.session.Session;
 import java.nio.file.Files;
 import java.nio.file.Path;

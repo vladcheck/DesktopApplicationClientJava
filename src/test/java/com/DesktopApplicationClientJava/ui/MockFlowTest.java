@@ -1,4 +1,4 @@
-package ui;
+package com.DesktopApplicationClientJava.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -25,7 +25,6 @@ import org.testfx.api.FxToolkit;
  * backend). Proves that MOCK_DATA mode renders actual data.
  */
 class MockFlowTest extends FxTestBase {
-
   private static final UUID SEEDED_RESOURCE_ID =
       UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 

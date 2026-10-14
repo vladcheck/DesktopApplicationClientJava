@@ -16,12 +16,12 @@ public class ResourceFormController extends Controller {
   private static final int TITLE_MIN = 3;
   private static final int TITLE_MAX = 255;
 
-  @FXML private Label formTitleLabel;
-  @FXML private TextField titleField;
-  @FXML private TextArea descriptionArea;
-  @FXML private Label errorLabel;
-  @FXML private Button cancelButton;
-  @FXML private Button saveButton;
+  @FXML Label formTitleLabel;
+  @FXML TextField titleField;
+  @FXML TextArea descriptionArea;
+  @FXML Label errorLabel;
+  @FXML Button cancelButton;
+  @FXML Button saveButton;
 
   private UUID resourceId;
 
@@ -39,7 +39,7 @@ public class ResourceFormController extends Controller {
   }
 
   @FXML
-  private void initialize() {
+  void initialize() {
     hideError();
     if (resourceId == null) {
       formTitleLabel.setText("Новый документ");
@@ -60,7 +60,7 @@ public class ResourceFormController extends Controller {
   }
 
   @FXML
-  private void onSave(ActionEvent event) {
+  void onSave(ActionEvent event) {
     hideError();
     String title = titleField.getText() == null ? "" : titleField.getText().trim();
     String description = descriptionArea.getText() == null ? "" : descriptionArea.getText().trim();
@@ -95,7 +95,7 @@ public class ResourceFormController extends Controller {
   }
 
   @FXML
-  private void onCancel(ActionEvent event) {
+  void onCancel(ActionEvent event) {
     navigator.goTo("/fxml/ResourceList.fxml");
   }
 

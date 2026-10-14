@@ -1,4 +1,4 @@
-package ui.integration;
+package com.DesktopApplicationClientJava.ui.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -15,6 +15,7 @@ import com.DesktopApplicationClientJava.services.filter.ResourceFilter;
 import com.DesktopApplicationClientJava.services.impl.AuthServiceImpl;
 import com.DesktopApplicationClientJava.services.impl.ResourceServiceImpl;
 import com.DesktopApplicationClientJava.session.Session;
+import com.DesktopApplicationClientJava.ui.FxTestBase;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 import org.testfx.util.WaitForAsyncUtils;
-import ui.FxTestBase;
 
 /**
  * UI-level integration tests for the resource list page: real services with a real ApiClient
@@ -245,6 +245,7 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
    * Monocle. Firing the search action afterwards triggers the same {@code loadAsync} path with the
    * newly selected sort, which is what the test needs.
    */
+  @SuppressWarnings("unchecked")
   private static void selectSortAndReload(FxRobot robot, String option) {
     robot.interact(
         () -> {

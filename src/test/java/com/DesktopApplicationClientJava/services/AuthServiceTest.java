@@ -1,4 +1,4 @@
-package services;
+package com.DesktopApplicationClientJava.services;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 import com.DesktopApplicationClientJava.Api.ApiClient;
 import com.DesktopApplicationClientJava.entities.Role;
 import com.DesktopApplicationClientJava.entities.User;
-import com.DesktopApplicationClientJava.services.AuthService;
 import com.DesktopApplicationClientJava.services.impl.AuthServiceImpl;
 import com.DesktopApplicationClientJava.session.Session;
 import java.util.UUID;
