@@ -75,9 +75,15 @@ public class UserCreateFormController extends Controller {
                 return;
             }
             hideError();
+            navigator.goTo("/fxml/UserList.fxml");
         } catch (ServiceException e) {
             showError(e.getMessage());
         }
+    }
+
+    @FXML
+    void onCancel(ActionEvent event) {
+        navigator.goTo("/fxml/UserList.fxml");
     }
 
     private void showError(String message) {

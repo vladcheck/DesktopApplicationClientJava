@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns:fx="http://javafx.com/fxml/1"
+      fx:id="root"
+      styleClass="auth-bg"
+      alignment="TOP_CENTER"
+      fx:controller="com.DesktopApplicationClientJava.controllers.UserDetailsController">
+
+    <VBox styleClass="card-lg"
+          spacing="16"
+          maxWidth="720">
+
+        <!-- Верхняя панель: назад / редактировать / статус -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <Button fx:id="backButton"
+                    text="← Назад"
+                    onAction="#onBack"
+                    styleClass="btn-ghost"/>
+            <Button fx:id="editButton"
+                    text="Редактировать"
+                    onAction="#onEdit"
+                    styleClass="btn-ghost"/>
+            <Button fx:id="deleteButton"
+                    text="Удалить"
+                    onAction="#onDelete"
+                    styleClass="btn-danger"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="statusLabel" styleClass="pagination-info"/>
+        </HBox>
+
+        <!-- Заголовок -->
+        <VBox spacing="6">
+            <Label fx:id="fullNameLabel" styleClass="card-title" text="..."/>
+            <Label fx:id="emailLabel" styleClass="card-subtitle" wrapText="true"/>
+        </VBox>
+
+        <!-- Мета-блок -->
+        <VBox spacing="6" styleClass="meta-block">
+            <HBox spacing="8">
+                <Label text="Роль:" styleClass="field-label" minWidth="90"/>
+                <Label fx:id="roleLabel" styleClass="meta-value"/>
+            </HBox>
+            <HBox spacing="8">
+                <Label text="Активен:" styleClass="field-label" minWidth="90"/>
+                <Label fx:id="enabledLabel" styleClass="meta-value"/>
+            </HBox>
+            <HBox spacing="8">
+                <Label text="UUID:" styleClass="field-label" minWidth="90"/>
+                <Label fx:id="uuidLabel" styleClass="meta-uuid"/>
+            </HBox>
+        </VBox>
+
+        <!-- Ошибка -->
+        <Label fx:id="errorLabel"
+               styleClass="alert-danger"
+               visible="false"
+               managed="false"
+               wrapText="true"
+               maxWidth="Infinity"/>
+
+    </VBox>
+
+    <padding>
+        <Insets top="24" right="24" bottom="24" left="24"/>
+    </padding>
+</VBox>
