@@ -409,21 +409,3 @@
 .text-area .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
-
-
-.btn-danger {
-    -fx-background-color: transparent;
-    -fx-border-color: -danger-fg;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
-    -fx-text-fill: -danger-fg;
-    -fx-font-size: 13px;
-    -fx-padding: 8px 14px;
-    -fx-cursor: hand;
-}
-.btn-danger:hover   { -fx-background-color: -danger-bg; }
-.btn-danger:pressed { -fx-background-color: derive(-danger-bg, -10%); }
-.btn-danger:disabled {
-    -fx-opacity: 0.45;
-    -fx-cursor: default;
-}
