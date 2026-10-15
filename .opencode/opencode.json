@@ -1,0 +1,10 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "commands": {
+    // This becomes the name of the command
+    "issue-branch-commit-pr": {
+      "template": "Create an issue, create a branch, commit changes, create a pr.",
+      "agent": "build",
+    }
+  }
+}
