@@ -17,6 +17,8 @@ import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import java.util.UUID;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -25,8 +27,14 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Аутентификация")
+@Feature("№1 Вход")
+@Tag("role:guest")
+@DisplayName("Форма входа")
 class LoginFormControllerTest {
 
   private static final String VALID_EMAIL = "user@example.com";
@@ -63,6 +71,7 @@ class LoginFormControllerTest {
   }
 
   @Test
+  @DisplayName("Пустые поля показывают ошибку без вызова сервиса")
   void emptyFieldsShowErrorAndDoNotCallApi() {
     controller.onSubmit(new ActionEvent());
 
@@ -73,6 +82,7 @@ class LoginFormControllerTest {
   }
 
   @Test
+  @DisplayName("Пустой пароль показывает ошибку без вызова сервиса")
   void blankPasswordShowsErrorAndDoesNotCallApi() {
     controller.emailField.setText(VALID_EMAIL);
     controller.onSubmit(new ActionEvent());
@@ -84,6 +94,7 @@ class LoginFormControllerTest {
   }
 
   @Test
+  @DisplayName("Неверный формат почты показывает ошибку без вызова сервиса")
   void invalidEmailShowsErrorAndDoesNotCallApi() {
     controller.emailField.setText("not-an-email");
     controller.passwordField.setText(VALID_PASSWORD);
@@ -96,6 +107,7 @@ class LoginFormControllerTest {
   }
 
   @Test
+  @DisplayName("Успешный вход переходит к списку ресурсов")
   void successfulLoginNavigatesToResourceList() {
     User user = new User(UUID.randomUUID(), VALID_EMAIL, Role.USER, "Имя", "Фамилия", true);
     when(authService.login(VALID_EMAIL, VALID_PASSWORD)).thenReturn(user);
@@ -110,6 +122,7 @@ class LoginFormControllerTest {
   }
 
   @Test
+  @DisplayName("Ошибка входа показывает сообщение сервера без перехода")
   void failedLoginShowsServerErrorAndDoesNotNavigate() {
     when(authService.login(VALID_EMAIL, VALID_PASSWORD))
         .thenThrow(new ServiceException("Неверный логин или пароль"));

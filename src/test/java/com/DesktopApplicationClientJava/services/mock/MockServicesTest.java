@@ -14,14 +14,19 @@ import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.filter.ResourceFilter;
 import com.DesktopApplicationClientJava.services.filter.UserFilter;
 import com.DesktopApplicationClientJava.session.Session;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+@DisplayName("Мок-сервисы входа и пользователей")
 class MockServicesTest {
 
   private Session session;
@@ -41,6 +46,10 @@ class MockServicesTest {
   }
 
   @Test
+  @Epic("Аутентификация")
+  @Feature("AuthService")
+  @Tag("role:guest")
+  @DisplayName("Начальный админ сохраняет роль админа")
   void seededAdminKeepsAdminRole() {
     User user = authService.login("admin@example.com", "whatever");
 
@@ -50,18 +59,30 @@ class MockServicesTest {
   }
 
   @Test
+  @Epic("Аутентификация")
+  @Feature("AuthService")
+  @Tag("role:guest")
+  @DisplayName("Неизвестной почте роль назначается по префиксу")
   void unknownEmailGetsRoleByPrefix() {
     assertEquals(Role.MODER, authService.login("moder-ivan@example.com", "x").getRole());
     assertEquals(Role.USER, authService.login("someone@example.com", "x").getRole());
   }
 
   @Test
+  @Epic("Аутентификация")
+  @Feature("AuthService")
+  @Tag("role:guest")
+  @DisplayName("Пустые учётные данные отклоняются")
   void blankCredentialsAreRejected() {
     assertThrows(ServiceException.class, () -> authService.login("", "x"));
     assertThrows(ServiceException.class, () -> authService.login("a@b.c", ""));
   }
 
   @Test
+  @Epic("Аутентификация")
+  @Feature("AuthService")
+  @Tag("role:guest")
+  @DisplayName("Выход очищает сессию")
   void logoutClearsSession() {
     authService.login("user@example.com", "x");
     authService.logout();
@@ -115,6 +136,10 @@ class MockServicesTest {
   }
 
   @Test
+  @Epic("Пользователи")
+  @Feature("UsersService")
+  @Tag("role:admin")
+  @DisplayName("Поиск пользователей находит начального админа")
   void usersSearchFindsSeededAdmin() {
     List<User> found = usersService.search(new UserFilter("admin@", null, null, null, null), 0, 10);
 
