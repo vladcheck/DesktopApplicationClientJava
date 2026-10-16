@@ -40,6 +40,10 @@
                     <Label text="Список всех документов в архиве" styleClass="card-subtitle"/>
                 </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="deleteButton"
+                        text="Удалить"
+                        onAction="#onDelete"
+                        styleClass="btn-ghost"/>
                 <Button fx:id="createButton"
                         text="+ Создать документ"
                         onAction="#onCreate"
@@ -49,6 +53,11 @@
             <HBox spacing="12" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField"
                            promptText="Поиск по названию..."
+                           onAction="#onSearch"
+                           styleClass="text-input"
+                           HBox.hgrow="ALWAYS"/>
+                <TextField fx:id="descriptionField"
+                           promptText="Поиск по описанию..."
                            onAction="#onSearch"
                            styleClass="text-input"
                            HBox.hgrow="ALWAYS"/>

@@ -28,9 +28,9 @@ UI не ходит в HTTP напрямую. Контроллер вызывае
 
 ### №2 — Список ресурсов
 
-* Есть: `ResourceListController` + `ResourceList.fxml`: поле поиска по `title`, `ComboBox` сортировки (4 опции: `createdAt desc/asc`, `title asc/desc`), таблица (`title, description, createdAt, updatedAt`), пагинация `offset/count` с `PAGE_SIZE=20`, переход дабл-кликом в №3 через `Navigator.goTo(path, c -> setResourceId(uuid))`, кнопка «+ Создать документ» только для `MODER/ADMIN`.
-* Нет: поля фильтра по `description` в UI нет (`ResourceFilter.description` всегда `null`); кнопки удаления в списке нет.
-* Готово когда: заведено поле `description` (или зафиксировано решение «искать только по title») и заведена кнопка удаления с подтверждением (см. DOD №4).
+* Есть: `ResourceListController` + `ResourceList.fxml`: поля поиска по `title` и `description`, `ComboBox` сортировки (4 опции: `createdAt desc/asc`, `title asc/desc`), таблица (`title, description, createdAt, updatedAt`), пагинация `offset/count` с `PAGE_SIZE=20`, переход дабл-кликом в №3 через `Navigator.goTo(path, c -> setResourceId(uuid))`, кнопка «+ Создать документ» и кнопка «Удалить» (по выбранной строке, с диалогом подтверждения) только для `MODER/ADMIN`.
+* Нет: —
+* Готово когда: закрыто — поиск по `description` заведён, удаление с подтверждением заведено (см. DOD №4).
 
 ### №3 — Просмотр метаданных ресурса
 
