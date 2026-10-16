@@ -14,6 +14,12 @@
         value="java.io.Serial, javafx.fxml.FXML"/>
     </module>
   </module>
+  <!-- Аналог oxlint no-console:error: любой System.out/System.err.print* роняет verify. -->
+  <module name="RegexpSingleline">
+    <property name="format" value="System\s*\.\s*(out|err)\s*\.\s*print\w*\s*\("/>
+    <property name="message" value="Логирование через System.out/System.err запрещено, используй java.util.logging.Logger"/>
+    <property name="severity" value="error"/>
+  </module>
   <!-- Lombok @Getter и Jackson читают эти поля в обход исходников, Checkstyle их не видит: без фильтра UnusedPrivateField ложно падает на entities/filter/data и ServiceRegistry. -->
   <module name="SuppressionSingleFilter">
     <property name="checks" value="UnusedPrivateField"/>

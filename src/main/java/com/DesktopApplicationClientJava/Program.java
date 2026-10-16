@@ -8,6 +8,8 @@ import com.DesktopApplicationClientJava.utils.ControllerWiring;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -25,6 +27,7 @@ public class Program extends Application {
 
   private static final String ICON_BASE = "/images/icons/png/app-";
   private static final List<Integer> ICON_SIZES = List.of(16, 32, 48, 64, 128, 256);
+  private static final Logger LOG = Logger.getLogger(Program.class.getName());
 
   private final Session session = new Session();
   private final ApiClient apiClient = new ApiClient(session);
@@ -80,7 +83,7 @@ public class Program extends Application {
           stage.getIcons().add(new Image(in));
         }
       } catch (IOException e) {
-        System.err.println(e);
+        LOG.log(Level.WARNING, "Не удалось загрузить иконку приложения", e);
       }
     }
   }
