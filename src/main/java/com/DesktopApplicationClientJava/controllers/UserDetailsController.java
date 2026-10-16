@@ -191,7 +191,11 @@ public class UserDetailsController extends Controller {
 
   // ===== Confirmation dialog =====
 
-  private boolean confirmDelete(User user) {
+  /**
+   * Диалог подтверждения удаления. Выделен в метод ради тестов: headless {@code Alert} блокирует
+   * поток, поэтому тесты переопределяют его без UI.
+   */
+  protected boolean confirmDelete(User user) {
     var alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle("Удаление пользователя");
     alert.setHeaderText(null);
