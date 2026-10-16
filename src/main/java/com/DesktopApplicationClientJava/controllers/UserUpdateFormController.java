@@ -6,7 +6,6 @@ import com.DesktopApplicationClientJava.entities.User;
 import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.data.UpdateUserData;
 import java.util.UUID;
-import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -15,7 +14,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 
 public class UserUpdateFormController extends Controller {
