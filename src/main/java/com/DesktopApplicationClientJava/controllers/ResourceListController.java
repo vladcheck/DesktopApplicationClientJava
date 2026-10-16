@@ -143,7 +143,6 @@ public class ResourceListController extends Controller {
   private void onOpenUsers(ActionEvent e) {
     navigator.goTo("/fxml/UserList.fxml");
   }
-  }
 
   // ===== Data loading =====
 
