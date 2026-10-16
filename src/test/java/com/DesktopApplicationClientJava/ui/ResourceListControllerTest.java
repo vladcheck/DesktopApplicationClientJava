@@ -2,6 +2,7 @@ package com.DesktopApplicationClientJava.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -67,6 +68,7 @@ class ResourceListControllerTest extends FxTestBase {
   private ResourceService resourceService;
   private ServiceRegistry services;
   private Navigator navigator;
+  private Session session;
   private TestableListController controller;
   private Stage stage;
 
@@ -104,6 +106,10 @@ class ResourceListControllerTest extends FxTestBase {
     when(services.getAuthService()).thenReturn(authService);
     when(services.getResourceService()).thenReturn(resourceService);
     navigator = mock(Navigator.class);
+    session = new Session();
+    session.setCurrentUser(ADMIN);
+    session.setAccessToken("access");
+    session.setRefreshToken("refresh");
     this.stage = stage;
     stubAdmin();
     loadPage();
@@ -121,7 +127,7 @@ class ResourceListControllerTest extends FxTestBase {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ResourceList.fxml"));
       loader.setControllerFactory(
           clazz -> {
-            ControllerWiring.wire(controller, navigator, new Session(), services);
+            ControllerWiring.wire(controller, navigator, session, services);
             return controller;
           });
       Parent root = loader.load();
@@ -299,7 +305,8 @@ class ResourceListControllerTest extends FxTestBase {
     robot.clickOn("#logoutButton");
 
     verify(authService).logout();
-    verify(navigator).goTo("/fxml/LoginForm.fxml");
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
   }
 
   @Test

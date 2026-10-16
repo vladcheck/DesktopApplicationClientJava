@@ -18,6 +18,16 @@ public class LoginFormController extends Controller {
   @FXML Label errorLabel;
   @FXML Button submitButton;
 
+  @Override
+  protected Label getErrorLabel() {
+    return errorLabel;
+  }
+
+  @Override
+  protected boolean interceptAuthFailure() {
+    return false;
+  }
+
   @FXML
   void onSubmit(ActionEvent event) {
     String email = emailField.getText() == null ? "" : emailField.getText().trim();
@@ -42,19 +52,7 @@ public class LoginFormController extends Controller {
       hideError();
       navigator.goTo("/fxml/ResourceList.fxml");
     } catch (ServiceException e) {
-      showError(e.getMessage());
+      showError(e);
     }
-  }
-
-  private void showError(String message) {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-  }
-
-  private void hideError() {
-    errorLabel.setText("");
-    errorLabel.setVisible(false);
-    errorLabel.setManaged(false);
   }
 }

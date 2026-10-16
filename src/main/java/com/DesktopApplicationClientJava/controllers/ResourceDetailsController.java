@@ -48,6 +48,11 @@ public class ResourceDetailsController extends Controller {
   @FXML Button editButton;
   @FXML Button deleteButton;
 
+  @Override
+  protected Label getErrorLabel() {
+    return errorLabel;
+  }
+
   private UUID resourceId;
 
   /**
@@ -101,7 +106,7 @@ public class ResourceDetailsController extends Controller {
     try {
       showResource(services.getResourceService().getById(resourceId));
     } catch (ServiceException e) {
-      showError(e.getMessage());
+      showError(e);
     }
   }
 
@@ -120,7 +125,7 @@ public class ResourceDetailsController extends Controller {
       Path saved = services.getFileService().downloadFile(resourceId, file.getUuid(), dir.toPath());
       statusLabel.setText("Сохранено: " + saved.getFileName());
     } catch (ServiceException e) {
-      showError(e.getMessage());
+      showError(e);
     }
   }
 
@@ -169,18 +174,6 @@ public class ResourceDetailsController extends Controller {
     return String.format("%.1f GB", bytes / (1024.0 * 1024 * 1024));
   }
 
-  private void showError(String message) {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-  }
-
-  private void hideError() {
-    errorLabel.setText("");
-    errorLabel.setVisible(false);
-    errorLabel.setManaged(false);
-  }
-
   private static final class DownloadCell extends TableCell<FileInfo, Void> {
     private final Button button = new Button("Скачать");
 
@@ -210,7 +203,7 @@ public class ResourceDetailsController extends Controller {
     try {
       services.getResourceService().delete(resourceId);
     } catch (ServiceException e) {
-      showError(e.getMessage());
+      showError(e);
       return;
     }
     navigator.goTo("/fxml/ResourceList.fxml");

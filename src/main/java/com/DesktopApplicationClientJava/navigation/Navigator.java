@@ -34,6 +34,7 @@ public class Navigator {
   private final Stage stage;
   private final Session session;
   private final ServiceRegistry services;
+  private boolean loginRedirectArmed;
 
   public Navigator(Stage stage, Session session, ServiceRegistry services) {
     this.stage = stage;
@@ -45,7 +46,24 @@ public class Navigator {
     goTo(fxmlFile, controller -> {});
   }
 
+  /**
+   * Однократный переход на форму входа для параллельных 401/403: первое обращение навигирует,
+   * повторные до ухода со входа — no-op. Флаг сбрасывается любым уходом на другую страницу.
+   */
+  public synchronized void goToLoginOnce() {
+    if (loginRedirectArmed) {
+      return;
+    }
+    loginRedirectArmed = true;
+    goTo(LOGIN);
+  }
+
   public void goTo(String fxmlFile, Consumer<Object> withController) {
+    if (!LOGIN.equals(fxmlFile)) {
+      synchronized (this) {
+        loginRedirectArmed = false;
+      }
+    }
     String redirect = guardRedirect(fxmlFile);
     if (redirect != null) {
       if (redirect.equals(fxmlFile)) {

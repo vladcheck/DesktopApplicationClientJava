@@ -3,6 +3,7 @@ package com.DesktopApplicationClientJava.controllers;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -60,6 +61,7 @@ class UserDetailsControllerTest {
   private UsersService usersService;
   private ServiceRegistry services;
   private Navigator navigator;
+  private Session session;
   private TestableUserDetailsController controller;
   private Parent root;
 
@@ -96,6 +98,10 @@ class UserDetailsControllerTest {
     when(services.getAuthService()).thenReturn(authService);
     when(services.getUsersService()).thenReturn(usersService);
     navigator = mock(Navigator.class);
+    session = new Session();
+    session.setCurrentUser(user());
+    session.setAccessToken("access");
+    session.setRefreshToken("refresh");
     when(authService.isAdmin()).thenReturn(true);
     when(authService.getCurrentUser()).thenReturn(null);
   }
@@ -207,16 +213,16 @@ class UserDetailsControllerTest {
 
   @Test
   @Tag("role:admin")
-  @DisplayName("ServiceException показывает её текст")
-  void serviceExceptionShowsItsMessage() {
+  @DisplayName("ServiceException 403 ведёт на вход с очищенной сессией")
+  void serviceExceptionForbiddenRedirectsToLogin() {
     when(usersService.getById(USER_ID)).thenThrow(new ServiceException("Нет доступа", 403));
     loadPage();
     fxSetUserId(USER_ID);
-    awaitLoaded();
+    awaitLoginRedirect();
 
-    assertTrue(label("#errorLabel").isVisible());
-    assertEquals("Нет доступа", label("#errorLabel").getText());
-    verifyNoInteractions(navigator);
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
+    assertFalse(label("#errorLabel").isVisible());
   }
 
   @Test
@@ -380,17 +386,17 @@ class UserDetailsControllerTest {
 
   @Test
   @Tag("role:admin")
-  @DisplayName("Ошибка 403 показывает текст без перехода")
-  void deleteForbiddenShowsMessageWithoutNavigation() {
+  @DisplayName("Ошибка 403 ведёт на вход с очищенной сессией")
+  void deleteForbiddenRedirectsToLogin() {
     loadUser(user());
     controller.confirmDeleteResult = true;
     doThrow(new ServiceException("Доступ запрещён", 403)).when(usersService).delete(USER_ID);
     fire("#deleteButton");
-    awaitUnbusy();
+    awaitLoginRedirect();
 
-    assertTrue(label("#errorLabel").isVisible());
-    assertEquals("Доступ запрещён", label("#errorLabel").getText());
-    verify(navigator, never()).goTo(anyString());
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
+    assertFalse(label("#errorLabel").isVisible());
   }
 
   @Test
@@ -420,7 +426,7 @@ class UserDetailsControllerTest {
         () -> {
           try {
             controller = new TestableUserDetailsController();
-            ControllerWiring.wire(controller, navigator, new Session(), services);
+            ControllerWiring.wire(controller, navigator, session, services);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/UserDetails.fxml"));
             loader.setControllerFactory(type -> controller);
             root = loader.load();
@@ -469,6 +475,24 @@ class UserDetailsControllerTest {
           () -> !button("#deleteButton").isDisable() || label("#errorLabel").isVisible());
     } catch (TimeoutException e) {
       throw new AssertionError("Не дождались завершения удаления", e);
+    }
+  }
+
+  private void awaitLoginRedirect() {
+    try {
+      WaitForAsyncUtils.waitFor(
+          30,
+          TimeUnit.SECONDS,
+          () -> {
+            try {
+              verify(navigator).goToLoginOnce();
+              return true;
+            } catch (AssertionError e) {
+              return false;
+            }
+          });
+    } catch (TimeoutException e) {
+      throw new AssertionError("Не дождались перехода на вход", e);
     }
   }
 

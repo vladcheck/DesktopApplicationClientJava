@@ -2,6 +2,7 @@ package com.DesktopApplicationClientJava.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
@@ -58,6 +59,7 @@ class UserDetailsControllerUiTest extends FxTestBase {
   private UsersService usersService;
   private ServiceRegistry services;
   private Navigator navigator;
+  private Session session;
   private TestableUserDetailsController controller;
   private Stage stage;
 
@@ -95,6 +97,10 @@ class UserDetailsControllerUiTest extends FxTestBase {
     when(services.getAuthService()).thenReturn(authService);
     when(services.getUsersService()).thenReturn(usersService);
     navigator = mock(Navigator.class);
+    session = new Session();
+    session.setCurrentUser(user());
+    session.setAccessToken("access");
+    session.setRefreshToken("refresh");
     this.stage = stage;
     when(authService.isAdmin()).thenReturn(true);
     when(authService.getCurrentUser()).thenReturn(null);
@@ -109,7 +115,7 @@ class UserDetailsControllerUiTest extends FxTestBase {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/UserDetails.fxml"));
       loader.setControllerFactory(
           clazz -> {
-            ControllerWiring.wire(controller, navigator, new Session(), services);
+            ControllerWiring.wire(controller, navigator, session, services);
             return controller;
           });
       Parent root = loader.load();
@@ -211,8 +217,8 @@ class UserDetailsControllerUiTest extends FxTestBase {
 
   @Test
   @Tag("role:admin")
-  @DisplayName("Удаление без прав показывает ошибку без перехода")
-  void deleteForbiddenShowsErrorWithoutNavigation() {
+  @DisplayName("Удаление без прав ведёт на вход с очищенной сессией")
+  void deleteForbiddenRedirectsToLogin() {
     awaitLoaded();
     doThrow(new ServiceException("Доступ запрещён", 403)).when(usersService).delete(USER_ID);
     robot.interact(() -> controller.stubConfirm = false);
@@ -223,8 +229,10 @@ class UserDetailsControllerUiTest extends FxTestBase {
     waitForClicker(clicker);
 
     assertModalClosed(robot);
-    awaitError("Доступ запрещён");
-    verify(navigator, never()).goTo(anyString());
+    awaitLoginRedirect();
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
+    assertFalse(robot.lookup("#errorLabel").queryAs(Label.class).isVisible());
   }
 
   @Test
@@ -281,6 +289,24 @@ class UserDetailsControllerUiTest extends FxTestBase {
           30, TimeUnit.SECONDS, () -> expected.equals(error().getText()) && error().isVisible());
     } catch (TimeoutException e) {
       throw new AssertionError("Не дождались ошибки: " + expected, e);
+    }
+  }
+
+  private void awaitLoginRedirect() {
+    try {
+      WaitForAsyncUtils.waitFor(
+          30,
+          TimeUnit.SECONDS,
+          () -> {
+            try {
+              verify(navigator).goToLoginOnce();
+              return true;
+            } catch (AssertionError e) {
+              return false;
+            }
+          });
+    } catch (TimeoutException e) {
+      throw new AssertionError("Не дождались перехода на вход", e);
     }
   }
 

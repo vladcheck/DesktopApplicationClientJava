@@ -21,6 +21,11 @@ public class UserCreateFormController extends Controller {
   @FXML private TextField firstNameField;
   @FXML private TextField lastNameField;
 
+  @Override
+  protected Label getErrorLabel() {
+    return errorLabel;
+  }
+
   @FXML
   public void initialize() {
     // Способ 1: через setItems
@@ -72,24 +77,12 @@ public class UserCreateFormController extends Controller {
       hideError();
       navigator.goTo("/fxml/UserList.fxml");
     } catch (ServiceException e) {
-      showError(e.getMessage());
+      showError(e);
     }
   }
 
   @FXML
   void onCancel(ActionEvent event) {
     navigator.goTo("/fxml/UserList.fxml");
-  }
-
-  private void showError(String message) {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-  }
-
-  private void hideError() {
-    errorLabel.setText("");
-    errorLabel.setVisible(false);
-    errorLabel.setManaged(false);
   }
 }

@@ -23,6 +23,11 @@ public class ResourceFormController extends Controller {
   @FXML Button cancelButton;
   @FXML Button saveButton;
 
+  @Override
+  protected Label getErrorLabel() {
+    return errorLabel;
+  }
+
   private UUID resourceId;
 
   /**
@@ -55,7 +60,7 @@ public class ResourceFormController extends Controller {
       titleField.setText(r.getTitle() == null ? "" : r.getTitle());
       descriptionArea.setText(r.getDescription() == null ? "" : r.getDescription());
     } catch (ServiceException e) {
-      showError(e.getMessage());
+      showError(e);
     }
   }
 
@@ -90,24 +95,12 @@ public class ResourceFormController extends Controller {
       }
       navigator.goTo("/fxml/ResourceList.fxml");
     } catch (ServiceException e) {
-      showError(e.getMessage());
+      showError(e);
     }
   }
 
   @FXML
   void onCancel(ActionEvent event) {
     navigator.goTo("/fxml/ResourceList.fxml");
-  }
-
-  private void showError(String message) {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-  }
-
-  private void hideError() {
-    errorLabel.setText("");
-    errorLabel.setVisible(false);
-    errorLabel.setManaged(false);
   }
 }
