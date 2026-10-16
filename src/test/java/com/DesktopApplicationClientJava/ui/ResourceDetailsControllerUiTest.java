@@ -1,6 +1,7 @@
 package com.DesktopApplicationClientJava.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -108,6 +109,29 @@ class ResourceDetailsControllerUiTest extends FxTestBase {
     } catch (Exception e) {
       throw new RuntimeException(e);
     }
+  }
+
+  @Test
+  void moderatorSeesEditAndDeleteButtons() {
+    assertTrue(robot.lookup("#editButton").queryAs(Button.class).isVisible());
+    assertTrue(robot.lookup("#deleteButton").queryAs(Button.class).isVisible());
+  }
+
+  @Test
+  void plainUserSeesNeitherEditNorDeleteButtons() {
+    robot.interact(
+        () -> {
+          when(authService.isAdmin()).thenReturn(false);
+          when(authService.isModerator()).thenReturn(false);
+          loadPage();
+        });
+
+    Button edit = robot.lookup("#editButton").queryAs(Button.class);
+    Button delete = robot.lookup("#deleteButton").queryAs(Button.class);
+    assertFalse(edit.isVisible());
+    assertFalse(edit.isManaged());
+    assertFalse(delete.isVisible());
+    assertFalse(delete.isManaged());
   }
 
   @Test
