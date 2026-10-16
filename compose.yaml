@@ -31,11 +31,10 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
-    healthcheck:
-      interval: 10s
-      retries: 5
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/java-pks/health/live || exit 1"]
-      timeout: 5s
+    # Без healthcheck: образ собран buildpacks без shell/curl/wget, поэтому внутреннюю
+    # HTTP-пробу выполнить нечем (CMD-SHELL падает с "stat /bin/sh: no such file or directory",
+    # давая ложный статус unhealthy). На health бэкенда ничего не завязано (depends_on
+    # на него нет); готовность видна по логам ("Started JavaPksApplication") и порту 8080.
     ports:
       - "8080:8080"
     environment:
