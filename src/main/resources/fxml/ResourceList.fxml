@@ -25,6 +25,10 @@
                 <Label text="Архив документов" styleClass="card-subtitle"/>
             </VBox>
             <Region HBox.hgrow="ALWAYS"/>
+            <Button fx:id="usersButton"
+                    text="Пользователи"
+                    onAction="#onOpenUsers"
+                    styleClass="btn-ghost"/>
             <Label fx:id="userInfoLabel" styleClass="user-chip"/>
             <Button fx:id="logoutButton"
                     text="Выйти"

@@ -47,6 +47,7 @@ public class ResourceListController extends Controller {
   @FXML private Button prevButton;
   @FXML private Button nextButton;
   @FXML private Button logoutButton;
+  @FXML private Button usersButton;
 
   private final ObservableList<Resource> rows = FXCollections.observableArrayList();
   private long offset = 0;
@@ -67,7 +68,6 @@ public class ResourceListController extends Controller {
     sortCombo.setOnAction(e -> reloadFromStart());
     resourceTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
-    // Initial load on open. Guarded for FXML tooling previews where no services are wired.
     if (services != null && services.getResourceService() != null) {
       reloadFromStart();
     }
@@ -126,12 +126,22 @@ public class ResourceListController extends Controller {
     deleteButton.setVisible(canModify);
     deleteButton.setManaged(canModify);
     updateDeleteButtonState();
+
+    // Кнопка «Пользователи» доступна только администраторам.
+    boolean isAdmin = authService != null && authService.isAdmin();
+    usersButton.setVisible(isAdmin);
+    usersButton.setManaged(isAdmin);
   }
 
   private void updateDeleteButtonState() {
     boolean hasSelection =
         resourceTable != null && resourceTable.getSelectionModel().getSelectedItem() != null;
     deleteButton.setDisable(!(canModify && hasSelection));
+  }
+
+  @FXML
+  private void onOpenUsers(ActionEvent e) {
+    navigator.goTo("/fxml/UserList.fxml");
   }
 
   // ===== Data loading =====
