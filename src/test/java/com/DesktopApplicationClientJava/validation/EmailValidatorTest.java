@@ -4,8 +4,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 import com.DesktopApplicationClientJava.validation.utils.ErrorMessages;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Проверка ввода")
+@Feature("Вход (email + пароль)")
+@Tag("role:none")
+@DisplayName("Проверка адреса почты")
 public class EmailValidatorTest {
   private static final String FIELD_NAME = EmailValidator.FIELD_NAME;
 
@@ -40,6 +48,7 @@ public class EmailValidatorTest {
   }
 
   @Test
+  @DisplayName("Корректный адрес принимается")
   void validEmailIsAccepted() {
     assertNull(EmailValidator.validate("test@example.com"));
   }
