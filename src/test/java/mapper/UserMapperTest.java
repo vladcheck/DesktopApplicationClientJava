@@ -6,13 +6,24 @@ import com.DesktopApplicationClientJava.Api.Dto.response.UserDto;
 import com.DesktopApplicationClientJava.entities.Role;
 import com.DesktopApplicationClientJava.entities.User;
 import com.DesktopApplicationClientJava.mapper.UserMapper;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Отображение данных")
+@Feature("UserMapper")
+@Story("Преобразование пользователя в сущность")
+@Tag("role:none")
+@DisplayName("Преобразование пользователя")
 class UserMapperTest {
 
   @Test
+  @DisplayName("Поля бэкенда преобразуются в сущность пользователя")
   void mapsBackendLowercaseNamesToCamelCaseFields() {
     UUID uuid = UUID.randomUUID();
     UserDto dto =
