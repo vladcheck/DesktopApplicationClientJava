@@ -18,31 +18,19 @@ UI не ходит в HTTP напрямую. Контроллер вызывае
 | №   | Название страницы                            | Маршрут (FXML)                | Доступ            | Назначение                                                                                                                                                       | Ответственный | Статус                        |
 | --- | -------------------------------------------- | ----------------------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ----------------------------- |
 | 1   | Вход (email + пароль)                        | `/fxml/LoginForm.fxml`        | гость (публичная) | Аутентификация через `AuthService`, после успеха → №2                                                                                                            | @vladcheck     | ✅ готово                      |
-| 2   | Список ресурсов и сортировка (главная)       | `/fxml/ResourceList.fxml`     | `USER`            | Поиск по `title`, сортировка, пагинация `offset/count` (`PAGE_SIZE=20`) через `ResourceService.search`                                                           | @miyagi18      | ⚠️ частично (см. DOD №2)       |
+| 2   | Список ресурсов и сортировка (главная)       | `/fxml/ResourceList.fxml`     | `USER`            | Поиск по `title` и `description`, удаление с подтверждением, сортировка, пагинация `offset/count` (`PAGE_SIZE=20`) через `ResourceService.search`                    | @miyagi18      | ✅ готово                      |
 | 3   | Просмотр метаданных ресурса                  | `/fxml/ResourceDetails.fxml`  | `USER`            | Только чтение: `ResourceService.getById` → `title, description, createdAt, updatedAt, uuid`; таблица файлов (имя/размер/тип + «Скачать»)                           | @vladcheck     | ⚠️ частично (см. DOD №3)       |
-| 4   | Форма ресурса (создание/редактирование)      | `/fxml/ResourceForm.fxml`     | `MODER`           | `create/update` через `ResourceService`; удаление — действием из №2/№3 с подтверждением, без отдельной страницы                                                  | @miyagi18      | ⚠️ частично (см. DOD №4)       |
+| 4   | Форма ресурса (создание/редактирование)      | `/fxml/ResourceForm.fxml`     | `MODER`           | `create/update` через `ResourceService`; удаление — действием из №2/№3 с подтверждением, без отдельной страницы                                                  | @miyagi18      | ✅ готово                      |
 | 5   | Список пользователей                         | `/fxml/UserList.fxml` (нет)   | `ADMIN`           | Поиск/фильтр через `UsersService.search` + `UserFilter`; удаление действием из списка                                                                            | @deatheh       | ❌ нет (сервис готов, UI нет)  |
 | 6   | Форма пользователя (создание/редактирование) | `/fxml/UserForm.fxml` (нет)   | `ADMIN`           | `create` через `RegisterData`, `update` через `UpdateUserData`, `getById` для предзаполнения                                                                     | @deatheh       | ❌ нет (сервис готов, UI нет)  |
 
 ## DOD для ⚠️-страниц
 
-### №2 — Список ресурсов
-
-* Есть: `ResourceListController` + `ResourceList.fxml`: поля поиска по `title` и `description`, `ComboBox` сортировки (4 опции: `createdAt desc/asc`, `title asc/desc`), таблица (`title, description, createdAt, updatedAt`), пагинация `offset/count` с `PAGE_SIZE=20`, переход дабл-кликом в №3 через `Navigator.goTo(path, c -> setResourceId(uuid))`, кнопка «+ Создать документ» и кнопка «Удалить» (по выбранной строке, с диалогом подтверждения) только для `MODER/ADMIN`.
-* Нет: —
-* Готово когда: закрыто — поиск по `description` заведён, удаление с подтверждением заведено (см. DOD №4).
-
 ### №3 — Просмотр метаданных ресурса
 
-* Есть: `ResourceDetailsController` (read-only): метаданные + таблица файлов (`name, size, contentType` + колонка «Скачать»), скачивание через `FileService.downloadFile` (`DirectoryChooser`, имя из `Content-Disposition`, fallback `fileUuid`), вход из №2 через `setResourceId(uuid)` + `load()`, кнопка «Редактировать» только для `MODER/ADMIN` (переход в №4).
+* Есть: `ResourceDetailsController` (read-only): метаданные + таблица файлов (`name, size, contentType` + колонка «Скачать»), скачивание через `FileService.downloadFile` (`DirectoryChooser`, имя из `Content-Disposition`, fallback `fileUuid`), вход из №2 через `setResourceId(uuid)` + `load()`, кнопка «Редактировать» только для `MODER/ADMIN` (переход в №4), кнопка «Удалить» с диалогом подтверждения только для `MODER/ADMIN` (после удаления → №2).
 * Нет: кнопок загрузки/удаления файлов в UI нет; кнопки экспорта архива файлов нет.
 * Готово когда: заведены upload/delete (`FileService.{uploadFile, deleteFile}` уже есть) и экспорт (`ExportService.exportResourceFiles` уже есть) либо зафиксировано решение «в №3 только скачивание».
-
-### №4 — Форма ресурса
-
-* Есть: `ResourceFormController` + `ResourceForm.fxml`: режимы `create/edit` по наличию `resourceId`, предзаполнение через `getById`, ручная проверка `title` (`обязательно, 3–255 символов`, пустой `description` → `null`), сохранение через `create/update`, отмена → №2.
-* Нет: кнопки удаления в №2/№3/№4 нет, диалога подтверждения нет (`ResourceService.delete` реализован, UI не заведено).
-* Готово когда: удаление вызывается действием из №2/№3 с диалогом подтверждения, без отдельной страницы.
 
 ## Интеграции страниц с эндпоинтами (через сервисы)
 
@@ -52,14 +40,14 @@ UI не ходит в HTTP напрямую. Контроллер вызывае
 | --- | --------------------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | 1   | Войти                                   | `AuthService.login(email, password)`                 | `POST /api/v1/auth/login` (`LoginRequest`), затем `GET /api/v1/user/me`; токены → `Session`                                            |
 | 1   | Выйти                                   | `AuthService.logout()`                               | `POST /api/v1/auth/logout` (`RefreshTokenRequest`), затем `Session.clear()`                                                            |
-| 2   | Поиск/сортировка ресурсов (только UI-факт: поиск по `title`) | `ResourceService.search(filter, offset, count[, sortBy, sortDir])` | `GET /api/v1/resource?title=&description=&offset=&count=&sortBy=&sortDir=` (UI шлёт только `title`; `description` поддерживается сервисом, из UI всегда `null`; сортировка `createdAt/title asc/desc`) |
+| 2   | Поиск/сортировка ресурсов | `ResourceService.search(filter, offset, count[, sortBy, sortDir])` | `GET /api/v1/resource?title=&description=&offset=&count=&sortBy=&sortDir=` (UI шлёт `title` и `description`; сортировка `createdAt/title asc/desc`) |
 | 3   | Открыть метаданные                      | `ResourceService.getById(id)`                        | `GET /api/v1/resource/{id}`                                                                                                            |
 | 3   | Скачать файл (UI-факт)                  | `FileService.downloadFile`                           | `GET /api/v1/resource/{id}/file/{fileId}` (имя из `Content-Disposition`)                                                               |
 | 3   | Загрузить/удалить файл (сервис готов, UI не заведено) | `FileService.{uploadFile, deleteFile}`    | `POST /api/v1/resource/{id}/file` (multipart), `DELETE /api/v1/resource/{id}/file/{fileId}`                                             |
 | 3   | Экспорт файлов ресурса (сервис готов, UI не заведено) | `ExportService.exportResourceFiles(id, dir)` | `GET /api/v1/admin/resource/{id}/files/export` (бинарный ответ → файл `files-{uuid}.xlsx`)                                              |
 | 4   | Создать ресурс                          | `ResourceService.create(title, description)`         | `POST /api/v1/resource` (`CreateResourceRequest`)                                                                                      |
 | 4   | Обновить ресурс                         | `ResourceService.update(id, title, description)`     | `PUT /api/v1/resource/{id}` (`UpdateResourceRequest`)                                                                                  |
-| 4   | Удалить ресурс из №2/№3 (сервис готов, UI не заведено) | `ResourceService.delete(id)`              | `DELETE /api/v1/resource/{id}`                                                                                                         |
+| 4   | Удалить ресурс из №2/№3 | `ResourceService.delete(id)`              | `DELETE /api/v1/resource/{id}`                                                                                                         |
 | 5   | Поиск/фильтр пользователей (сервис готов, UI не заведено) | `UsersService.search(filter, offset, count)` | `GET /api/v1/admin?email=&firstName=&lastName=&role=&enabled=&offset=&count=&sortBy=createdAt&sortDir=desc` (сортировка захардкожена в `UsersServiceImpl`) |
 | 5   | Удалить пользователя (сервис готов, UI не заведено) | `UsersService.delete(id)`                 | `DELETE /api/v1/admin/{id}`                                                                                                            |
 | 5   | Экспорт пользователей/ресурсов (сервис готов, UI не заведено) | `ExportService.{exportUsers, exportResources}` | `GET /api/v1/admin/users/export` (→ `users.xlsx`), `GET /api/v1/admin/resource/export` (→ `resources.xlsx`)                             |
@@ -77,7 +65,7 @@ UI не ходит в HTTP напрямую. Контроллер вызывае
 ## Примечания по реализации
 
 * №1: ✅ готово — `LoginFormController` только email + пароль: проверка непустоты + `EmailValidator.validate`, вызов `AuthService.login`, после успеха → №2.
-* №2: переименование `Search.fxml → ResourceList.fxml` готово; список наполнен: `ResourceService.search` + пагинация `PAGE_SIZE=20`, фильтр `ResourceFilter` (факт: из UI заполняется только `title`).
+* №2: ✅ готово — `ResourceListController`: поиск по `title` и `description` (`ResourceFilter`), сортировка, пагинация `PAGE_SIZE=20`, переход в №3 дабл-кликом, кнопки «+ Создать документ» и «Удалить» (с диалогом подтверждения) только для `MODER/ADMIN`.
 * №3: частично — `ResourceDetailsController` (read-only): метаданные + таблица файлов
   со скачиванием (`FileService.downloadFile`), вход из №2 — `Navigator.goTo(path, c -> ...)`
   с `setResourceId(uuid)` + `load()`. Upload/delete/экспорт не заведены.
@@ -88,7 +76,7 @@ UI не ходит в HTTP напрямую. Контроллер вызывае
 * Роли: `AuthServiceImpl.hasRole` сравнивает по уровню (`USER=0 < MODER=1 < ADMIN=2`),
   поэтому `isModerator()` возвращает true и для `ADMIN` — соответствует RBAC выше.
 * SoC: списки (№2) не содержат логики форм; форма №4 работает в двух режимах `create/edit` по наличию `uuid`.
-* Кнопки: `create` (№2) и `edit` (№3) рендерятся по роли (`isAdmin() || isModerator()` из `Session.getCurrentUser().role`), а не отдельными страницами. Кнопки `delete` не рендерятся нигде.
+* Кнопки: `create`/`delete` (№2) и `edit`/`delete` (№3) рендерятся по роли (`isAdmin() || isModerator()` из `Session.getCurrentUser().role`), а не отдельными страницами.
 * Проверка ввода (факт): №1 — `EmailValidator`; №4 — ручные проверки длины; классы
   `PasswordValidator/FirstNameValidator/LastNameValidator/ThirdNameValidator` на FormsFX существуют как задел под №6, в текущих страницах не используются.
 * Терминология: в доке используется «ресурс» per `GLOSSARY.md` (avoid «документ»).
@@ -105,6 +93,10 @@ UI не ходит в HTTP напрямую. Контроллер вызывае
   (`MockAuthService/MockUsersService/MockResourceService/MockFileService/MockExportService` + `MockStore`),
   `MOCK_DATA=true` / `INITIAL_PAGE_PATH` в `Program`. Покрыты: `LoginFormController`,
   `ResourceListController`, `ResourceDetailsController`, `ResourceFormController`, мапперы, валидаторы.
+* Удаление ресурсов: компонентные тесты настоящей модалки (`ResourceListControllerTest`,
+  `ResourceDetailsControllerUiTest`: открытие/отмена/подтверждение/ошибка 404) + live-цикл
+  в `ResourceListIntegrationTest` (создание → удаление → проверка отсутствия на бэкенде;
+  кейс за MODER — `@Disabled`, сида MODER в бэкенде нет).
 * Live-интеграционные (`@Tag("integration")`, `src/test/.../ui/integration/`):
   исключены из дефолтного билда/CI через `excludedGroups` в surefire; требуют живой
   бэкенд `localhost:8080` и `.env` (`IT_ADMIN_EMAIL`, `IT_ADMIN_PASSWORD`, `dotenv.path`).
