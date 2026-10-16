@@ -69,3 +69,28 @@ jobs:
         uses: ./.github/actions/setup-jdk
       - name: Run tests
         run: mvn -B test --file pom.xml
+      - name: Generate Allure HTML report
+        # Версия совпадает с allure-maven.version в pom.xml.
+        # Результат задания определяют тесты: генерация не маскирует их статус
+        # и не роняет задание при отсутствии результатов.
+        if: always()
+        continue-on-error: true
+        run: mvn -B io.qameta.allure:allure-maven:2.17.0:report --file pom.xml
+      - name: Upload Allure raw results
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-results
+          path: target/allure-results
+          retention-days: 21
+          if-no-files-found: warn
+      - name: Upload Allure HTML report
+        if: always()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: target/allure-report
+          retention-days: 21
+          if-no-files-found: warn
