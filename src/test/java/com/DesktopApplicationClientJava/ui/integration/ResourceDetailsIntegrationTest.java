@@ -23,8 +23,8 @@ import org.junit.jupiter.api.Test;
  * explicitly: {@code mvn test -Dgroups=integration -DexcludedGroups=} ({@code @Tag} inherited from
  * IntegrationTestCase).
  */
-@Epic("Ресурс")
-@Feature("Просмотр метаданных ресурса")
+@Epic("Ресурсы")
+@Feature("№3 Просмотр метаданных ресурса")
 @Story("Страница деталей ресурса")
 @Tag("role:admin")
 @DisplayName("Детали ресурса через живой API")

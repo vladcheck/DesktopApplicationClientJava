@@ -59,8 +59,8 @@ import org.testfx.util.WaitForAsyncUtils;
  * the default build and CI (see surefire {@code excludedGroups} in pom.xml). Run explicitly: {@code
  * mvn test -Dgroups=integration -DexcludedGroups= -Dtest=ResourceListIntegrationTest}.
  */
-@Epic("Ресурс")
-@Feature("Список ресурсов")
+@Epic("Ресурсы")
+@Feature("№2 Список ресурсов")
 @Story("Страница списка ресурсов")
 @DisplayName("Список ресурсов через живой API")
 class ResourceListIntegrationTest extends IntegrationTestCase {
