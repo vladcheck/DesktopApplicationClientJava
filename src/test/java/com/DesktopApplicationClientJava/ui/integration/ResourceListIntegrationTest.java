@@ -245,6 +245,59 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
     authService.login(adminEmail, adminPassword);
   }
 
+  @Test
+  void searchByDescriptionFindsSeededResource() {
+    loginAsAdmin();
+    String description = "IT описание " + UUID.randomUUID();
+    Resource created = resourceService.create("IT ResourceDesc " + UUID.randomUUID(), description);
+    try {
+      loadListPage(robot);
+      // Дождаться начальной загрузки (пустой фильтр), иначе она может финишировать позже поиска
+      // и перетереть таблицу полным списком.
+      waitForLoadComplete(robot);
+
+      searchByDescription(robot, description);
+      waitForLoadComplete(robot);
+
+      List<Resource> found = rows(robot);
+      assertEquals(1, found.size(), () -> "diagnostics: " + diagnostics(robot));
+      assertEquals(description, found.get(0).getDescription());
+    } finally {
+      deleteQuietly(created.getUuid());
+    }
+  }
+
+  @Test
+  void cancelledDeleteKeepsResourceOnBackend() {
+    loginAsAdmin();
+    String title = "IT ResourceCancel " + UUID.randomUUID();
+    Resource created = resourceService.create(title, "created by ResourceListIntegrationTest");
+    try {
+      loadListPage(robot);
+      waitForLoadComplete(robot);
+
+      searchFor(robot, title);
+      waitForLoadComplete(robot);
+      assertEquals(1, rows(robot).size(), () -> "diagnostics: " + diagnostics(robot));
+
+      selectFirstRow(robot);
+
+      Thread clicker = clickDeleteNoWait(robot);
+      DialogPane dialog = waitForDialog(robot);
+      assertTrue(dialog.getScene().getWindow().isShowing(), "модалка удаления не открылась");
+      pressDialogButton(robot, dialog, ButtonType.CANCEL);
+      waitForClicker(clicker);
+
+      assertTrue(
+          robot.lookup(".dialog-pane").tryQuery().isEmpty(), "модалка удаления не закрылась");
+      assertEquals(1, rows(robot).size());
+      assertEquals(title, rows(robot).get(0).getTitle());
+      assertEquals(created.getUuid(), resourceService.getById(created.getUuid()).getUuid());
+    } finally {
+      deleteQuietly(created.getUuid());
+    }
+  }
+
   private void loadListPage(FxRobot robot) {
     robot.interact(
         () -> {
@@ -282,6 +335,19 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
         query,
         robot.lookup("#searchField").queryAs(TextField.class).getText(),
         "search field did not take the query");
+  }
+
+  private static void searchByDescription(FxRobot robot, String query) {
+    robot.interact(
+        () -> {
+          TextField field = robot.lookup("#descriptionField").queryAs(TextField.class);
+          field.setText(query);
+          field.getOnAction().handle(new ActionEvent());
+        });
+    assertEquals(
+        query,
+        robot.lookup("#descriptionField").queryAs(TextField.class).getText(),
+        "description field did not take the query");
   }
 
   /**
