@@ -19,6 +19,7 @@ import com.DesktopApplicationClientJava.Api.Dto.response.UserDto;
 import com.DesktopApplicationClientJava.entities.Role;
 import com.DesktopApplicationClientJava.entities.User;
 import com.DesktopApplicationClientJava.navigation.Navigator;
+import com.DesktopApplicationClientJava.services.AuthService;
 import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.services.UsersService;
@@ -64,6 +65,7 @@ class UserUpdateFormControllerTest {
   private static final String LAST_NAME = "Петров";
 
   private UsersService usersService;
+  private AuthService authService;
   private Navigator navigator;
   private UserUpdateFormController controller;
 
@@ -90,10 +92,13 @@ class UserUpdateFormControllerTest {
   @BeforeEach
   void setUp() {
     usersService = mock(UsersService.class);
+    authService = mock(AuthService.class);
     navigator = mock(Navigator.class);
 
     ServiceRegistry services = mock(ServiceRegistry.class);
     when(services.getUsersService()).thenReturn(usersService);
+    when(services.getAuthService()).thenReturn(authService);
+    when(authService.getCurrentUser()).thenReturn(null);
 
     controller = new UserUpdateFormController();
     ControllerWiring.wire(controller, navigator, new Session(), services);
@@ -602,6 +607,84 @@ class UserUpdateFormControllerTest {
     verify(navigator, never()).goTo(anyString());
     assertFalse(saveButton.isDisabled());
     assertFalse(emailField.isDisabled());
+  }
+
+  // ===== Самодаунгрейд и самоблокировка (#95) =====
+
+  @Test
+  @DisplayName("Своя запись: смена роли с ADMIN на другую блокируется")
+  void selfRoleDowngradeIsBlocked() {
+    User me = new User(USER_ID, EMAIL, Role.ADMIN, FIRST_NAME, LAST_NAME, true);
+    when(authService.getCurrentUser()).thenReturn(me);
+    when(usersService.getById(USER_ID)).thenReturn(me);
+    controller.setUserId(USER_ID);
+    awaitLoaded();
+
+    roleChoiceBox.getSelectionModel().select(Role.USER);
+    invokeHandler("onSave");
+
+    assertTrue(errorLabel.isVisible());
+    assertEquals("Нельзя снять себе роль администратора", errorLabel.getText());
+    verify(usersService, never()).update(any(), any());
+    verify(navigator, never()).goTo(anyString());
+  }
+
+  @Test
+  @DisplayName("Своя запись: снятие активности себе блокируется")
+  void selfDisableIsBlocked() {
+    User me = new User(USER_ID, EMAIL, Role.ADMIN, FIRST_NAME, LAST_NAME, true);
+    when(authService.getCurrentUser()).thenReturn(me);
+    when(usersService.getById(USER_ID)).thenReturn(me);
+    controller.setUserId(USER_ID);
+    awaitLoaded();
+
+    enabledCheckBox.setSelected(false);
+    invokeHandler("onSave");
+
+    assertTrue(errorLabel.isVisible());
+    assertEquals("Нельзя отключить собственную учётную запись", errorLabel.getText());
+    verify(usersService, never()).update(any(), any());
+    verify(navigator, never()).goTo(anyString());
+  }
+
+  @Test
+  @DisplayName("Чужой пользователь: смена роли и активности не блокируется")
+  void otherUserRoleAndEnabledChangeIsNotBlocked() {
+    User me =
+        new User(UUID.randomUUID(), "admin@example.com", Role.ADMIN, "Админ", "Главный", true);
+    when(authService.getCurrentUser()).thenReturn(me);
+    when(usersService.getById(USER_ID)).thenReturn(existingUser());
+    when(usersService.update(eq(USER_ID), any())).thenReturn(existingUser());
+    controller.setUserId(USER_ID);
+    awaitLoaded();
+
+    roleChoiceBox.getSelectionModel().select(Role.USER);
+    enabledCheckBox.setSelected(false);
+    invokeHandler("onSave");
+
+    awaitNavigation();
+    verify(usersService).update(eq(USER_ID), any(UpdateUserData.class));
+  }
+
+  @Test
+  @DisplayName("Своя запись: смена имени и почты не блокируется")
+  void selfNameAndEmailChangeIsNotBlocked() {
+    User me = new User(USER_ID, EMAIL, Role.ADMIN, FIRST_NAME, LAST_NAME, true);
+    when(authService.getCurrentUser()).thenReturn(me);
+    when(usersService.getById(USER_ID)).thenReturn(me);
+    when(usersService.update(eq(USER_ID), any())).thenReturn(me);
+    controller.setUserId(USER_ID);
+    awaitLoaded();
+
+    firstNameField.setText("Пётр");
+    emailField.setText("petr@example.com");
+    invokeHandler("onSave");
+
+    awaitNavigation();
+    ArgumentCaptor<UpdateUserData> captor = ArgumentCaptor.forClass(UpdateUserData.class);
+    verify(usersService).update(eq(USER_ID), captor.capture());
+    assertEquals("Пётр", captor.getValue().getFirstName());
+    assertEquals("petr@example.com", captor.getValue().getEmail());
   }
 
   // ===== Отмена =====

@@ -108,6 +108,9 @@ public class UserUpdateFormController extends Controller {
     if (data == null) {
       return;
     }
+    if (isSelfDowngrade(data)) {
+      return;
+    }
 
     hideError();
     setFormDisabled(true);
@@ -146,6 +149,34 @@ public class UserUpdateFormController extends Controller {
   }
 
   // ===== Validation / data =====
+
+  /**
+   * Админ не может понизить или заблокировать сам себя (симметрично запрету самоудаления в {@code
+   * UserDetailsController}): цель — текущий пользователь, роль уходит с ADMIN или активность
+   * снимается. Показывает ошибку и возвращает {@code true} — сохранение пропускается без вызова
+   * сервиса и без навигации. Свои имя/email вне скоупа и не блокируются.
+   */
+  private boolean isSelfDowngrade(UpdateUserData data) {
+    var authService = services == null ? null : services.getAuthService();
+    var me = authService == null ? null : authService.getCurrentUser();
+    boolean isSelf =
+        me != null
+            && current != null
+            && current.getUuid() != null
+            && current.getUuid().equals(me.getUuid());
+    if (!isSelf) {
+      return false;
+    }
+    if (current.getRole() == Role.ADMIN && data.getRole() != Role.ADMIN) {
+      showError("Нельзя снять себе роль администратора");
+      return true;
+    }
+    if (Boolean.FALSE.equals(data.getEnabled())) {
+      showError("Нельзя отключить собственную учётную запись");
+      return true;
+    }
+    return false;
+  }
 
   /**
    * Собирает данные формы. Если валидация не прошла — показывает ошибку и возвращает {@code null}.
