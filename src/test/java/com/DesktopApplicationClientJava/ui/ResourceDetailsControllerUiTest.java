@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -16,6 +17,7 @@ import com.DesktopApplicationClientJava.navigation.Navigator;
 import com.DesktopApplicationClientJava.services.AuthService;
 import com.DesktopApplicationClientJava.services.FileService;
 import com.DesktopApplicationClientJava.services.ResourceService;
+import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
@@ -30,6 +32,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -174,6 +177,27 @@ class ResourceDetailsControllerUiTest extends FxTestBase {
     assertModalClosed(robot);
     verify(resourceService).delete(RESOURCE_ID);
     verify(navigator).goTo("/fxml/ResourceList.fxml");
+  }
+
+  @Test
+  void confirmingDeleteOfGoneResourceShowsErrorWithoutNavigation() {
+    robot.interact(
+        () -> {
+          controller.stubConfirm = false;
+          controller.setResourceId(RESOURCE_ID);
+        });
+    doThrow(new ServiceException("Ресурс не найден")).when(resourceService).delete(RESOURCE_ID);
+
+    Thread clicker = clickDeleteNoWait();
+    DialogPane dialog = waitForDialog(robot);
+    pressDialogButton(robot, dialog, ButtonType.OK);
+    waitForClicker(clicker);
+
+    assertModalClosed(robot);
+    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
+    assertTrue(error.isVisible());
+    assertEquals("Ресурс не найден", error.getText());
+    verify(navigator, never()).goTo(anyString());
   }
 
   private Resource resource() {
