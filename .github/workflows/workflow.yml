@@ -36,7 +36,8 @@ jobs:
         uses: ./.github/actions/setup-jdk
       - name: Check formatting
         # -nsu безопасен: SNAPSHOT-зависимостей нет.
-        run: mvn -B -nsu spotless:check --file pom.xml
+        # Полные координаты вместо префикса spotless: резолв префикса требует metadata из central и падает без кэша.
+        run: mvn -B -nsu com.diffplug.spotless:spotless-maven-plugin:3.10.3:check --file pom.xml
 
   lint:
     needs: build
@@ -56,7 +57,8 @@ jobs:
           restore-keys: checkstyle-
       - name: Check lint
         # -nsu безопасен: SNAPSHOT-зависимостей нет.
-        run: mvn -B -nsu checkstyle:check --file pom.xml
+        # Полные координаты вместо префикса checkstyle: резолв префикса требует metadata из central и падает без кэша.
+        run: mvn -B -nsu org.apache.maven.plugins:maven-checkstyle-plugin:3.6.0:check --file pom.xml
 
   junit:
     needs: build
