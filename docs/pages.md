@@ -78,7 +78,7 @@ UI не ходит в HTTP напрямую. Контроллер вызывае
 * SoC: списки (№2) не содержат логики форм; форма №4 работает в двух режимах `create/edit` по наличию `uuid`.
 * Кнопки: `create`/`delete` (№2) и `edit`/`delete` (№3) рендерятся по роли (`isAdmin() || isModerator()` из `Session.getCurrentUser().role`), а не отдельными страницами.
 * Проверка ввода (факт): №1 — `EmailValidator`; №4 — ручные проверки длины; классы
-  `PasswordValidator/FirstNameValidator/LastNameValidator/ThirdNameValidator` на FormsFX существуют как задел под №6, в текущих страницах не используются.
+  `PasswordValidator/FirstNameValidator/LastNameValidator` на FormsFX существуют как задел под №6, в текущих страницах не используются.
 * Терминология: в доке используется «ресурс» per `GLOSSARY.md` (avoid «документ»).
   Факт расхождения: строки UI/FXML до сих пор говорят «документ» («Новый документ»,
   «Редактирование документа», «Архив документов», «Документов пока нет») — правится отдельно, не в этом доке.
