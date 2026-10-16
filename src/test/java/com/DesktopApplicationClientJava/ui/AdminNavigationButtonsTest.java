@@ -44,7 +44,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -274,8 +273,6 @@ class AdminNavigationButtonsTest extends FxTestBase {
   @Test
   @Tag("role:moder")
   @DisplayName("Модер не может перейти на список пользователей")
-  @Disabled(
-      "Gated: onOpenUsers ведёт на UserList безусловно, без проверки роли (скрытие кнопки ≠ запрет перехода)")
   void nonAdminCannotNavigateToUserList() {
     robot.interact(
         () -> {
@@ -290,8 +287,6 @@ class AdminNavigationButtonsTest extends FxTestBase {
   @Test
   @Tag("role:moder")
   @DisplayName("Модер не может перейти на список ресурсов")
-  @Disabled(
-      "Gated: onOpenResources ведёт на ResourceList безусловно, без проверки роли (скрытие кнопки ≠ запрет перехода)")
   void nonAdminCannotNavigateToResourceList() {
     robot.interact(
         () -> {

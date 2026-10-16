@@ -141,6 +141,10 @@ public class ResourceListController extends Controller {
 
   @FXML
   private void onOpenUsers(ActionEvent e) {
+    var authService = services == null ? null : services.getAuthService();
+    if (authService == null || !authService.isAdmin()) {
+      return;
+    }
     navigator.goTo("/fxml/UserList.fxml");
   }
 
