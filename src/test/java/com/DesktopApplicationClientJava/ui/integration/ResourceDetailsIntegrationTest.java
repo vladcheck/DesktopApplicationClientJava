@@ -7,7 +7,12 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.DesktopApplicationClientJava.entities.Resource;
 import com.DesktopApplicationClientJava.services.ServiceException;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -18,13 +23,20 @@ import org.junit.jupiter.api.Test;
  * explicitly: {@code mvn test -Dgroups=integration -DexcludedGroups=} ({@code @Tag} inherited from
  * IntegrationTestCase).
  */
+@Epic("Ресурс")
+@Feature("Просмотр метаданных ресурса")
+@Story("Страница деталей ресурса")
+@Tag("role:admin")
+@DisplayName("Детали ресурса через живой API")
 class ResourceDetailsIntegrationTest extends IntegrationTestCase {
   @Test
+  @DisplayName("Неизвестный идентификатор бросает сервисную ошибку")
   void unknownIdThrowsServiceException() {
     assertThrows(ServiceException.class, () -> resourceService.getById(UUID.randomUUID()));
   }
 
   @Test
+  @DisplayName("Созданный ресурс читается обратно")
   void createdResourceRoundTrip() {
     assumeTrue(
         adminPassword != null && !adminPassword.isBlank(),

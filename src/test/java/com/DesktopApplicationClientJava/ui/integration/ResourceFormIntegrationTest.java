@@ -21,6 +21,9 @@ import com.DesktopApplicationClientJava.services.impl.ResourceServiceImpl;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.ui.FxTestBase;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.util.UUID;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -35,6 +38,8 @@ import javafx.stage.Stage;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
@@ -52,6 +57,11 @@ import org.testfx.api.FxToolkit;
  * excludedGroups} in pom.xml). Run explicitly: {@code mvn test -Dgroups=integration
  * -DexcludedGroups= -Dtest=ResourceFormIntegrationTest}.
  */
+@Epic("Ресурс")
+@Feature("Создание и правка ресурса")
+@Story("Страница формы ресурса")
+@Tag("role:admin")
+@DisplayName("Форма ресурса через живой API")
 class ResourceFormIntegrationTest extends IntegrationTestCase {
 
   private final FxRobot robot = new FxRobot();
@@ -99,6 +109,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @DisplayName("Создание с корректными полями читается обратно")
   void createValidRoundTrip() {
     loginAsAdmin();
     String title = "IT ResourceForm " + UUID.randomUUID();
@@ -113,6 +124,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @DisplayName("Создание без описания читается обратно")
   void createNullDescriptionRoundTrip() {
     loginAsAdmin();
     String title = "IT ResourceForm " + UUID.randomUUID();
@@ -125,6 +137,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @DisplayName("Правка названия и описания сохраняется")
   void updateValidRoundTrip() {
     loginAsAdmin();
     String updatedTitle = "IT ResourceForm updated " + UUID.randomUUID();
@@ -141,6 +154,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @DisplayName("Некорректные названия отклоняются с 400")
   void invalidTitlesAreRejectedWith400() {
     loginAsAdmin();
 
@@ -150,6 +164,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @DisplayName("Пустое описание отклоняется с 400")
   void emptyDescriptionIsRejectedWith400() {
     loginAsAdmin();
 
@@ -159,6 +174,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @DisplayName("Правка неизвестного ресурса возвращает 404")
   void updateUnknownIdReturns404() {
     loginAsAdmin();
 
@@ -166,6 +182,7 @@ class ResourceFormIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @DisplayName("Сохранение с чужими токенами показывает ошибку без перехода")
   void saveWithInvalidTokensShowsErrorAndDoesNotNavigate() {
     // Garbage tokens (not a fresh session) force a real HTTP 401 round-trip instead of the
     // client's offline "no refresh token" shortcut, proving server-side auth enforcement.
