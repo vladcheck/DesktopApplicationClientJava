@@ -20,6 +20,9 @@ import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -35,9 +38,14 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Window;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+@Epic("Ресурсы")
+@Feature("№3 Просмотр метаданных ресурса")
+@DisplayName("Детали ресурса")
 class ResourceDetailsControllerTest {
 
   private static final UUID RESOURCE_ID = UUID.randomUUID();
@@ -114,6 +122,8 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Загрузка показывает метаданные и файлы")
   void successfulLoadShowsMetadataAndFiles() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     controller.setResourceId(RESOURCE_ID);
@@ -129,6 +139,8 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Отсутствующий ресурс: ошибка и пустая таблица")
   void resourceNotFoundShowsErrorAndLeavesTableEmpty() {
     when(resourceService.getById(RESOURCE_ID)).thenThrow(new ServiceException("Ресурс не найден"));
     controller.setResourceId(RESOURCE_ID);
@@ -140,6 +152,9 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Story("Скачивание")
+  @Tag("role:user")
+  @DisplayName("Скачивание сохраняет файл и показывает статус")
   void downloadSavesFileAndShowsStatus(@TempDir Path tempDir) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     controller.setResourceId(RESOURCE_ID);
@@ -156,6 +171,9 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Story("Скачивание")
+  @Tag("role:user")
+  @DisplayName("Ошибка скачивания показывается в строке ошибки")
   void downloadErrorShowsInErrorLabel(@TempDir Path tempDir) {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     controller.setResourceId(RESOURCE_ID);
@@ -172,6 +190,9 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Story("Скачивание")
+  @Tag("role:user")
+  @DisplayName("Отмена выбора каталога не вызывает скачивание")
   void cancelledDirectoryChooserDoesNotCallDownload() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     controller.setResourceId(RESOURCE_ID);
@@ -185,12 +206,17 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Кнопка «Назад» ведёт в список ресурсов")
   void backNavigatesToResourceList() {
     controller.onBack(new ActionEvent());
     verify(navigator).goTo("/fxml/ResourceList.fxml");
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Подтверждённое удаление вызывает сервис и ведёт в список")
   void confirmedDeleteCallsServiceAndNavigatesToList() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     controller.setResourceId(RESOURCE_ID);
@@ -204,6 +230,9 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Отменённое удаление не вызывает сервис")
   void cancelledDeleteDoesNotCallServiceNorNavigate() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     controller.setResourceId(RESOURCE_ID);
@@ -217,6 +246,9 @@ class ResourceDetailsControllerTest {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Ошибка удаления показывается без перехода")
   void deleteErrorShowsInErrorLabelWithoutNavigation() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
     controller.setResourceId(RESOURCE_ID);

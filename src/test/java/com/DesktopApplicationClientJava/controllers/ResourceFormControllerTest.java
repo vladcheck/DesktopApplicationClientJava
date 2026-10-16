@@ -17,6 +17,8 @@ import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -27,8 +29,14 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Ресурсы")
+@Feature("№4 Форма ресурса")
+@Tag("role:moder")
+@DisplayName("Форма ресурса")
 class ResourceFormControllerTest {
 
   private static final UUID RESOURCE_ID = UUID.randomUUID();
@@ -69,12 +77,14 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Режим создания показывает заголовок формы создания")
   void createModeShowsNewDocumentTitle() {
     assertEquals("Новый документ", controller.formTitleLabel.getText());
     assertFalse(controller.errorLabel.isVisible());
   }
 
   @Test
+  @DisplayName("Пустое название: ошибка без сохранения")
   void blankTitleShowsErrorAndDoesNotSave() {
     controller.onSave(new ActionEvent());
 
@@ -85,6 +95,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Короткое название: ошибка без сохранения")
   void shortTitleShowsErrorAndDoesNotSave() {
     controller.titleField.setText("ab");
     controller.onSave(new ActionEvent());
@@ -95,6 +106,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Длинное название: ошибка без сохранения")
   void longTitleShowsErrorAndDoesNotSave() {
     controller.titleField.setText("a".repeat(256));
     controller.onSave(new ActionEvent());
@@ -106,6 +118,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Корректный ввод создаёт ресурс и ведёт в список")
   void validInputCreatesAndNavigatesToList() {
     controller.titleField.setText(TITLE);
     controller.descriptionArea.setText(DESCRIPTION);
@@ -117,6 +130,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Пустое описание сохраняется как null")
   void blankDescriptionIsSavedAsNull() {
     controller.titleField.setText(TITLE);
     controller.onSave(new ActionEvent());
@@ -126,6 +140,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Ошибка сервиса показывается без перехода")
   void serviceErrorShowsInErrorLabelAndDoesNotNavigate() {
     when(resourceService.create(anyString(), any()))
         .thenThrow(new ServiceException("Не удалось сохранить"));
@@ -139,6 +154,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Отмена ведёт в список без сохранения")
   void cancelNavigatesToListWithoutSaving() {
     controller.titleField.setText(TITLE);
     controller.onCancel(new ActionEvent());
@@ -149,6 +165,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Режим редактирования подставляет сохранённые значения")
   void editModePrefillsExistingValues() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(existingResource());
     controller.setResourceId(RESOURCE_ID);
@@ -159,6 +176,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Сохранение обновляет ресурс и ведёт в список")
   void editModeSaveUpdatesAndNavigatesToList() {
     when(resourceService.getById(RESOURCE_ID)).thenReturn(existingResource());
     controller.setResourceId(RESOURCE_ID);
@@ -172,6 +190,7 @@ class ResourceFormControllerTest {
   }
 
   @Test
+  @DisplayName("Ошибка загрузки показывает ошибку")
   void editModeLoadErrorShowsInErrorLabel() {
     when(resourceService.getById(RESOURCE_ID)).thenThrow(new ServiceException("Ресурс не найден"));
     controller.setResourceId(RESOURCE_ID);

@@ -28,8 +28,8 @@ import org.testfx.api.FxToolkit;
  * Mock-backed UI flow: real pages wired to real in-memory mock services (no Mockito on services, no
  * backend). Proves that MOCK_DATA mode renders actual data.
  */
-@Epic("Ресурс")
-@Feature("Просмотр метаданных ресурса")
+@Epic("Ресурсы")
+@Feature("№3 Просмотр метаданных ресурса")
 @Tag("role:user")
 @DisplayName("Просмотр ресурса на моках")
 class MockFlowTest extends FxTestBase {
@@ -72,6 +72,7 @@ class MockFlowTest extends FxTestBase {
   }
 
   @Test
+  @DisplayName("Мок-вход кладёт пользователя в сессию")
   void mockLoginPutsUserIntoSession() {
     Session session = new Session();
     ServiceRegistry registry = ServiceRegistry.mock(session);
@@ -99,6 +100,7 @@ class MockFlowTest extends FxTestBase {
 
   @Test
   @SuppressWarnings("unchecked")
+  @DisplayName("Страница без id показывает первый мок-ресурс")
   void detailsPageAutoSelectsFirstSeedWithoutId() {
     robot.interact(() -> controller.load());
 

@@ -21,6 +21,9 @@ import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -35,6 +38,8 @@ import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
@@ -44,6 +49,9 @@ import org.testfx.util.WaitForAsyncUtils;
  * Компонентные тесты страницы деталей ресурса: удаление через настоящую модалку подтверждения (роль
  * МОДЕР).
  */
+@Epic("Ресурсы")
+@Feature("№3 Просмотр метаданных ресурса")
+@DisplayName("Детали ресурса: удаление через модалку")
 class ResourceDetailsControllerUiTest extends FxTestBase {
 
   private static final UUID RESOURCE_ID = UUID.randomUUID();
@@ -115,12 +123,16 @@ class ResourceDetailsControllerUiTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:moder")
+  @DisplayName("Модер видит кнопки редактирования и удаления")
   void moderatorSeesEditAndDeleteButtons() {
     assertTrue(robot.lookup("#editButton").queryAs(Button.class).isVisible());
     assertTrue(robot.lookup("#deleteButton").queryAs(Button.class).isVisible());
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Пользователь не видит кнопок редактирования и удаления")
   void plainUserSeesNeitherEditNorDeleteButtons() {
     robot.interact(
         () -> {
@@ -138,6 +150,9 @@ class ResourceDetailsControllerUiTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Клик модера открывает модалку подтверждения")
   void moderatorDeleteClickOpensConfirmationModal() {
     robot.interact(
         () -> {
@@ -162,6 +177,9 @@ class ResourceDetailsControllerUiTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Подтверждение удаляет ресурс и ведёт в список")
   void confirmingModalClosesItDeletesAndNavigatesToList() {
     robot.interact(
         () -> {
@@ -180,6 +198,9 @@ class ResourceDetailsControllerUiTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Удаление отсутствующего ресурса показывает ошибку без перехода")
   void confirmingDeleteOfGoneResourceShowsErrorWithoutNavigation() {
     robot.interact(
         () -> {

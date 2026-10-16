@@ -27,6 +27,9 @@ import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.services.filter.ResourceFilter;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -45,11 +48,16 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
 import org.testfx.util.WaitForAsyncUtils;
 
+@Epic("Ресурсы")
+@Feature("№2 Список ресурсов")
+@DisplayName("Список ресурсов")
 class ResourceListControllerTest extends FxTestBase {
 
   private static final User ADMIN =
@@ -125,11 +133,15 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Шапка показывает текущего пользователя")
   void showsCurrentUserInHeader() {
     assertEquals("Имя Фамилия · ADMIN", textOf(robot, "#userInfoLabel"));
   }
 
   @Test
+  @Tag("role:moder")
+  @DisplayName("Администратор видит кнопку создания")
   void adminSeesCreateButton() {
     Button create = robot.lookup("#createButton").queryAs(Button.class);
     assertTrue(create.isVisible());
@@ -137,6 +149,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:moder")
+  @DisplayName("Модер видит кнопку создания")
   void moderatorSeesCreateButton() {
     robot.interact(
         () -> {
@@ -149,6 +163,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Пользователь не видит кнопку создания")
   void plainUserDoesNotSeeCreateButton() {
     robot.interact(
         () -> {
@@ -163,6 +179,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Открытие страницы сразу грузит первую страницу")
   void initialOpenLoadsFirstPageWithoutInteraction() {
     // Regression test for the missing auto-load: opening the page must fetch the first page
     // with no user interaction. Red until initialize() triggers the initial load.
@@ -177,6 +195,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Поиск/сортировка")
+  @Tag("role:user")
+  @DisplayName("Сортировка по умолчанию — сначала новые")
   void sortDefaultsToNewestFirst() {
     @SuppressWarnings("unchecked")
     ComboBox<String> sort = robot.lookup("#sortCombo").queryAs(ComboBox.class);
@@ -187,6 +208,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Поиск/сортировка")
+  @Tag("role:user")
+  @DisplayName("Поиск подгружает подходящие строки")
   void searchLoadsMatchingRows() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of(resource("Документ 1")));
@@ -208,6 +232,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Поиск/сортировка")
+  @Tag("role:user")
+  @DisplayName("Смена сортировки перезагружает по названию")
   void changingSortReloadsWithTitleAsc() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of());
@@ -223,6 +250,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Следующая страница грузится со смещением")
   void nextPageLoadsWithOffsetAndDisablesButtonsOnShortPage() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of(resource("Документ 1")));
@@ -247,6 +276,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Ошибка сервиса показывает ошибку и очищает таблицу")
   void serviceErrorShowsErrorAndClearsTable() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenThrow(new ServiceException("Сервер недоступен"));
@@ -262,6 +293,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Выход вызывает сервис и ведёт на страницу входа")
   void logoutCallsServiceAndNavigatesToLogin() {
     robot.clickOn("#logoutButton");
 
@@ -270,6 +303,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Двойной клик по строке открывает детали")
   void doubleClickRowOpensDetails() {
     Resource resource = resource("Документ 1");
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
@@ -283,6 +318,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Поиск/сортировка")
+  @Tag("role:user")
+  @DisplayName("Поиск отправляет фильтры названия и описания")
   void searchSendsTitleAndDescriptionFilters() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of(resource("Документ 1")));
@@ -306,6 +344,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Поиск/сортировка")
+  @Tag("role:user")
+  @DisplayName("Пустое описание отправляется как null-фильтр")
   void blankDescriptionSendsNullFilter() {
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
         .thenReturn(List.of(resource("Документ 1")));
@@ -323,6 +364,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:user")
+  @DisplayName("Пользователь не видит кнопку удаления")
   void deleteButtonHiddenFromPlainUser() {
     robot.interact(
         () -> {
@@ -337,6 +380,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:moder")
+  @DisplayName("Без выбранной строки удаление недоступно модеру")
   void deleteButtonDisabledWithoutSelectionForModerator() {
     robot.interact(
         () -> {
@@ -351,6 +396,8 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Tag("role:moder")
+  @DisplayName("Выбор строки включает кнопку удаления")
   void selectingRowEnablesDeleteButton() {
     Resource resource = resource("Документ 1");
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
@@ -364,6 +411,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Подтверждённое удаление вызывает сервис и обновляет список")
   void confirmedDeleteCallsServiceAndReloads() {
     Resource resource = resource("Документ 1");
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
@@ -381,6 +431,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Отменённое удаление не вызывает сервис")
   void cancelledDeleteDoesNotCallService() {
     Resource resource = resource("Документ 1");
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
@@ -395,6 +448,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Ошибка удаления показывается в строке ошибки")
   void deleteErrorShowsErrorLabel() {
     Resource resource = resource("Документ 1");
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
@@ -414,6 +470,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Клик модера открывает модалку подтверждения")
   void moderatorDeleteClickOpensConfirmationModal() {
     givenModeratorPageWithResource(resource("Документ 1"));
 
@@ -435,6 +494,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Подтверждение в модалке закрывает её и удаляет ресурс")
   void confirmingModalClosesItAndDeletesResource() {
     Resource resource = resource("Документ 1");
     givenModeratorPageWithResource(resource);
@@ -451,6 +513,9 @@ class ResourceListControllerTest extends FxTestBase {
   }
 
   @Test
+  @Story("Удаление с подтверждением")
+  @Tag("role:moder")
+  @DisplayName("Удаление отсутствующего ресурса показывает ошибку")
   void deletingGoneResourceShowsErrorThroughModal() {
     Resource resource = resource("Документ 1");
     when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
