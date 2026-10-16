@@ -133,3 +133,26 @@ docker compose up -d
 
 mvn test -Dgroups=integration -DexcludedGroups=
 ```
+
+### Allure-отчёт
+
+Просмотр по умолчанию — по штатному прогону, без живого бэкенда
+(`integration`-группа исключена, живого бэкенда в конвейере нет):
+
+```bash
+mvn test
+mvn io.qameta.allure:allure-maven:2.17.0:report
+# открыть target/allure-report/index.html
+```
+
+Полный отчёт с live-интеграцией собирается только явным запуском против
+локального бэкенда. Требования окружения: поднятый бэкенд на `localhost:8080`
+(см. «Запуск с реальным бэкендом» выше) и `.env` с `IT_ADMIN_EMAIL` /
+`IT_ADMIN_PASSWORD` сид-админа локального бэкенда (без пароля live-тесты
+скипаются):
+
+```bash
+mvn test -Dgroups=integration -DexcludedGroups=
+mvn io.qameta.allure:allure-maven:2.17.0:report
+# открыть target/allure-report/index.html
+```

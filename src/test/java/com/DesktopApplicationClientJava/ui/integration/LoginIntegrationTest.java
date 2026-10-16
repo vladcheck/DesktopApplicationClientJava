@@ -3,6 +3,11 @@ package com.DesktopApplicationClientJava.ui.integration;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.DesktopApplicationClientJava.services.ServiceException;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,9 +18,15 @@ import org.junit.jupiter.api.Test;
  * explicitly: {@code mvn test -Dgroups=integration -DexcludedGroups=} ({@code @Tag} inherited from
  * IntegrationTestCase).
  */
+@Epic("Проверка ввода")
+@Feature("Вход (email + пароль)")
+@Story("Страница входа")
+@Tag("role:admin")
+@DisplayName("Вход через живой API")
 class LoginIntegrationTest extends IntegrationTestCase {
 
   @Test
+  @DisplayName("Чужие учётные данные отклоняются живым API")
   void invalidCredentialsAreRejectedByRealApi() {
     assertThrows(
         ServiceException.class,

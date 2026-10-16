@@ -19,6 +19,9 @@ import com.DesktopApplicationClientJava.services.impl.ResourceServiceImpl;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.ui.FxTestBase;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +43,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
@@ -54,6 +59,10 @@ import org.testfx.util.WaitForAsyncUtils;
  * the default build and CI (see surefire {@code excludedGroups} in pom.xml). Run explicitly: {@code
  * mvn test -Dgroups=integration -DexcludedGroups= -Dtest=ResourceListIntegrationTest}.
  */
+@Epic("Ресурс")
+@Feature("Список ресурсов")
+@Story("Страница списка ресурсов")
+@DisplayName("Список ресурсов через живой API")
 class ResourceListIntegrationTest extends IntegrationTestCase {
 
   private final FxRobot robot = new FxRobot();
@@ -103,6 +112,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @Tag("role:admin")
+  @DisplayName("Пустой поиск показывает заглушку и нулевой счётчик")
   void emptySearchShowsPlaceholderAndZeroCounter() {
     loginAsAdmin();
     loadListPage(robot);
@@ -116,6 +127,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @Tag("role:admin")
+  @DisplayName("Созданный ресурс находится поиском")
   void seededResourceAppearsInSearch() {
     loginAsAdmin();
     String title = "IT ResourceList " + UUID.randomUUID();
@@ -136,6 +149,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @Tag("role:admin")
+  @DisplayName("Сортировка по названию упорядочивает ресурсы")
   void sortByTitleAscOrdersSeededResources() {
     loginAsAdmin();
     String prefix = "IT ResourceSort " + UUID.randomUUID() + " ";
@@ -161,6 +176,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @Tag("role:admin")
+  @DisplayName("Поиск без входа показывает ошибку и пустую таблицу")
   void unauthenticatedSearchShowsErrorAndLeavesTableEmpty() {
     // Fresh session, no login: the request cannot be authenticated.
     session.clear();
@@ -182,6 +199,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
    * that lenient contract: unknown sort fields must still return 200 ordered by creation time.
    */
   @Test
+  @Tag("role:admin")
+  @DisplayName("Неизвестное поле сортировки откатывается к дате создания")
   void invalidSortFieldFallsBackToCreatedAtDesc() {
     loginAsAdmin();
     String prefix = "IT SortFallback " + UUID.randomUUID() + " ";
@@ -206,6 +225,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
    * модалку, подтверждение закрывает её и удаляет ресурс на бэкенде.
    */
   @Test
+  @Tag("role:admin")
+  @DisplayName("Удаление через модалку убирает ресурс с бэкенда")
   void deleteCycleRemovesResourceFromBackend() {
     loginAsAdmin();
     String title = "IT ResourceDelete " + UUID.randomUUID();
@@ -240,6 +261,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @Tag("role:moder")
+  @DisplayName("Удаление глазами модератора")
   @Disabled("Невоспроизводим: в дев-бэкенде засеян только ADMIN, сида MODER нет")
   void deleteCycleAsModerator() {
     // Живой цикл удаления за МОДЕР (не админа) невоспроизводим: интеграционное окружение
@@ -255,6 +278,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @Tag("role:admin")
+  @DisplayName("Поиск по описанию находит ресурс")
   void searchByDescriptionFindsSeededResource() {
     loginAsAdmin();
     String description = "IT описание " + UUID.randomUUID();
@@ -277,6 +302,8 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   }
 
   @Test
+  @Tag("role:admin")
+  @DisplayName("Отмена удаления оставляет ресурс на бэкенде")
   void cancelledDeleteKeepsResourceOnBackend() {
     loginAsAdmin();
     String title = "IT ResourceCancel " + UUID.randomUUID();
