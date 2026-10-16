@@ -11,23 +11,26 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 @Epic("Проверка ввода")
-@Feature("Вход (email + пароль)")
+@Feature("EmailValidator")
 @Tag("role:none")
 @DisplayName("Проверка адреса почты")
 public class EmailValidatorTest {
   private static final String FIELD_NAME = EmailValidator.FIELD_NAME;
 
   @Test
+  @DisplayName("Пустой адрес отклоняется")
   void emptyEmailIsRejected() {
     assertEquals(ErrorMessages.Required, EmailValidator.validate(""));
   }
 
   @Test
+  @DisplayName("Адрес из пробелов отклоняется")
   void blankEmailIsRejected() {
     assertEquals(ErrorMessages.Required, EmailValidator.validate("   "));
   }
 
   @Test
+  @DisplayName("Короткий адрес отклоняется")
   void shortEmailIsRejected() {
     assertEquals(
         ErrorMessages.MinLength(FIELD_NAME, EmailValidator.MIN_EMAIL_LENGTH),
@@ -35,6 +38,7 @@ public class EmailValidatorTest {
   }
 
   @Test
+  @DisplayName("Длинный адрес отклоняется")
   void longEmailIsRejected() {
     String e = "a".repeat(95) + "@x.com";
     assertEquals(
@@ -43,6 +47,7 @@ public class EmailValidatorTest {
   }
 
   @Test
+  @DisplayName("Адрес без @ отклоняется")
   void emailWithoutAtIsRejected() {
     assertEquals(ErrorMessages.IncorrectFormat, EmailValidator.validate("nope.com"));
   }

@@ -57,8 +57,8 @@ import org.testfx.api.FxToolkit;
  * excludedGroups} in pom.xml). Run explicitly: {@code mvn test -Dgroups=integration
  * -DexcludedGroups= -Dtest=ResourceFormIntegrationTest}.
  */
-@Epic("Ресурс")
-@Feature("Создание и правка ресурса")
+@Epic("Ресурсы")
+@Feature("№4 Форма ресурса")
 @Story("Страница формы ресурса")
 @Tag("role:admin")
 @DisplayName("Форма ресурса через живой API")

@@ -18,8 +18,8 @@ import org.junit.jupiter.api.Test;
  * explicitly: {@code mvn test -Dgroups=integration -DexcludedGroups=} ({@code @Tag} inherited from
  * IntegrationTestCase).
  */
-@Epic("Проверка ввода")
-@Feature("Вход (email + пароль)")
+@Epic("Аутентификация")
+@Feature("№1 Вход")
 @Story("Страница входа")
 @Tag("role:admin")
 @DisplayName("Вход через живой API")
