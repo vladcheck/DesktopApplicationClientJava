@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -447,6 +448,33 @@ class ResourceListControllerTest extends FxTestBase {
     waitForLoadComplete(robot);
 
     verify(resourceService).delete(resource.getUuid());
+  }
+
+  @Test
+  void deletingGoneResourceShowsErrorThroughModal() {
+    Resource resource = resource("Документ 1");
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource));
+    doThrow(new ServiceException("Ресурс не найден"))
+        .when(resourceService)
+        .delete(resource.getUuid());
+
+    fireSearch(robot, "");
+    waitForLoadComplete(robot);
+    robot.interact(() -> controller.stubConfirm = false);
+    selectFirstRow(robot);
+
+    Thread clicker = clickDeleteNoWait();
+    DialogPane dialog = waitForDialog(robot);
+    pressDialogButton(robot, dialog, ButtonType.OK);
+    waitForClicker(clicker);
+    waitForLoadComplete(robot);
+
+    assertModalClosed(robot);
+    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
+    assertTrue(error.isVisible());
+    assertEquals("Ресурс не найден", error.getText());
+    assertEquals(1, rows(robot).size());
   }
 
   /**
