@@ -20,6 +20,8 @@
         <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
+        <allure.version>2.35.4</allure.version>
+        <allure-maven.version>2.17.0</allure-maven.version>
         <excludedGroups>integration</excludedGroups>
     </properties>
 
@@ -119,6 +121,12 @@
             <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-junit5</artifactId>
+            <version>${allure.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories></repositories>
@@ -174,6 +182,22 @@
                     <systemPropertyVariables>
                         <dotenv.path>${project.basedir}/.env</dotenv.path>
                     </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <!-- Локальный Allure-отчёт поверх штатного прогона (тикет #60).
+                Адаптер allure-junit5 сам регистрируется через SPI, headless-конфигурация
+                surefire и excludedGroups выше не изменены. aspectjweaver осознанно НЕ
+                подключаем: шаги (@Step/@Attachment) вне скоупа скелета, сырые результаты
+                и аннотации Epic/Feature/DisplayName/Tag работают без него.
+                Генерация HTML только вручную, дефолтный билд не замедляет:
+                mvn -B test && mvn -B io.qameta.allure:allure-maven:${allure-maven.version}:report -->
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>${allure-maven.version}</version>
+                <configuration>
+                    <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+                    <reportDirectory>${project.build.directory}/allure-report</reportDirectory>
                 </configuration>
             </plugin>
             <plugin>

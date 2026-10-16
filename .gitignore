@@ -29,6 +29,8 @@ hs_err_pid*
 replay_pid*
 
 target/
+# Локальный дистрибутив Allure CLI, скачиваемый allure-maven при генерации отчёта (тикет #60)
+.allure/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup

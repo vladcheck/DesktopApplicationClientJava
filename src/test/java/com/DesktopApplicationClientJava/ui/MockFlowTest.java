@@ -9,6 +9,8 @@ import com.DesktopApplicationClientJava.navigation.Navigator;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.session.Session;
 import com.DesktopApplicationClientJava.utils.ControllerWiring;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import java.util.UUID;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -17,6 +19,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.testfx.api.FxToolkit;
 
@@ -24,6 +28,10 @@ import org.testfx.api.FxToolkit;
  * Mock-backed UI flow: real pages wired to real in-memory mock services (no Mockito on services, no
  * backend). Proves that MOCK_DATA mode renders actual data.
  */
+@Epic("Ресурс")
+@Feature("Просмотр метаданных ресурса")
+@Tag("role:user")
+@DisplayName("Просмотр ресурса на моках")
 class MockFlowTest extends FxTestBase {
   private static final UUID SEEDED_RESOURCE_ID =
       UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
@@ -75,6 +83,7 @@ class MockFlowTest extends FxTestBase {
 
   @Test
   @SuppressWarnings("unchecked")
+  @DisplayName("Страница показывает мок-ресурс из памяти")
   void detailsPageRendersSeededMockResource() {
     robot.interact(
         () -> {
