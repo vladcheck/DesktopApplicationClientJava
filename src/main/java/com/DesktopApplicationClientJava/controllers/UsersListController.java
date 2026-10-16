@@ -120,10 +120,19 @@ public class UsersListController extends Controller {
   }
 
   private void setupRbac() {
+    // NB: services/getAuthService может быть частичным моком в тестах — остаёмся null-safe:
+    // getAuthService()==null, getCurrentUser()==null и role==null дают скрытые кнопки без NPE,
+    // т.к. isAdmin() внутри проверяет current и role на null.
     var authService = services == null ? null : services.getAuthService();
     boolean canCreate = authService != null && authService.isAdmin();
     createButton.setVisible(canCreate);
     createButton.setManaged(canCreate);
+
+    // Кнопка «Ресурсы» доступна только администраторам (как кнопка «Пользователи» на списке
+    // ресурсов).
+    boolean isAdmin = authService != null && authService.isAdmin();
+    resourcesButton.setVisible(isAdmin);
+    resourcesButton.setManaged(isAdmin);
   }
 
   // ===== Data loading =====
