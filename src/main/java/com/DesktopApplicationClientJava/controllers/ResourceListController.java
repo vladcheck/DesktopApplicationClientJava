@@ -13,7 +13,9 @@ import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
@@ -33,6 +35,7 @@ public class ResourceListController extends Controller {
   @FXML private Label pageInfoLabel;
   @FXML private Label statusLabel;
   @FXML private TextField searchField;
+  @FXML private TextField descriptionField;
   @FXML private ComboBox<String> sortCombo;
   @FXML private TableView<Resource> resourceTable;
   @FXML private TableColumn<Resource, String> titleColumn;
@@ -40,12 +43,14 @@ public class ResourceListController extends Controller {
   @FXML private TableColumn<Resource, String> createdColumn;
   @FXML private TableColumn<Resource, String> updatedColumn;
   @FXML private Button createButton;
+  @FXML private Button deleteButton;
   @FXML private Button prevButton;
   @FXML private Button nextButton;
   @FXML private Button logoutButton;
 
   private final ObservableList<Resource> rows = FXCollections.observableArrayList();
   private long offset = 0;
+  private boolean canModify = false;
 
   // ===== Lifecycle =====
 
@@ -58,6 +63,7 @@ public class ResourceListController extends Controller {
     setupRbac();
 
     searchField.setOnAction(e -> reloadFromStart());
+    descriptionField.setOnAction(e -> reloadFromStart());
     sortCombo.setOnAction(e -> reloadFromStart());
     resourceTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_FLEX_LAST_COLUMN);
 
@@ -94,6 +100,10 @@ public class ResourceListController extends Controller {
 
     resourceTable.setItems(rows);
     resourceTable.setPlaceholder(new Label("Документов пока нет"));
+    resourceTable
+        .getSelectionModel()
+        .selectedItemProperty()
+        .addListener((obs, oldSel, newSel) -> updateDeleteButtonState());
 
     resourceTable.setRowFactory(
         tv -> {
@@ -110,9 +120,18 @@ public class ResourceListController extends Controller {
 
   private void setupRbac() {
     var authService = services == null ? null : services.getAuthService();
-    boolean canCreate = authService != null && (authService.isAdmin() || authService.isModerator());
-    createButton.setVisible(canCreate);
-    createButton.setManaged(canCreate);
+    canModify = authService != null && (authService.isAdmin() || authService.isModerator());
+    createButton.setVisible(canModify);
+    createButton.setManaged(canModify);
+    deleteButton.setVisible(canModify);
+    deleteButton.setManaged(canModify);
+    updateDeleteButtonState();
+  }
+
+  private void updateDeleteButtonState() {
+    boolean hasSelection =
+        resourceTable != null && resourceTable.getSelectionModel().getSelectedItem() != null;
+    deleteButton.setDisable(!(canModify && hasSelection));
   }
 
   // ===== Data loading =====
@@ -126,12 +145,7 @@ public class ResourceListController extends Controller {
     hideError();
     statusLabel.setText("Загрузка…");
 
-    var filter =
-        new ResourceFilter(
-            searchField.getText() == null || searchField.getText().isBlank()
-                ? null
-                : searchField.getText().trim(),
-            null);
+    var filter = buildFilter();
     var sort = resolveSort();
     long currentOffset = offset;
 
@@ -171,6 +185,17 @@ public class ResourceListController extends Controller {
 
   private record SortSpec(String sortBy, String sortDir) {}
 
+  private ResourceFilter buildFilter() {
+    return new ResourceFilter(normalizeQuery(searchField), normalizeQuery(descriptionField));
+  }
+
+  private static String normalizeQuery(TextField field) {
+    if (field == null || field.getText() == null || field.getText().isBlank()) {
+      return null;
+    }
+    return field.getText().trim();
+  }
+
   private SortSpec resolveSort() {
     String choice = sortCombo.getValue();
     if (choice == null) return new SortSpec("createdAt", "desc");
@@ -195,6 +220,60 @@ public class ResourceListController extends Controller {
   @FXML
   private void onCreate(ActionEvent e) {
     navigator.goTo("/fxml/ResourceForm.fxml");
+  }
+
+  @FXML
+  void onDelete(ActionEvent e) {
+    var selected = resourceTable.getSelectionModel().getSelectedItem();
+    if (selected == null) {
+      return;
+    }
+    if (!confirmDelete(selected)) {
+      return;
+    }
+    deleteAsync(selected);
+  }
+
+  private void deleteAsync(Resource resource) {
+    hideError();
+    statusLabel.setText("Удаление…");
+
+    var task =
+        new Task<Void>() {
+          @Override
+          protected Void call() {
+            services.getResourceService().delete(resource.getUuid());
+            return null;
+          }
+        };
+
+    task.setOnSucceeded(e -> loadAsync());
+
+    task.setOnFailed(
+        e -> {
+          var ex = task.getException();
+          String msg =
+              ex instanceof ServiceException se ? se.getMessage() : "Не удалось удалить ресурс";
+          showError(msg);
+          statusLabel.setText("");
+        });
+
+    var thread = new Thread(task, "resource-list-delete");
+    thread.setDaemon(true);
+    thread.start();
+  }
+
+  /**
+   * Диалог подтверждения удаления. Выделен в метод ради тестов: headless {@code Alert} блокирует
+   * поток, поэтому тесты переопределяют его без UI.
+   */
+  protected boolean confirmDelete(Resource resource) {
+    var alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Удаление ресурса");
+    alert.setHeaderText("Удалить ресурс?");
+    alert.setContentText(
+        "«" + resource.getTitle() + "» будет удалён без возможности восстановления.");
+    return alert.showAndWait().map(button -> button == ButtonType.OK).orElse(false);
   }
 
   @FXML

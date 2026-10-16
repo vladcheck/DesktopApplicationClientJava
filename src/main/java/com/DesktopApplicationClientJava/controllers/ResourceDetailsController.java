@@ -17,7 +17,9 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -44,6 +46,7 @@ public class ResourceDetailsController extends Controller {
   @FXML TableColumn<FileInfo, Void> downloadColumn;
   @FXML Button backButton;
   @FXML Button editButton;
+  @FXML Button deleteButton;
 
   private UUID resourceId;
 
@@ -88,6 +91,8 @@ public class ResourceDetailsController extends Controller {
     boolean canEdit = authService != null && (authService.isAdmin() || authService.isModerator());
     editButton.setVisible(canEdit);
     editButton.setManaged(canEdit);
+    deleteButton.setVisible(canEdit);
+    deleteButton.setManaged(canEdit);
     autoSelectFirstInMockMode();
   }
 
@@ -196,5 +201,30 @@ public class ResourceDetailsController extends Controller {
     if (resourceId == null) return;
     navigator.goTo(
         "/fxml/ResourceForm.fxml", c -> ((ResourceFormController) c).setResourceId(resourceId));
+  }
+
+  @FXML
+  void onDelete(ActionEvent event) {
+    if (resourceId == null) return;
+    if (!confirmDelete()) return;
+    try {
+      services.getResourceService().delete(resourceId);
+    } catch (ServiceException e) {
+      showError(e.getMessage());
+      return;
+    }
+    navigator.goTo("/fxml/ResourceList.fxml");
+  }
+
+  /**
+   * Диалог подтверждения удаления. Выделен в метод ради тестов: headless {@code Alert} блокирует
+   * поток, поэтому тесты переопределяют его без UI.
+   */
+  protected boolean confirmDelete() {
+    var alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Удаление ресурса");
+    alert.setHeaderText("Удалить ресурс?");
+    alert.setContentText("Ресурс будет удалён без возможности восстановления.");
+    return alert.showAndWait().map(button -> button == ButtonType.OK).orElse(false);
   }
 }

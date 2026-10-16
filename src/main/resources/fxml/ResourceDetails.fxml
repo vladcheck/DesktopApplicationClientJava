@@ -28,6 +28,10 @@
                     text="Редактировать"
                     onAction="#onEdit"
                     styleClass="btn-ghost"/>
+            <Button fx:id="deleteButton"
+                    text="Удалить"
+                    onAction="#onDelete"
+                    styleClass="btn-ghost"/>
             <Region HBox.hgrow="ALWAYS"/>
             <Label fx:id="statusLabel" styleClass="pagination-info"/>
         </HBox>
