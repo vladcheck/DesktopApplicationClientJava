@@ -6,13 +6,24 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import com.DesktopApplicationClientJava.Api.Dto.response.UserDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Отображение данных")
+@Feature("UserDto")
+@Story("Разбор контракта пользователя")
+@Tag("role:none")
+@DisplayName("Разбор пользователя из JSON")
 class UserDtoParsingTest {
 
   private final ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
 
   @Test
+  @DisplayName("Контракт бэкенда разбирается один к одному")
   void parsesBackendContractOneToOne() throws Exception {
     String json =
         """
@@ -36,6 +47,7 @@ class UserDtoParsingTest {
   }
 
   @Test
+  @DisplayName("Неизвестные поля завершаются ошибкой")
   void unknownPropertiesFailFast() {
     String json = "{\"uuid\": null, \"unexpectedField\": 1}";
 

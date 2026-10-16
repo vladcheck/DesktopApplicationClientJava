@@ -7,14 +7,25 @@ import com.DesktopApplicationClientJava.Api.Dto.response.FileDto;
 import com.DesktopApplicationClientJava.Api.Dto.response.ResourceDto;
 import com.DesktopApplicationClientJava.entities.Resource;
 import com.DesktopApplicationClientJava.mapper.ResourceMapper;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
+import io.qameta.allure.Story;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Отображение данных")
+@Feature("ResourceMapper")
+@Story("Преобразование ресурса в сущность")
+@Tag("role:none")
+@DisplayName("Преобразование ресурса")
 class ResourceMapperTest {
 
   @Test
+  @DisplayName("Все поля ресурса с файлами преобразуются")
   void mapsAllFieldsIncludingFiles() {
     UUID uuid = UUID.randomUUID();
     UUID fileUuid = UUID.randomUUID();
@@ -42,6 +53,7 @@ class ResourceMapperTest {
   }
 
   @Test
+  @DisplayName("Отсутствие файлов даёт пустой список")
   void nullFilesBecomeEmptyList() {
     ResourceDto dto =
         new ResourceDto(
