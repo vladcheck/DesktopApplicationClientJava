@@ -9,10 +9,18 @@ import com.DesktopApplicationClientJava.entities.Role;
 import com.DesktopApplicationClientJava.entities.User;
 import com.DesktopApplicationClientJava.services.impl.AuthServiceImpl;
 import com.DesktopApplicationClientJava.session.Session;
+import io.qameta.allure.Epic;
+import io.qameta.allure.Feature;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
+@Epic("Аутентификация")
+@Feature("AuthService")
+@Tag("role:none")
+@DisplayName("Сервис аутентификации")
 class AuthServiceTest {
 
   private Session session;
@@ -25,6 +33,7 @@ class AuthServiceTest {
   }
 
   @Test
+  @DisplayName("Гость не имеет ролей")
   void guestHasNoRoles() {
     assertFalse(authService.hasRole(Role.USER));
     assertFalse(authService.hasRole(Role.MODER));
@@ -32,6 +41,7 @@ class AuthServiceTest {
   }
 
   @Test
+  @DisplayName("Пользователь имеет только роль пользователя")
   void userHasOnlyUserRole() {
     loginAs(Role.USER);
 
@@ -41,6 +51,7 @@ class AuthServiceTest {
   }
 
   @Test
+  @DisplayName("Модер имеет роли пользователя и модера, но не админа")
   void moderHasUserAndModerRolesButIsNotAdmin() {
     loginAs(Role.MODER);
 
@@ -52,6 +63,7 @@ class AuthServiceTest {
   }
 
   @Test
+  @DisplayName("Админ имеет все роли")
   void adminHasAllRoles() {
     loginAs(Role.ADMIN);
 
