@@ -2,7 +2,6 @@ package com.DesktopApplicationClientJava.controllers;
 
 import com.DesktopApplicationClientJava.controllers.utils.Controller;
 import com.DesktopApplicationClientJava.entities.User;
-import com.DesktopApplicationClientJava.services.ServiceException;
 import java.util.UUID;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
@@ -28,6 +27,11 @@ public class UserDetailsController extends Controller {
 
   private UUID userId;
   private User current;
+
+  @Override
+  protected Label getErrorLabel() {
+    return errorLabel;
+  }
 
   // ===== Lifecycle =====
 
@@ -85,11 +89,7 @@ public class UserDetailsController extends Controller {
         e -> {
           statusLabel.setText("");
           var ex = task.getException();
-          String msg =
-              ex instanceof ServiceException se
-                  ? se.getMessage()
-                  : "Не удалось загрузить пользователя";
-          showError(msg);
+          showError(ex, "Не удалось загрузить пользователя");
         });
 
     startDaemon(task, "user-details-load");
@@ -179,11 +179,7 @@ public class UserDetailsController extends Controller {
         ev -> {
           setBusy(false);
           var ex = task.getException();
-          String msg =
-              ex instanceof ServiceException se
-                  ? se.getMessage()
-                  : "Не удалось удалить пользователя";
-          showError(msg);
+          showError(ex, "Не удалось удалить пользователя");
         });
 
     startDaemon(task, "user-delete");
@@ -226,18 +222,6 @@ public class UserDetailsController extends Controller {
     editButton.setDisable(busy);
     backButton.setDisable(busy);
     statusLabel.setText(busy ? "Удаление…" : "");
-  }
-
-  private void showError(String message) {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-  }
-
-  private void hideError() {
-    errorLabel.setText("");
-    errorLabel.setVisible(false);
-    errorLabel.setManaged(false);
   }
 
   private static void startDaemon(Task<?> task, String name) {

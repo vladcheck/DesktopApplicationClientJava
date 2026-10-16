@@ -2,7 +2,6 @@ package com.DesktopApplicationClientJava.controllers;
 
 import com.DesktopApplicationClientJava.controllers.utils.Controller;
 import com.DesktopApplicationClientJava.entities.User;
-import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.filter.UserFilter;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +48,11 @@ public class UsersListController extends Controller {
 
   private final ObservableList<User> rows = FXCollections.observableArrayList();
   private long offset = 0;
+
+  @Override
+  protected Label getErrorLabel() {
+    return errorLabel;
+  }
 
   // ===== Lifecycle =====
 
@@ -191,9 +195,7 @@ public class UsersListController extends Controller {
     task.setOnFailed(
         e -> {
           var ex = task.getException();
-          String msg =
-              ex instanceof ServiceException se ? se.getMessage() : "Не удалось загрузить список";
-          showError(msg);
+          showError(ex, "Не удалось загрузить список");
           rows.clear();
           updatePaginationUi(0, searching);
           statusLabel.setText("");
@@ -303,8 +305,16 @@ public class UsersListController extends Controller {
 
   @FXML
   private void onLogout(ActionEvent e) {
-    services.getAuthService().logout();
-    navigator.goTo("/fxml/LoginForm.fxml");
+    try {
+      services.getAuthService().logout();
+    } catch (RuntimeException ignored) {
+      // Выход съедает ошибку сервиса без мелькания: редирект ниже выполняется в любом случае.
+    } finally {
+      if (session != null) {
+        session.clear();
+      }
+      navigator.goToLoginOnce();
+    }
   }
 
   @FXML
@@ -334,19 +344,5 @@ public class UsersListController extends Controller {
   private void openDetails(User user) {
     navigator.goTo(
         "/fxml/UserDetails.fxml", c -> ((UserDetailsController) c).setUserId(user.getUuid()));
-  }
-
-  // ===== helpers =====
-
-  private void showError(String message) {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-  }
-
-  private void hideError() {
-    errorLabel.setText("");
-    errorLabel.setVisible(false);
-    errorLabel.setManaged(false);
   }
 }

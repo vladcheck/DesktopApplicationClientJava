@@ -2,6 +2,7 @@ package com.DesktopApplicationClientJava.ui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -58,6 +59,7 @@ class UsersListControllerTest extends FxTestBase {
   private UsersService usersService;
   private ServiceRegistry services;
   private Navigator navigator;
+  private Session session;
   private Stage stage;
 
   @BeforeEach
@@ -79,6 +81,10 @@ class UsersListControllerTest extends FxTestBase {
     when(services.getAuthService()).thenReturn(authService);
     when(services.getUsersService()).thenReturn(usersService);
     navigator = mock(Navigator.class);
+    session = new Session();
+    session.setCurrentUser(ADMIN);
+    session.setAccessToken("access");
+    session.setRefreshToken("refresh");
     this.stage = stage;
     stubAdmin();
     loadPage();
@@ -95,7 +101,7 @@ class UsersListControllerTest extends FxTestBase {
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/UserList.fxml"));
       loader.setControllerFactory(
           clazz -> {
-            ControllerWiring.wire(controller, navigator, new Session(), services);
+            ControllerWiring.wire(controller, navigator, session, services);
             return controller;
           });
       Parent root = loader.load();
@@ -479,7 +485,8 @@ class UsersListControllerTest extends FxTestBase {
     fireButton("#logoutButton");
 
     verify(authService).logout();
-    verify(navigator).goTo("/fxml/LoginForm.fxml");
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
   }
 
   @Test
@@ -521,16 +528,18 @@ class UsersListControllerTest extends FxTestBase {
   }
 
   @Test
-  @DisplayName("Ошибка 403 прокидывает текст сервера")
-  void forbiddenErrorPassesThroughText() {
+  @DisplayName("Ошибка 403 ведёт на вход с очищенной сессией")
+  void forbiddenErrorRedirectsToLogin() {
     when(usersService.search(any(), eq(0L), eq(20L)))
         .thenThrow(new ServiceException("Доступ запрещён", 403));
 
     fireSearch("");
-    waitForLoadComplete();
+    awaitLoginRedirect();
 
-    assertEquals("Доступ запрещён", textOf("#errorLabel"));
-    assertTrue(rows().isEmpty());
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
+    assertNull(session.getAccessToken());
+    assertFalse(robot.lookup("#errorLabel").queryAs(Label.class).isVisible());
   }
 
   @Test
@@ -639,6 +648,24 @@ class UsersListControllerTest extends FxTestBase {
           });
     } catch (TimeoutException e) {
       throw new AssertionError("Не дождались загрузки списка пользователей", e);
+    }
+  }
+
+  private void awaitLoginRedirect() {
+    try {
+      WaitForAsyncUtils.waitFor(
+          30,
+          TimeUnit.SECONDS,
+          () -> {
+            try {
+              verify(navigator).goToLoginOnce();
+              return true;
+            } catch (AssertionError e) {
+              return false;
+            }
+          });
+    } catch (TimeoutException e) {
+      throw new AssertionError("Не дождались перехода на вход", e);
     }
   }
 

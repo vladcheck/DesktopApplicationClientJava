@@ -65,6 +65,7 @@ class UserUpdateFormControllerTest {
 
   private UsersService usersService;
   private Navigator navigator;
+  private Session session;
   private UserUpdateFormController controller;
 
   private TextField emailField;
@@ -96,7 +97,11 @@ class UserUpdateFormControllerTest {
     when(services.getUsersService()).thenReturn(usersService);
 
     controller = new UserUpdateFormController();
-    ControllerWiring.wire(controller, navigator, new Session(), services);
+    session = new Session();
+    session.setCurrentUser(existingUser());
+    session.setAccessToken("access");
+    session.setRefreshToken("refresh");
+    ControllerWiring.wire(controller, navigator, session, services);
 
     emailField = new TextField();
     firstNameField = new TextField();
@@ -523,14 +528,17 @@ class UserUpdateFormControllerTest {
   }
 
   @Test
-  @DisplayName("Загрузка: 403 показывает текст ошибки без перехода")
-  void loadForbiddenShowsErrorWithoutNavigation() {
+  @DisplayName("Загрузка: 403 ведёт на вход с очищенной сессией")
+  void loadForbiddenRedirectsToLoginWithClearedSession() {
     when(usersService.getById(USER_ID)).thenThrow(new ServiceException("Доступ запрещён", 403));
     controller.setUserId(USER_ID);
 
-    awaitError("Доступ запрещён");
-    verify(navigator, never()).goTo(anyString());
-    assertTrue(saveButton.isDisabled());
+    awaitLoginRedirect();
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
+    assertNull(session.getAccessToken());
+    assertNull(session.getRefreshToken());
+    assertFalse(errorLabel.isVisible());
   }
 
   @Test
@@ -571,14 +579,17 @@ class UserUpdateFormControllerTest {
   }
 
   @Test
-  @DisplayName("Сохранение: 403 показывает текст ошибки без перехода")
-  void saveForbiddenShowsErrorWithoutNavigation() {
+  @DisplayName("Сохранение: 403 ведёт на вход с очищенной сессией")
+  void saveForbiddenRedirectsToLoginWithClearedSession() {
     stubLoadedAndFailingUpdate(new ServiceException("Доступ запрещён", 403));
     invokeHandler("onSave");
 
-    awaitError("Доступ запрещён");
-    verify(navigator, never()).goTo(anyString());
-    assertFalse(saveButton.isDisabled());
+    awaitLoginRedirect();
+    verify(navigator).goToLoginOnce();
+    assertNull(session.getCurrentUser());
+    assertNull(session.getAccessToken());
+    assertNull(session.getRefreshToken());
+    assertFalse(errorLabel.isVisible());
   }
 
   @Test
@@ -652,6 +663,19 @@ class UserUpdateFormControllerTest {
           }
         },
         "Не дождались перехода в список пользователей");
+  }
+
+  private void awaitLoginRedirect() {
+    await(
+        () -> {
+          try {
+            verify(navigator).goToLoginOnce();
+            return true;
+          } catch (AssertionError e) {
+            return false;
+          }
+        },
+        "Не дождались перехода на вход");
   }
 
   private static void await(Callable<Boolean> condition, String message) {

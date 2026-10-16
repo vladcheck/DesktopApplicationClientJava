@@ -3,7 +3,6 @@ package com.DesktopApplicationClientJava.controllers;
 import com.DesktopApplicationClientJava.controllers.utils.Controller;
 import com.DesktopApplicationClientJava.entities.Role;
 import com.DesktopApplicationClientJava.entities.User;
-import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.data.UpdateUserData;
 import java.util.UUID;
 import javafx.collections.FXCollections;
@@ -30,6 +29,11 @@ public class UserUpdateFormController extends Controller {
 
   private UUID userId;
   private User current;
+
+  @Override
+  protected Label getErrorLabel() {
+    return errorLabel;
+  }
 
   // ===== Lifecycle =====
 
@@ -77,11 +81,7 @@ public class UserUpdateFormController extends Controller {
     task.setOnFailed(
         e -> {
           var ex = task.getException();
-          String msg =
-              ex instanceof ServiceException se
-                  ? se.getMessage()
-                  : "Не удалось загрузить пользователя";
-          showError(msg);
+          showError(ex, "Не удалось загрузить пользователя");
           setFormDisabled(true);
         });
 
@@ -130,11 +130,7 @@ public class UserUpdateFormController extends Controller {
         ev -> {
           setFormDisabled(false);
           var ex = task.getException();
-          String msg =
-              ex instanceof ServiceException se
-                  ? se.getMessage()
-                  : "Не удалось сохранить изменения";
-          showError(msg);
+          showError(ex, "Не удалось сохранить изменения");
         });
 
     startDaemon(task, "user-update-save");
@@ -193,18 +189,6 @@ public class UserUpdateFormController extends Controller {
     lastNameField.setDisable(disabled);
     enabledCheckBox.setDisable(disabled);
     saveButton.setDisable(disabled);
-  }
-
-  private void showError(String message) {
-    errorLabel.setText(message);
-    errorLabel.setVisible(true);
-    errorLabel.setManaged(true);
-  }
-
-  private void hideError() {
-    errorLabel.setText("");
-    errorLabel.setVisible(false);
-    errorLabel.setManaged(false);
   }
 
   private static String safeTrim(String value) {
