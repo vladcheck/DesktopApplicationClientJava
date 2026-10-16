@@ -8,7 +8,9 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +36,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -54,8 +58,23 @@ class ResourceListControllerTest extends FxTestBase {
   private ResourceService resourceService;
   private ServiceRegistry services;
   private Navigator navigator;
-  private ResourceListController controller;
+  private TestableListController controller;
   private Stage stage;
+
+  static class TestableListController extends ResourceListController {
+    boolean confirmDeleteResult = false;
+    boolean stubConfirm = true;
+    int confirmCalls = 0;
+
+    @Override
+    protected boolean confirmDelete(Resource resource) {
+      confirmCalls++;
+      if (stubConfirm) {
+        return confirmDeleteResult;
+      }
+      return super.confirmDelete(resource);
+    }
+  }
 
   @BeforeEach
   void resetScene() throws Exception {
@@ -89,7 +108,7 @@ class ResourceListControllerTest extends FxTestBase {
 
   private void loadPage() {
     try {
-      controller = new ResourceListController();
+      controller = new TestableListController();
       FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/ResourceList.fxml"));
       loader.setControllerFactory(
           clazz -> {
@@ -262,6 +281,197 @@ class ResourceListControllerTest extends FxTestBase {
     verify(navigator).goTo(eq("/fxml/ResourceDetails.fxml"), any());
   }
 
+  @Test
+  void searchSendsTitleAndDescriptionFilters() {
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource("Документ 1")));
+
+    robot.interact(
+        () -> {
+          TextField title = robot.lookup("#searchField").queryAs(TextField.class);
+          title.setText("Отчёт");
+          robot.lookup("#descriptionField").queryAs(TextField.class).setText("годовой");
+          title.getOnAction().handle(new ActionEvent());
+        });
+    waitForLoadComplete(robot);
+
+    verify(resourceService)
+        .search(
+            argThat(f -> "Отчёт".equals(f.getTitle()) && "годовой".equals(f.getDescription())),
+            eq(0L),
+            eq(20L),
+            eq("createdAt"),
+            eq("desc"));
+  }
+
+  @Test
+  void blankDescriptionSendsNullFilter() {
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource("Документ 1")));
+
+    fireSearch(robot, "Документ");
+    waitForLoadComplete(robot);
+
+    verify(resourceService)
+        .search(
+            argThat(f -> "Документ".equals(f.getTitle()) && f.getDescription() == null),
+            eq(0L),
+            eq(20L),
+            eq("createdAt"),
+            eq("desc"));
+  }
+
+  @Test
+  void deleteButtonHiddenFromPlainUser() {
+    robot.interact(
+        () -> {
+          when(authService.isAdmin()).thenReturn(false);
+          when(authService.isModerator()).thenReturn(false);
+          loadPage();
+        });
+
+    Button delete = robot.lookup("#deleteButton").queryAs(Button.class);
+    assertFalse(delete.isVisible());
+    assertFalse(delete.isManaged());
+  }
+
+  @Test
+  void deleteButtonDisabledWithoutSelectionForModerator() {
+    robot.interact(
+        () -> {
+          when(authService.isAdmin()).thenReturn(false);
+          when(authService.isModerator()).thenReturn(true);
+          loadPage();
+        });
+
+    Button delete = robot.lookup("#deleteButton").queryAs(Button.class);
+    assertTrue(delete.isVisible());
+    assertTrue(delete.isDisabled());
+  }
+
+  @Test
+  void selectingRowEnablesDeleteButton() {
+    Resource resource = resource("Документ 1");
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource));
+
+    fireSearch(robot, "");
+    waitForLoadComplete(robot);
+    selectFirstRow(robot);
+
+    assertFalse(robot.lookup("#deleteButton").queryAs(Button.class).isDisabled());
+  }
+
+  @Test
+  void confirmedDeleteCallsServiceAndReloads() {
+    Resource resource = resource("Документ 1");
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource));
+
+    fireSearch(robot, "");
+    waitForLoadComplete(robot);
+    fireDelete(true);
+    waitForLoadComplete(robot);
+
+    verify(resourceService).delete(resource.getUuid());
+    verify(resourceService, atLeast(2))
+        .search(any(ResourceFilter.class), eq(0L), eq(20L), eq("createdAt"), eq("desc"));
+    assertFalse(robot.lookup("#errorLabel").queryAs(Label.class).isVisible());
+  }
+
+  @Test
+  void cancelledDeleteDoesNotCallService() {
+    Resource resource = resource("Документ 1");
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource));
+
+    fireSearch(robot, "");
+    waitForLoadComplete(robot);
+    fireDelete(false);
+
+    assertEquals(1, controller.confirmCalls);
+    verify(resourceService, never()).delete(any());
+  }
+
+  @Test
+  void deleteErrorShowsErrorLabel() {
+    Resource resource = resource("Документ 1");
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource));
+    org.mockito.Mockito.doThrow(new ServiceException("Удаление запрещено"))
+        .when(resourceService)
+        .delete(resource.getUuid());
+
+    fireSearch(robot, "");
+    waitForLoadComplete(robot);
+    fireDelete(true);
+    waitForLoadComplete(robot);
+
+    Label error = robot.lookup("#errorLabel").queryAs(Label.class);
+    assertTrue(error.isVisible());
+    assertEquals("Удаление запрещено", error.getText());
+  }
+
+  @Test
+  void moderatorDeleteClickOpensConfirmationModal() {
+    givenModeratorPageWithResource(resource("Документ 1"));
+
+    Thread clicker = clickDeleteNoWait();
+    DialogPane dialog = waitForDialog(robot);
+
+    assertTrue(dialog.getScene().getWindow().isShowing(), "модалка удаления не открылась");
+    assertEquals("Удалить ресурс?", dialog.getHeaderText());
+    assertEquals(
+        "«Документ 1» будет удалён без возможности восстановления.", dialog.getContentText());
+
+    pressDialogButton(robot, dialog, ButtonType.CANCEL);
+    waitForClicker(clicker);
+
+    assertModalClosed(robot);
+    assertEquals(1, controller.confirmCalls);
+    verify(resourceService, never()).delete(any());
+    assertEquals(1, rows(robot).size());
+  }
+
+  @Test
+  void confirmingModalClosesItAndDeletesResource() {
+    Resource resource = resource("Документ 1");
+    givenModeratorPageWithResource(resource);
+
+    Thread clicker = clickDeleteNoWait();
+    DialogPane dialog = waitForDialog(robot);
+    pressDialogButton(robot, dialog, ButtonType.OK);
+    waitForClicker(clicker);
+
+    assertModalClosed(robot);
+    waitForLoadComplete(robot);
+
+    verify(resourceService).delete(resource.getUuid());
+  }
+
+  /**
+   * Дано: пользователь с ролью МОДЕР на странице просмотра ресурсов, в списке есть хотя бы один
+   * ресурс. Настоящий диалог подтверждения включён ({@code stubConfirm = false}), первая строка
+   * выбрана — страница готова к клику по удалению.
+   */
+  private void givenModeratorPageWithResource(Resource resource) {
+    when(resourceService.search(any(), anyLong(), anyLong(), anyString(), anyString()))
+        .thenReturn(List.of(resource));
+    robot.interact(
+        () -> {
+          when(authService.isAdmin()).thenReturn(false);
+          when(authService.isModerator()).thenReturn(true);
+          loadPage();
+          controller.stubConfirm = false;
+        });
+    waitForLoadComplete(robot);
+    selectFirstRow(robot);
+  }
+
+  private static void assertModalClosed(FxRobot robot) {
+    assertTrue(robot.lookup(".dialog-pane").tryQuery().isEmpty(), "модалка удаления не закрылась");
+  }
+
   private Resource resource(String title) {
     return new Resource(
         UUID.randomUUID(),
@@ -285,6 +495,65 @@ class ResourceListControllerTest extends FxTestBase {
           field.setText(query);
           field.getOnAction().handle(new ActionEvent());
         });
+  }
+
+  /**
+   * Selects the first row and fires the delete button action directly: the confirmation {@code
+   * Alert} is stubbed through {@link TestableListController#confirmDeleteResult}, because a real
+   * modal dialog blocks headless Monocle.
+   */
+  private void fireDelete(boolean confirm) {
+    controller.confirmDeleteResult = confirm;
+    selectFirstRow(robot);
+    robot.interact(
+        () ->
+            robot
+                .lookup("#deleteButton")
+                .queryAs(Button.class)
+                .getOnAction()
+                .handle(new ActionEvent()));
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void selectFirstRow(FxRobot robot) {
+    robot.interact(
+        () ->
+            robot.lookup("#resourceTable").queryAs(TableView.class).getSelectionModel().select(0));
+  }
+
+  /**
+   * Нажимает кнопку удаления, не дожидаясь закрытия модального окна: настоящий {@code Alert}
+   * блокирует поток JavaFX через {@code showAndWait}, поэтому клик уходит в отдельный поток, а тест
+   * продолжает работать с диалогом.
+   */
+  private Thread clickDeleteNoWait() {
+    Button delete = robot.lookup("#deleteButton").queryAs(Button.class);
+    Thread clicker = new Thread(() -> robot.interact(delete::fire), "delete-click");
+    clicker.setDaemon(true);
+    clicker.start();
+    return clicker;
+  }
+
+  private static DialogPane waitForDialog(FxRobot robot) {
+    try {
+      WaitForAsyncUtils.waitFor(
+          30, TimeUnit.SECONDS, () -> !robot.lookup(".dialog-pane").tryQuery().isEmpty());
+    } catch (TimeoutException e) {
+      throw new AssertionError("Не дождались модального окна подтверждения удаления", e);
+    }
+    return robot.lookup(".dialog-pane").queryAs(DialogPane.class);
+  }
+
+  private static void pressDialogButton(FxRobot robot, DialogPane dialog, ButtonType type) {
+    robot.interact(() -> ((Button) dialog.lookupButton(type)).fire());
+  }
+
+  private static void waitForClicker(Thread clicker) {
+    try {
+      WaitForAsyncUtils.waitFor(30, TimeUnit.SECONDS, () -> !clicker.isAlive());
+    } catch (TimeoutException e) {
+      throw new AssertionError("Клик по удалению не завершился после закрытия диалога", e);
+    }
   }
 
   /** The controller loads data on a background thread; wait until the status clears. */

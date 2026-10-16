@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -50,6 +51,9 @@ class ResourceDetailsControllerTest {
 
   static class TestableResourceDetailsController extends ResourceDetailsController {
     private File directory;
+    boolean confirmDeleteResult = true;
+    boolean stubConfirm = true;
+    int confirmCalls = 0;
 
     void setDirectory(File directory) {
       this.directory = directory;
@@ -58,6 +62,15 @@ class ResourceDetailsControllerTest {
     @Override
     protected File chooseDirectory(Window owner) {
       return directory;
+    }
+
+    @Override
+    protected boolean confirmDelete() {
+      confirmCalls++;
+      if (stubConfirm) {
+        return confirmDeleteResult;
+      }
+      return super.confirmDelete();
     }
   }
 
@@ -175,6 +188,48 @@ class ResourceDetailsControllerTest {
   void backNavigatesToResourceList() {
     controller.onBack(new ActionEvent());
     verify(navigator).goTo("/fxml/ResourceList.fxml");
+  }
+
+  @Test
+  void confirmedDeleteCallsServiceAndNavigatesToList() {
+    when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
+    controller.setResourceId(RESOURCE_ID);
+    controller.confirmDeleteResult = true;
+
+    controller.onDelete(new ActionEvent());
+
+    verify(resourceService).delete(RESOURCE_ID);
+    verify(navigator).goTo("/fxml/ResourceList.fxml");
+    assertFalse(controller.errorLabel.isVisible());
+  }
+
+  @Test
+  void cancelledDeleteDoesNotCallServiceNorNavigate() {
+    when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
+    controller.setResourceId(RESOURCE_ID);
+    controller.confirmDeleteResult = false;
+
+    controller.onDelete(new ActionEvent());
+
+    assertEquals(1, controller.confirmCalls);
+    verify(resourceService, never()).delete(any());
+    verifyNoInteractions(navigator);
+  }
+
+  @Test
+  void deleteErrorShowsInErrorLabelWithoutNavigation() {
+    when(resourceService.getById(RESOURCE_ID)).thenReturn(resourceWithFiles());
+    controller.setResourceId(RESOURCE_ID);
+    controller.confirmDeleteResult = true;
+    org.mockito.Mockito.doThrow(new ServiceException("Удаление запрещено"))
+        .when(resourceService)
+        .delete(RESOURCE_ID);
+
+    controller.onDelete(new ActionEvent());
+
+    assertTrue(controller.errorLabel.isVisible());
+    assertEquals("Удаление запрещено", controller.errorLabel.getText());
+    verify(navigator, never()).goTo(any());
   }
 
   private Resource resourceWithFiles() {

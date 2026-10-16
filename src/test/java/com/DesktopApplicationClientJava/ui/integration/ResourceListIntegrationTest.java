@@ -2,6 +2,7 @@ package com.DesktopApplicationClientJava.ui.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.mock;
@@ -10,6 +11,7 @@ import com.DesktopApplicationClientJava.Api.ApiClient;
 import com.DesktopApplicationClientJava.controllers.ResourceListController;
 import com.DesktopApplicationClientJava.entities.Resource;
 import com.DesktopApplicationClientJava.navigation.Navigator;
+import com.DesktopApplicationClientJava.services.ServiceException;
 import com.DesktopApplicationClientJava.services.ServiceRegistry;
 import com.DesktopApplicationClientJava.services.filter.ResourceFilter;
 import com.DesktopApplicationClientJava.services.impl.AuthServiceImpl;
@@ -25,7 +27,10 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -194,6 +199,45 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
     }
   }
 
+  /**
+   * Полный цикл удаления глазами пользователя с правами МОДЕР и выше (вход как ADMIN, который по
+   * иерархии ролей включает права МОДЕР): ресурс виден в списке, клик по «Удалить» открывает
+   * модалку, подтверждение закрывает её и удаляет ресурс на бэкенде.
+   */
+  @Test
+  void deleteCycleRemovesResourceFromBackend() {
+    loginAsAdmin();
+    String title = "IT ResourceDelete " + UUID.randomUUID();
+    Resource created = resourceService.create(title, "created by ResourceListIntegrationTest");
+    try {
+      loadListPage(robot);
+      // Дождаться начальной загрузки (пустой фильтр), иначе она может финишировать позже поиска
+      // и перетереть таблицу полным списком.
+      waitForLoadComplete(robot);
+
+      searchFor(robot, title);
+      waitForLoadComplete(robot);
+      assertEquals(1, rows(robot).size(), () -> "diagnostics: " + diagnostics(robot));
+
+      selectFirstRow(robot);
+
+      Thread clicker = clickDeleteNoWait(robot);
+      DialogPane dialog = waitForDialog(robot);
+      assertTrue(dialog.getScene().getWindow().isShowing(), "модалка удаления не открылась");
+      pressDialogButton(robot, dialog, ButtonType.OK);
+      waitForClicker(clicker);
+      waitForLoadComplete(robot);
+
+      assertTrue(
+          robot.lookup(".dialog-pane").tryQuery().isEmpty(), "модалка удаления не закрылась");
+      assertTrue(rows(robot).isEmpty());
+      assertEquals("Показано 0–0", textOf(robot, "#pageInfoLabel"));
+      assertThrows(ServiceException.class, () -> resourceService.getById(created.getUuid()));
+    } finally {
+      deleteQuietly(created.getUuid());
+    }
+  }
+
   private void loginAsAdmin() {
     assumeTrue(
         adminPassword != null && !adminPassword.isBlank(),
@@ -276,6 +320,48 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
   @SuppressWarnings("unchecked")
   private static List<Resource> rows(FxRobot robot) {
     return robot.lookup("#resourceTable").queryAs(TableView.class).getItems();
+  }
+
+  @SuppressWarnings("unchecked")
+  private static void selectFirstRow(FxRobot robot) {
+    robot.interact(
+        () ->
+            robot.lookup("#resourceTable").queryAs(TableView.class).getSelectionModel().select(0));
+  }
+
+  /**
+   * Нажимает кнопку удаления, не дожидаясь закрытия модального окна: настоящий {@code Alert}
+   * блокирует поток JavaFX через {@code showAndWait}, поэтому клик уходит в отдельный поток, а тест
+   * продолжает работать с диалогом.
+   */
+  private static Thread clickDeleteNoWait(FxRobot robot) {
+    Button delete = robot.lookup("#deleteButton").queryAs(Button.class);
+    Thread clicker = new Thread(() -> robot.interact(delete::fire), "it-delete-click");
+    clicker.setDaemon(true);
+    clicker.start();
+    return clicker;
+  }
+
+  private static DialogPane waitForDialog(FxRobot robot) {
+    try {
+      WaitForAsyncUtils.waitFor(
+          30, TimeUnit.SECONDS, () -> !robot.lookup(".dialog-pane").tryQuery().isEmpty());
+    } catch (TimeoutException e) {
+      throw new AssertionError("Не дождались модального окна подтверждения удаления", e);
+    }
+    return robot.lookup(".dialog-pane").queryAs(DialogPane.class);
+  }
+
+  private static void pressDialogButton(FxRobot robot, DialogPane dialog, ButtonType type) {
+    robot.interact(() -> ((Button) dialog.lookupButton(type)).fire());
+  }
+
+  private static void waitForClicker(Thread clicker) {
+    try {
+      WaitForAsyncUtils.waitFor(30, TimeUnit.SECONDS, () -> !clicker.isAlive());
+    } catch (TimeoutException e) {
+      throw new AssertionError("Клик по удалению не завершился после закрытия диалога", e);
+    }
   }
 
   private static String textOf(FxRobot robot, String query) {
