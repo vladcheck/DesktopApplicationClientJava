@@ -29,8 +29,6 @@ public class UserCreateFormController extends Controller {
             Role.USER.toString(), Role.MODER.toString(), Role.ADMIN.toString()));
     // Установить значение по умолчанию (опционально)
     rolesChoiceBox.setValue(Role.USER.toString());
-
-    System.out.println(rolesChoiceBox.getValue());
   }
 
   @FXML
