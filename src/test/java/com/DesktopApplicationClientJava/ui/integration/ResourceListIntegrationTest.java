@@ -39,6 +39,7 @@ import javafx.stage.Stage;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.testfx.api.FxRobot;
 import org.testfx.api.FxToolkit;
@@ -236,6 +237,14 @@ class ResourceListIntegrationTest extends IntegrationTestCase {
     } finally {
       deleteQuietly(created.getUuid());
     }
+  }
+
+  @Test
+  @Disabled("Невоспроизводим: в дев-бэкенде засеян только ADMIN, сида MODER нет")
+  void deleteCycleAsModerator() {
+    // Живой цикл удаления за МОДЕР (не админа) невоспроизводим: интеграционное окружение
+    // предоставляет только IT_ADMIN_EMAIL/IT_ADMIN_PASSWORD, отдельного пользователя с ролью
+    // MODER в сидах бэкенда нет. RBAC-видимость кнопок покрыта мок-тестами.
   }
 
   private void loginAsAdmin() {
