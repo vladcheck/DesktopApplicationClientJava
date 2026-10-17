@@ -26,6 +26,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.stage.Window;
 
 public class ResourceDetailsController extends Controller {
@@ -44,21 +45,20 @@ public class ResourceDetailsController extends Controller {
   @FXML TableColumn<FileInfo, String> sizeColumn;
   @FXML TableColumn<FileInfo, String> contentTypeColumn;
   @FXML TableColumn<FileInfo, Void> downloadColumn;
+  @FXML TableColumn<FileInfo, Void> deleteFileColumn;
   @FXML Button backButton;
   @FXML Button editButton;
   @FXML Button deleteButton;
+  @FXML Button addFileButton;
+
+  private UUID resourceId;
+  private boolean canModifyFiles;
 
   @Override
   protected Label getErrorLabel() {
     return errorLabel;
   }
 
-  private UUID resourceId;
-
-  /**
-   * Navigator sets the id <i>after</i> FXML load (see {@code Navigator.goTo}), so the setter itself
-   * must load the resource when the view is already initialized.
-   */
   public void setResourceId(UUID resourceId) {
     this.resourceId = resourceId;
     if (titleLabel != null && resourceId != null && services != null) {
@@ -94,10 +94,19 @@ public class ResourceDetailsController extends Controller {
     // NB: services/getAuthService may be a partial mock in tests — stay null-safe.
     var authService = services == null ? null : services.getAuthService();
     boolean canEdit = authService != null && (authService.isAdmin() || authService.isModerator());
+    canModifyFiles = canEdit;
+
     editButton.setVisible(canEdit);
     editButton.setManaged(canEdit);
     deleteButton.setVisible(canEdit);
     deleteButton.setManaged(canEdit);
+
+    addFileButton.setVisible(canEdit);
+    addFileButton.setManaged(canEdit);
+
+    deleteFileColumn.setCellFactory(col -> new DeleteFileCell(this::onDeleteFile));
+    deleteFileColumn.setVisible(canEdit);
+
     autoSelectFirstInMockMode();
   }
 
@@ -115,6 +124,8 @@ public class ResourceDetailsController extends Controller {
     navigator.goTo("/fxml/ResourceList.fxml");
   }
 
+  // ===== Скачивание =====
+
   @FXML
   void onDownload(FileInfo file) {
     File dir = chooseDirectory(backButton.getScene().getWindow());
@@ -129,15 +140,65 @@ public class ResourceDetailsController extends Controller {
     }
   }
 
+  // ===== Добавление файла =====
+
+  @FXML
+  void onAddFile(ActionEvent event) {
+    if (resourceId == null) {
+      return;
+    }
+    File file = chooseFile(backButton.getScene().getWindow());
+    if (file == null) {
+      return;
+    }
+    try {
+      services.getFileService().uploadFile(resourceId, file.toPath());
+      statusLabel.setText("Файл добавлен: " + file.getName());
+      load(); // перезагружаем resource, чтобы таблица файлов обновилась
+    } catch (ServiceException e) {
+      showError(e);
+    }
+  }
+
+  // ===== Удаление файла =====
+
+  @FXML
+  void onDeleteFile(FileInfo file) {
+    if (resourceId == null || file == null) {
+      return;
+    }
+    if (!confirmDeleteFile(file)) {
+      return;
+    }
+    try {
+      services.getFileService().deleteFile(resourceId, file.getUuid());
+      statusLabel.setText("Файл удалён: " + file.getName());
+      load();
+    } catch (ServiceException e) {
+      showError(e);
+    }
+  }
+
+  // ===== Диалоги, выделены ради тестов =====
+
   protected File chooseDirectory(Window owner) {
     return new DirectoryChooser().showDialog(owner);
   }
 
-  /**
-   * Dev-only fallback: when the page is opened without an id (e.g. straight via INITIAL_PAGE_PATH)
-   * against a mock service, show the first seeded resource so the UI is clickable without the
-   * resource list. Never triggers against the real backend.
-   */
+  protected File chooseFile(Window owner) {
+    return new FileChooser().showOpenDialog(owner);
+  }
+
+  protected boolean confirmDeleteFile(FileInfo file) {
+    var alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle("Удаление файла");
+    alert.setHeaderText("Удалить файл?");
+    alert.setContentText("«" + file.getName() + "» будет удалён без возможности восстановления.");
+    return alert.showAndWait().map(b -> b == ButtonType.OK).orElse(false);
+  }
+
+  // ===== Мок-режим =====
+
   private void autoSelectFirstInMockMode() {
     if (resourceId != null
         || services == null
@@ -149,7 +210,7 @@ public class ResourceDetailsController extends Controller {
     services.getResourceService().search(ResourceFilter.empty(), 0, 1).stream()
         .map(Resource::getUuid)
         .findFirst()
-        .ifPresent(this::setResourceId); // the setter loads the resource
+        .ifPresent(this::setResourceId);
   }
 
   private void showResource(Resource resource) {
@@ -174,6 +235,8 @@ public class ResourceDetailsController extends Controller {
     return String.format("%.1f GB", bytes / (1024.0 * 1024 * 1024));
   }
 
+  // ===== Ячейки таблицы =====
+
   private static final class DownloadCell extends TableCell<FileInfo, Void> {
     private final Button button = new Button("Скачать");
 
@@ -188,6 +251,23 @@ public class ResourceDetailsController extends Controller {
       setGraphic(empty ? null : button);
     }
   }
+
+  private static final class DeleteFileCell extends TableCell<FileInfo, Void> {
+    private final Button button = new Button("Удалить");
+
+    DeleteFileCell(Consumer<FileInfo> onDelete) {
+      button.getStyleClass().setAll("btn-danger");
+      button.setOnAction(event -> onDelete.accept(getTableView().getItems().get(getIndex())));
+    }
+
+    @Override
+    protected void updateItem(Void item, boolean empty) {
+      super.updateItem(item, empty);
+      setGraphic(empty ? null : button);
+    }
+  }
+
+  // ===== Ресурс: edit/delete (без изменений) =====
 
   @FXML
   private void onEdit(ActionEvent event) {
@@ -209,10 +289,6 @@ public class ResourceDetailsController extends Controller {
     navigator.goTo("/fxml/ResourceList.fxml");
   }
 
-  /**
-   * Диалог подтверждения удаления. Выделен в метод ради тестов: headless {@code Alert} блокирует
-   * поток, поэтому тесты переопределяют его без UI.
-   */
   protected boolean confirmDelete() {
     var alert = new Alert(Alert.AlertType.CONFIRMATION);
     alert.setTitle("Удаление ресурса");

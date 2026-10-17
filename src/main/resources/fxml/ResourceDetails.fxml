@@ -66,16 +66,24 @@
                maxWidth="Infinity"/>
 
         <VBox spacing="6">
-            <Label text="Файлы" styleClass="field-label"/>
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <Label text="Файлы" styleClass="field-label"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="addFileButton"
+                        text="+ Добавить файл"
+                        onAction="#onAddFile"
+                        styleClass="btn-primary"/>
+            </HBox>
             <TableView fx:id="filesTable"
                        styleClass="modern-table"
                        prefHeight="220"
                        maxWidth="Infinity">
                 <columns>
-                    <TableColumn fx:id="nameColumn"        text="Имя"    prefWidth="280"/>
-                    <TableColumn fx:id="sizeColumn"        text="Размер" prefWidth="100"/>
-                    <TableColumn fx:id="contentTypeColumn" text="Тип"    prefWidth="180"/>
-                    <TableColumn fx:id="downloadColumn"    text=""       prefWidth="120" sortable="false"/>
+                    <TableColumn fx:id="nameColumn"         text="Имя"    prefWidth="240"/>
+                    <TableColumn fx:id="sizeColumn"         text="Размер" prefWidth="90"/>
+                    <TableColumn fx:id="contentTypeColumn"  text="Тип"    prefWidth="150"/>
+                    <TableColumn fx:id="downloadColumn"     text=""       prefWidth="110" sortable="false"/>
+                    <TableColumn fx:id="deleteFileColumn"   text=""       prefWidth="110" sortable="false"/>
                 </columns>
             </TableView>
         </VBox>
