@@ -13,9 +13,9 @@
 <?import javafx.scene.layout.VBox?>
 
 <StackPane xmlns:fx="http://javafx.com/fxml/1"
-           fx:id="root"
-           styleClass="auth-bg"
-           fx:controller="com.DesktopApplicationClientJava.controllers.ResourceListController">
+            fx:id="root"
+            styleClass="auth-bg"
+            fx:controller="com.DesktopApplicationClientJava.controllers.ResourceListController">
 
     <VBox styleClass="page-shell" spacing="18" maxWidth="1080" maxHeight="Infinity">
 
@@ -56,33 +56,33 @@
 
             <HBox spacing="12" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField"
-                           promptText="Поиск по названию..."
-                           onAction="#onSearch"
-                           styleClass="text-input"
-                           HBox.hgrow="ALWAYS"/>
+                        promptText="Поиск по названию..."
+                        onAction="#onSearch"
+                        styleClass="text-input"
+                        HBox.hgrow="ALWAYS"/>
                 <TextField fx:id="descriptionField"
-                           promptText="Поиск по описанию..."
-                           onAction="#onSearch"
-                           styleClass="text-input"
-                           HBox.hgrow="ALWAYS"/>
+                        promptText="Поиск по описанию..."
+                        onAction="#onSearch"
+                        styleClass="text-input"
+                        HBox.hgrow="ALWAYS"/>
                 <ComboBox fx:id="sortCombo"
-                          onAction="#onSort"
-                          styleClass="combo"
-                          prefWidth="220"/>
+                        onAction="#onSort"
+                        styleClass="combo"
+                        prefWidth="220"/>
             </HBox>
 
             <Label fx:id="errorLabel"
-                   styleClass="alert-danger"
-                   visible="false"
-                   managed="false"
-                   wrapText="true"
-                   maxWidth="Infinity"/>
+                styleClass="alert-danger"
+                visible="false"
+                managed="false"
+                wrapText="true"
+                maxWidth="Infinity"/>
 
             <TableView fx:id="resourceTable"
-                       styleClass="modern-table"
-                       VBox.vgrow="ALWAYS"
-                       prefHeight="380"
-                       >
+                    styleClass="modern-table"
+                    VBox.vgrow="ALWAYS"
+                    prefHeight="380"
+                    >
                 <columns>
                     <TableColumn fx:id="titleColumn"       text="Название"    prefWidth="280"/>
                     <TableColumn fx:id="descriptionColumn" text="Описание"    prefWidth="380"/>

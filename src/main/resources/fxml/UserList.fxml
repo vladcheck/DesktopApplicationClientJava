@@ -13,9 +13,9 @@
 <?import javafx.scene.layout.VBox?>
 
 <StackPane xmlns:fx="http://javafx.com/fxml/1"
-           fx:id="root"
-           styleClass="auth-bg"
-           fx:controller="com.DesktopApplicationClientJava.controllers.UsersListController">
+        fx:id="root"
+        styleClass="auth-bg"
+        fx:controller="com.DesktopApplicationClientJava.controllers.UsersListController">
 
     <VBox styleClass="page-shell" spacing="18" maxWidth="1080" maxHeight="Infinity">
 
@@ -54,29 +54,29 @@
             <!-- Поиск и сортировка -->
             <HBox spacing="12" alignment="CENTER_LEFT">
                 <TextField fx:id="searchField"
-                           promptText="Поиск по email, имени или фамилии..."
-                           onAction="#onSearch"
-                           styleClass="text-input"
-                           HBox.hgrow="ALWAYS"/>
+                        promptText="Поиск по email, имени или фамилии..."
+                        onAction="#onSearch"
+                        styleClass="text-input"
+                        HBox.hgrow="ALWAYS"/>
                 <ComboBox fx:id="sortCombo"
-                          onAction="#onSort"
-                          styleClass="combo"
-                          prefWidth="220"/>
+                        onAction="#onSort"
+                        styleClass="combo"
+                        prefWidth="220"/>
             </HBox>
 
             <!-- Ошибка -->
             <Label fx:id="errorLabel"
-                   styleClass="alert-danger"
-                   visible="false"
-                   managed="false"
-                   wrapText="true"
-                   maxWidth="Infinity"/>
+                styleClass="alert-danger"
+                visible="false"
+                managed="false"
+                wrapText="true"
+                maxWidth="Infinity"/>
 
             <!-- Таблица -->
             <TableView fx:id="usersTable"
-                       styleClass="modern-table"
-                       VBox.vgrow="ALWAYS"
-                       prefHeight="380">
+                    styleClass="modern-table"
+                    VBox.vgrow="ALWAYS"
+                    prefHeight="380">
                 <columns>
                     <TableColumn fx:id="emailColumn"     text="Почта"    prefWidth="240"/>
                     <TableColumn fx:id="firstNameColumn" text="Имя"      prefWidth="140"/>

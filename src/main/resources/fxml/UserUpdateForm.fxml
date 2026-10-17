@@ -11,15 +11,15 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns="http://javafx.com/javafx/17.0.12"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:id="root"
-      fx:controller="com.DesktopApplicationClientJava.controllers.UserUpdateFormController"
-      styleClass="auth-bg"
-      alignment="TOP_CENTER">
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:id="root"
+    fx:controller="com.DesktopApplicationClientJava.controllers.UserUpdateFormController"
+    styleClass="auth-bg"
+    alignment="TOP_CENTER">
 
     <VBox styleClass="card-lg"
-          spacing="18"
-          maxWidth="480">
+        spacing="18"
+        maxWidth="480">
 
         <!-- Заголовок -->
         <VBox spacing="4">
@@ -31,48 +31,48 @@
         <VBox spacing="6">
             <Label styleClass="field-label" text="Почта" labelFor="$emailField"/>
             <TextField fx:id="emailField"
-                       styleClass="text-input"
-                       promptText="youremail@example.com"/>
+                    styleClass="text-input"
+                    promptText="youremail@example.com"/>
         </VBox>
 
         <!-- Роль -->
         <VBox spacing="6">
             <Label styleClass="field-label" text="Роль" labelFor="$roleChoiceBox"/>
             <ChoiceBox fx:id="roleChoiceBox"
-                       styleClass="combo"
-                       maxWidth="Infinity"/>
+                    styleClass="combo"
+                    maxWidth="Infinity"/>
         </VBox>
 
         <!-- Имя -->
         <VBox spacing="6">
             <Label styleClass="field-label" text="Имя" labelFor="$firstNameField"/>
             <TextField fx:id="firstNameField"
-                       styleClass="text-input"
-                       promptText="Иван"/>
+                    styleClass="text-input"
+                    promptText="Иван"/>
         </VBox>
 
         <!-- Фамилия -->
         <VBox spacing="6">
             <Label styleClass="field-label" text="Фамилия" labelFor="$lastNameField"/>
             <TextField fx:id="lastNameField"
-                       styleClass="text-input"
-                       promptText="Иванов"/>
+                    styleClass="text-input"
+                    promptText="Иванов"/>
         </VBox>
 
         <!-- Активен -->
         <VBox spacing="6">
             <CheckBox fx:id="enabledCheckBox"
-                      text="Учётная запись активна"
-                      styleClass="field-label"/>
+                    text="Учётная запись активна"
+                    styleClass="field-label"/>
         </VBox>
 
         <!-- Ошибка -->
         <Label fx:id="errorLabel"
-               styleClass="alert-danger"
-               visible="false"
-               managed="false"
-               wrapText="true"
-               maxWidth="Infinity"/>
+            styleClass="alert-danger"
+            visible="false"
+            managed="false"
+            wrapText="true"
+            maxWidth="Infinity"/>
 
         <!-- Кнопки -->
         <HBox spacing="12" alignment="CENTER_RIGHT">

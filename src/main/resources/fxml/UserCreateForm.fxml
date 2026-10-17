@@ -33,8 +33,8 @@
       <VBox spacing="6">
          <Label styleClass="field-label" text="Почта" labelFor="$emailField"/>
          <TextField fx:id="emailField"
-                    styleClass="text-input"
-                    promptText="youremail@example.com"/>
+                  styleClass="text-input"
+                  promptText="youremail@example.com"/>
       </VBox>
 
       <!-- Пароль -->
@@ -49,8 +49,8 @@
       <VBox spacing="6">
          <Label styleClass="field-label" text="Роль" labelFor="$rolesChoiceBox"/>
          <ChoiceBox fx:id="rolesChoiceBox"
-                    styleClass="combo"
-                    maxWidth="Infinity">
+                  styleClass="combo"
+                  maxWidth="Infinity">
             <items>
                <FXCollections fx:factory="observableArrayList">
                   <String fx:value="Значение 1"/>
@@ -65,37 +65,37 @@
       <VBox spacing="6">
          <Label styleClass="field-label" text="Имя" labelFor="$firstNameField"/>
          <TextField fx:id="firstNameField"
-                    styleClass="text-input"
-                    promptText="Иван"/>
+                  styleClass="text-input"
+                  promptText="Иван"/>
       </VBox>
 
       <!-- Фамилия -->
       <VBox spacing="6">
          <Label styleClass="field-label" text="Фамилия" labelFor="$lastNameField"/>
          <TextField fx:id="lastNameField"
-                    styleClass="text-input"
-                    promptText="Иванов"/>
+                  styleClass="text-input"
+                  promptText="Иванов"/>
       </VBox>
 
       <!-- Ошибка -->
       <Label fx:id="errorLabel"
-             styleClass="alert-danger"
-             visible="false"
-             managed="false"
-             wrapText="true"
-             maxWidth="Infinity"/>
+            styleClass="alert-danger"
+            visible="false"
+            managed="false"
+            wrapText="true"
+            maxWidth="Infinity"/>
 
       <!-- Кнопки -->
       <HBox spacing="12" alignment="CENTER_RIGHT">
          <Button fx:id="cancelButton"
-                 text="Отмена"
-                 onAction="#onCancel"
-                 styleClass="btn-ghost"/>
+               text="Отмена"
+               onAction="#onCancel"
+               styleClass="btn-ghost"/>
          <Button fx:id="submitButton"
-                 text="Создать"
-                 onAction="#onSubmit"
-                 styleClass="btn-primary"
-                 defaultButton="true"/>
+               text="Создать"
+               onAction="#onSubmit"
+               styleClass="btn-primary"
+               defaultButton="true"/>
       </HBox>
    </VBox>
 

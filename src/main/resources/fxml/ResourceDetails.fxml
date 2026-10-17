@@ -10,14 +10,14 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:id="root"
-      styleClass="auth-bg"
-      alignment="TOP_CENTER"
-      fx:controller="com.DesktopApplicationClientJava.controllers.ResourceDetailsController">
+    fx:id="root"
+    styleClass="auth-bg"
+    alignment="TOP_CENTER"
+    fx:controller="com.DesktopApplicationClientJava.controllers.ResourceDetailsController">
 
     <VBox styleClass="card-lg"
-          spacing="16"
-          maxWidth="720">
+        spacing="16"
+        maxWidth="720">
 
         <HBox alignment="CENTER_LEFT" spacing="12">
             <Button fx:id="backButton"
@@ -39,8 +39,8 @@
         <VBox spacing="6">
             <Label fx:id="titleLabel" styleClass="card-title" text="..."/>
             <Label fx:id="descriptionLabel"
-                   styleClass="card-subtitle"
-                   wrapText="true"/>
+                styleClass="card-subtitle"
+                wrapText="true"/>
         </VBox>
 
         <VBox spacing="6" styleClass="meta-block">
@@ -59,18 +59,18 @@
         </VBox>
 
         <Label fx:id="errorLabel"
-               styleClass="alert-danger"
-               visible="false"
-               managed="false"
-               wrapText="true"
-               maxWidth="Infinity"/>
+            styleClass="alert-danger"
+            visible="false"
+            managed="false"
+            wrapText="true"
+            maxWidth="Infinity"/>
 
         <VBox spacing="6">
             <Label text="Файлы" styleClass="field-label"/>
             <TableView fx:id="filesTable"
-                       styleClass="modern-table"
-                       prefHeight="220"
-                       maxWidth="Infinity">
+                    styleClass="modern-table"
+                    prefHeight="220"
+                    maxWidth="Infinity">
                 <columns>
                     <TableColumn fx:id="nameColumn"        text="Имя"    prefWidth="280"/>
                     <TableColumn fx:id="sizeColumn"        text="Размер" prefWidth="100"/>

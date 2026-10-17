@@ -9,14 +9,14 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:id="root"
-      styleClass="auth-bg"
-      alignment="TOP_CENTER"
-      fx:controller="com.DesktopApplicationClientJava.controllers.ResourceFormController">
+    fx:id="root"
+    styleClass="auth-bg"
+    alignment="TOP_CENTER"
+    fx:controller="com.DesktopApplicationClientJava.controllers.ResourceFormController">
 
     <VBox styleClass="card-lg"
-          spacing="18"
-          maxWidth="600">
+        spacing="18"
+        maxWidth="600">
 
         <!-- Заголовок -->
         <VBox spacing="4">
@@ -28,27 +28,27 @@
         <VBox spacing="6">
             <Label text="Название" styleClass="field-label" labelFor="$titleField"/>
             <TextField fx:id="titleField"
-                       styleClass="text-input"
-                       promptText="Например: Годовой отчёт"/>
+                    styleClass="text-input"
+                    promptText="Например: Годовой отчёт"/>
         </VBox>
 
         <!-- Описание -->
         <VBox spacing="6">
             <Label text="Описание" styleClass="field-label" labelFor="$descriptionArea"/>
             <TextArea fx:id="descriptionArea"
-                      styleClass="text-area"
-                      promptText="Краткое описание документа"
-                      wrapText="true"
-                      prefRowCount="5"/>
+                    styleClass="text-area"
+                    promptText="Краткое описание документа"
+                    wrapText="true"
+                    prefRowCount="5"/>
         </VBox>
 
         <!-- Ошибка -->
         <Label fx:id="errorLabel"
-               styleClass="alert-danger"
-               visible="false"
-               managed="false"
-               wrapText="true"
-               maxWidth="Infinity"/>
+            styleClass="alert-danger"
+            visible="false"
+            managed="false"
+            wrapText="true"
+            maxWidth="Infinity"/>
 
         <!-- Кнопки -->
         <HBox spacing="12" alignment="CENTER_RIGHT">

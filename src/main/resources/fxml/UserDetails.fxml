@@ -8,14 +8,14 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:id="root"
-      styleClass="auth-bg"
-      alignment="TOP_CENTER"
-      fx:controller="com.DesktopApplicationClientJava.controllers.UserDetailsController">
+    fx:id="root"
+    styleClass="auth-bg"
+    alignment="TOP_CENTER"
+    fx:controller="com.DesktopApplicationClientJava.controllers.UserDetailsController">
 
     <VBox styleClass="card-lg"
-          spacing="16"
-          maxWidth="720">
+        spacing="16"
+        maxWidth="720">
 
         <!-- Верхняя панель: назад / редактировать / статус -->
         <HBox alignment="CENTER_LEFT" spacing="12">
@@ -59,11 +59,11 @@
 
         <!-- Ошибка -->
         <Label fx:id="errorLabel"
-               styleClass="alert-danger"
-               visible="false"
-               managed="false"
-               wrapText="true"
-               maxWidth="Infinity"/>
+            styleClass="alert-danger"
+            visible="false"
+            managed="false"
+            wrapText="true"
+            maxWidth="Infinity"/>
 
     </VBox>
 

@@ -8,51 +8,51 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox xmlns:fx="http://javafx.com/fxml/1"
-      fx:id="root"
-      styleClass="auth-bg"
-      alignment="CENTER"
-      fx:controller="com.DesktopApplicationClientJava.controllers.LoginFormController">
+    fx:id="root"
+    styleClass="auth-bg"
+    alignment="CENTER"
+    fx:controller="com.DesktopApplicationClientJava.controllers.LoginFormController">
 
     <VBox styleClass="card"
-          spacing="18"
-          alignment="TOP_LEFT"
-          maxWidth="420">
+        spacing="18"
+        alignment="TOP_LEFT"
+        maxWidth="420">
 
         <VBox spacing="4">
-            <Label text="Госхрон" styleClass="card-title"/>
-            <Label text="Войдите в свой аккаунт" styleClass="card-subtitle"/>
+            <Label text="Госхрон" styleClass="card-title" />
+            <Label text="Войдите в свой аккаунт" styleClass="card-subtitle" />
         </VBox>
 
         <VBox spacing="6">
-            <Label text="Почта" styleClass="field-label" labelFor="$emailField"/>
+            <Label text="Почта" styleClass="field-label" labelFor="$emailField" />
             <TextField fx:id="emailField"
-                       promptText="youremail@example.com"
-                       styleClass="text-input"/>
+                promptText="youremail@example.com"
+                styleClass="text-input" />
         </VBox>
 
         <VBox spacing="6">
-            <Label text="Пароль" styleClass="field-label" labelFor="$passwordField"/>
+            <Label text="Пароль" styleClass="field-label" labelFor="$passwordField" />
             <PasswordField fx:id="passwordField"
-                           promptText="••••••••"
-                           styleClass="text-input"/>
+                promptText="••••••••"
+                styleClass="text-input" />
         </VBox>
 
         <Label fx:id="errorLabel"
-               styleClass="alert-danger"
-               visible="false"
-               managed="false"
-               wrapText="true"
-               maxWidth="Infinity"/>
+            styleClass="alert-danger"
+            visible="false"
+            managed="false"
+            wrapText="true"
+            maxWidth="Infinity" />
 
         <Button fx:id="submitButton"
-                text="Войти"
-                onAction="#onSubmit"
-                styleClass="btn-primary"
-                maxWidth="Infinity"
-                defaultButton="true"/>
+            text="Войти"
+            onAction="#onSubmit"
+            styleClass="btn-primary"
+            maxWidth="Infinity"
+            defaultButton="true" />
     </VBox>
 
     <padding>
-        <Insets top="24" right="24" bottom="24" left="24"/>
+        <Insets top="24" right="24" bottom="24" left="24" />
     </padding>
 </VBox>
